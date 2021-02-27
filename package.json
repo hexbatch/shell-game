@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "@popperjs/core": "^2.8.6",
+    "ace-builds": "^1.4.12",
+    "bootstrap": "^4.6.0",
+    "jquery": "^3.5.1"
+  },
+  "license": "MIT",
+  "name": "shell-game",
+  "description": "Used to explore some concepts with the hexbatch library",
+  "version": "0.0.1",
+  "keywords": [
+    "hexbatch"
+  ],
+  "homepage": "https://hexbatch.com/shell-game",
+  "author": "Will Woodlief",
+  "contributors": [
+    "Will Woodlief"
+  ]
+}
