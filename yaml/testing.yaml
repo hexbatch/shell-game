@@ -1,0 +1,28 @@
+author: Will
+date: 2021-03-10
+elements:
+  - element_variables:
+      - variable_name: betty
+        variable_initial_value: whatt??
+        variable_current_value: 3.141568
+      - variable_name: harvey
+        variable_initial_value: 11
+        variable_current_value: nyet
+    element_gloms:
+      - glom_target_name: 'sam'
+        glom_current_value: 'wise'
+      - glom_target_name: 'lot'
+        glom_current_value: null
+    element_script: "let i = sam; if (sam > 90) {betty++;}"
+    element_name: 'Test 101'
+  - element_variables: []
+    element_gloms: []
+    element_name: "hope"
+    element_script: |
+      function() { Arbitrary free text
+      over "multiple lines" stopping
+      after indentation changes...
+      let y = "ok" + '\n';
+      }
+other_thing: ok
+

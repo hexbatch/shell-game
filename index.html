@@ -8,15 +8,84 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="node_modules/bootstrap/dist/css/bootstrap.min.css" >
 
+    <!-- Toast Wrapper -->
+    <link rel="stylesheet" href="node_modules/bs4-toast/dist/toast.min.css ">
+
+    <!-- My Styles-->
+    <link rel="stylesheet" href="css/shell-style.css" >
+
     <title>Shell Game</title>
 </head>
 <body>
-<h1>Shell Emulator</h1>
 
-<!-- Optional JavaScript -->
+
+<div class="container-fluid mx-3 mt-3">
+
+    <div class="row">
+        <div class="col col-sm-2 col-md">
+            <!-- space for future -->
+        </div>
+        <div class="col col-sm-8 col-md-6">
+            <h1>Shell Emulator</h1>
+        </div>
+        <div class="col col-sm-2 col-md">
+            <!-- space for future -->
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col col-sm-12 col-md-12 col-lg order-1 order-lg-2 mr-lg-2">
+            <div class="card " >
+                <div class="card-body">
+                    <h5 class="card-title">Start with Yaml</h5>
+                    <p class="card-text  ">
+                        <label class="bg-warning text-dark p-2">Any glom values will be nulled out, initial variable values set</label>
+                        <button id="shell-game-start" type="button" class="btn btn-warning border border-light">Start</button>
+                    </p>
+                </div>
+
+                <div class="card-body">
+                    <h5 class="card-title">Continue</h5>
+                    <p class="card-text ">
+
+                        <label class="bg-success text-white p-2">Use current variable and glom values</label>
+                        <button id="shell-game-step" type="button" class="btn btn-success border border-dark">Step</button>
+                    </p>
+                </div>
+
+
+
+            </div> <!-- /.card -->
+        </div>
+
+        <div class="col-11 col-sm-12 col-md-12 col-lg-10 order-2 order-lg-1">
+            <div class="card " >
+                <div class="card-body">
+                    <h5 class="card-title">Yaml Display</h5>
+                    <div class="card-text shell-game-yaml-holder">
+                        <div id="shell-game-editor"></div>
+                    </div> <!-- /.shell-game-holder -->
+                </div> <!-- /.card-body -->
+            </div> <!-- /.card -->
+        </div>
+
+    </div>
+
+</div>
+
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="node_modules/jquery/dist/jquery.min.js" ></script>
 <script src="node_modules/@popperjs/core/dist/umd/popper.min.js" ></script>
 <script src="node_modules/bootstrap/dist/js/bootstrap.min.js" ></script>
+<script src="node_modules/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+<script src="node_modules/bs4-toast/dist/toast.min.js"></script>
+<script src="node_modules/js-yaml/dist/js-yaml.min.js"></script>
+
+<!-- My Stuff-->
+<script src="js/helpers.js"></script>
+<script src="js/errors.js"></script>
+<script src="js/glob.js"></script>
+<script src="js/editor_gui.js"></script>
+<script src="js/shell-main.js"></script>
 </body>
 </html>

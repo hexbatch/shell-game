@@ -17,7 +17,7 @@ watch things change in the yaml or in the debugger by pressing the step button
     * Name
         * The name needs to be unique
     * Variables
-        * each variable has name, value
+        * each variable has name, value, and initial value, if no initial value default will be null at start
         * the value can be anything
         * Any variable can be used as a target for a glom
     * Gloms
@@ -47,20 +47,27 @@ watch things change in the yaml or in the debugger by pressing the step button
    * If more than one glom is found, then a random choice will be made
    * The glom values will be updated in the element in memory 
 * Second all the elements, in an undefined order, will run their scripts
-   * The script string will have a generated let and const definitions for the variables and gloms be prepended. So any declarations using the same names will be an error
-   * The script string will have a function call appended to the bottom that will have all the variables be passed in with their names and values 
+   * The script string will have a generated let and const definitions for the variables and gloms be prepended.
+     So any declarations using the same names will be an error
+   * The script string will have a function call appended to the bottom that will have all the variables
+     be passed in with their names and values 
        * This function will update the array of elements in memory
-   * The script string will be evalled, inside a handler to catch any exceptions , and exception will have its message put in the array node in memory
+   * The script string will be evalled, inside a handler to catch any exceptions ,
+     and exception will have its message put in the array node in memory
 * Third the yaml in the editor will be updated from the memory 
 
 Then the page will wait for the next step button press
 
 
-## Reference
+## Development Reference
 
-* https://ace.c9.io/
+* [Bootstrap](https://getbootstrap.com/)
+* [Ace JS library](https://ace.c9.io/) 
+* [Making MIT license](https://license-generator.intm.org/)
+* [Bootstrap 4 toast wrapper](https://github.com/Script47/Toast)
+* [Yaml Library](https://github.com/nodeca/js-yaml)
 
 
 ## Todo
 
-todo https://shields.io/category/version
+[Add Badges to other things](https://shields.io/category/version)
