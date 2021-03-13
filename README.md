@@ -6,7 +6,10 @@ Version 0.1
 
 There is no support for shells here, its just elements running in a single shell
 
-To use:
+####to install:
+run `yarn` at the root to install the js libraries
+
+####To use:
 Add in a new yaml or copy and paste it from somewhere, and press the run button to load in the elements and start fresh. 
 watch things change in the yaml or in the debugger by pressing the step button
 
@@ -66,6 +69,7 @@ Then the page will wait for the next step button press
 * [Making MIT license](https://license-generator.intm.org/)
 * [Bootstrap 4 toast wrapper](https://github.com/Script47/Toast)
 * [Yaml Library](https://github.com/nodeca/js-yaml)
+* [Lodash](https://lodash.com/)
 
 
 ## Todo

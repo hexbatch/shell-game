@@ -1,28 +1,37 @@
 author: Will
-date: 2021-03-10
+date: 2021-03-12
 elements:
-  - element_variables:
-      - variable_name: betty
-        variable_initial_value: whatt??
+  - element_name: "first"
+    element_variables:
+      - variable_name: apple
+        variable_initial_value: 1
         variable_current_value: 3.141568
-      - variable_name: harvey
-        variable_initial_value: 11
-        variable_current_value: nyet
+      - variable_name: baker
+        variable_initial_value: 'a string will go here'
+        variable_current_value: 0
     element_gloms:
-      - glom_target_name: 'sam'
-        glom_current_value: 'wise'
-      - glom_target_name: 'lot'
+      - glom_target_name: 'xer'
+        glom_current_value: 3
+        glom_reference_name: 'x'
+      - glom_target_name: 'yer'
         glom_current_value: null
-    element_script: "let i = sam; if (sam > 90) {betty++;}"
-    element_name: 'Test 101'
-  - element_variables: []
-    element_gloms: []
-    element_name: "hope"
+        glom_reference_name: 'y'
     element_script: |
-      function() { Arbitrary free text
-      over "multiple lines" stopping
-      after indentation changes...
-      let y = "ok" + '\n';
-      }
-other_thing: ok
+      this.apple = this.x * this.y;
+      this.baker = this.y + ' is y value';
+
+  - element_name: 'second'
+    element_variables:
+      - variable_name: xer
+        variable_initial_value: 1
+        variable_current_value: null
+      - variable_name: yer
+        variable_initial_value: 1
+        variable_current_value: null
+    element_gloms: []
+    element_script: |
+      this.xer ++;
+      this.yer --;
+
+notes: first test
 
