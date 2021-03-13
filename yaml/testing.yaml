@@ -1,37 +1,68 @@
 author: Will
 date: 2021-03-12
-elements:
-  - element_name: "first"
-    element_variables:
-      - variable_name: apple
-        variable_initial_value: 1
-        variable_current_value: 3.141568
-      - variable_name: baker
-        variable_initial_value: 'a string will go here'
-        variable_current_value: 0
-    element_gloms:
-      - glom_target_name: 'xer'
-        glom_current_value: 3
-        glom_reference_name: 'x'
-      - glom_target_name: 'yer'
-        glom_current_value: null
-        glom_reference_name: 'y'
-    element_script: |
-      this.apple = this.x * this.y;
-      this.baker = this.y + ' is y value';
 
-  - element_name: 'second'
+element_lib:
+  first:
+    - element_name: "first"
+      element_variables:
+        apple:
+         variable_name: apple
+         variable_initial_value: 1
+         variable_current_value: 3.141568
+        baker:
+          variable_name: baker
+          variable_initial_value: 'a string will go here'
+          variable_current_value: 0
+      element_gloms:
+        x:
+          glom_target_name: 'xer'
+          glom_current_value: 3
+          glom_reference_name: 'x'
+        y:
+          glom_target_name: 'yer'
+          glom_current_value: null
+          glom_reference_name: 'y'
+      element_script: |
+        this.apple = this.x * this.y;
+        this.baker = this.y + ' is y value';
+
+  second:
+    element_name: 'second'
     element_variables:
-      - variable_name: xer
+      xer:
+        variable_name: xer
         variable_initial_value: 1
         variable_current_value: null
-      - variable_name: yer
+      yer:
+        variable_name: yer
         variable_initial_value: 1
         variable_current_value: null
-    element_gloms: []
+    element_gloms: [ ]
     element_script: |
       this.xer ++;
       this.yer --;
+
+shell_lib:
+  main:
+    shell_name: main
+    parent: null
+    elements:
+      - element_name: first
+        element_init: original
+      - element_name: second
+        element_init: original
+
+running_shells:
+  main:
+    elements:
+      first:
+        variables:
+          apple: 1
+          baker: 'some string'
+      second:
+        variables:
+          xer: 1
+          yer: 1
 
 notes: first test
 
