@@ -45,24 +45,28 @@ element_lib:
 shell_lib:
   main:
     shell_name: main
-    parent: null
+    shell_parent_name: null
     elements:
       - element_name: first
-        element_init: original
+        element_init: new
       - element_name: second
-        element_init: original
+        element_init: new
 
 running_shells:
   main:
-    elements:
+    shell_elements:
       first:
         variables:
           apple: 1
           baker: 'some string'
+        gloms:
+          x: null,
+          y: 2
       second:
         variables:
           xer: 1
           yer: 1
+        gloms: []
 
 notes: first test
 

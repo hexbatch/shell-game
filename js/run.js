@@ -8,10 +8,24 @@
 function ShellGameRun(yaml_parsed) {
 
 
+    /**
+     * @type {ShellGameElementLib}
+     */
+    this.element_lib = null;
+
+    /**
+     * @type {ShellGameShellLib}
+     */
+    this.shell_lib = null;
 
     if (!$.isPlainObject(yaml_parsed)) { throw new ShellGameRunError("yaml parsed is not an object");}
-    if (!('elements' in yaml_parsed)) {throw new ShellGameRunError("yaml parsed does not have an elements member");}
-    if (!Array.isArray(yaml_parsed.elements)) { throw new ShellGameRunError("yaml parsed element member is not an array");}
+    if (!('element_lib' in yaml_parsed)) {throw new ShellGameRunError("yaml parsed does not have an element_lib member");}
+    if (!('shell_lib' in yaml_parsed)) {throw new ShellGameRunError("yaml parsed does not have an shell_lib member");}
+
+    this.element_lib = new ShellGameElementLib(yaml_parsed);
+
+    this.shell_lib = new ShellGameShellLib(yaml_parsed,this);
+
 
     let elements_raw = yaml_parsed.elements;
 

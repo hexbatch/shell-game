@@ -60,3 +60,10 @@ class ShellGameElementTemplateError extends Error {
         this.name = "ShellGameElementTemplateError";
     }
 }
+
+class ShellGameShellLibError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameShellLibError";
+    }
+}
