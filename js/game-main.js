@@ -40,6 +40,7 @@ $(function($){
             let shell_name = sel.val();
             if (!shell_name) {return;}
             run.add_active_shell(shell_name);
+            shell_game_set_editor_value_from_object(run.export_as_object(),'game');
         })
     }
 
