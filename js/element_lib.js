@@ -76,8 +76,8 @@ function ShellGameElementLib(raw_input) {
         let ret = {};
         for(let element_name in this.elements) {
             if (!this.elements.hasOwnProperty(element_name)) {continue;}
-            let node = this.elements[element_name];
-            ret[node.element_name] = node;
+            let element = this.elements[element_name];
+            ret[element.element_name] = element.export_element_definition();
         }
         return ret;
     };

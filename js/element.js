@@ -228,6 +228,34 @@ function ShellGameElement(raw_input) {
         return ret;
     }
 
+    this.export_element_definition = function() {
+        let ret = {
+            element_name: this.element_name,
+            element_variables: {},
+            element_gloms: {},
+            element_script: this.element_script
+        };
+
+
+        for(let y =0; y < this.element_variables.length; y++) {
+            let da_var = this.element_variables[y];
+            ret.element_variables[ da_var.variable_name] = {
+                variable_name: da_var.variable_name,
+                variable_initial_value: da_var.variable_initial_value
+            };
+        }
+
+        for(let y =0; y < this.element_gloms.length; y++) {
+            let da_glom = this.element_gloms[y];
+            ret.element_gloms[da_glom.glom_reference_name] = {
+                glom_target_name: da_glom.glom_target_name,
+                glom_reference_name: da_glom.glom_reference_name
+            };
+        }
+
+        return ret;
+    }
+
     /**
      *
      * @param {string} variable_name
