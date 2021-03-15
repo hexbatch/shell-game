@@ -61,7 +61,7 @@ $(function($){
                    throw new ShellGameRunError("yaml does not have a game member");
                }
                run = new ShellGameRun(raw.game);
-               console.log('run', run);
+               console.debug('run', run);
                let da_export = run.export_as_object()
                shell_game_set_editor_value_from_object(da_export,'game');
                do_toast({title:'Checked',subtitle:'(its done already)',content: "Read in and then Replaced the YAML", delay:2000,type:'warning'});

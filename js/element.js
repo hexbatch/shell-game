@@ -176,14 +176,12 @@ function ShellGameElement(raw_input) {
             vars_to_run[node.glom_reference_name] = node.glom_current_value;
         }
 
-        console.log('Element ' + this.element_name + ": running vars from script " + this.element_name,vars_to_run,this.element_script);
         try {
             run_script(vars_to_run, this.element_script);
         } catch (err) {
             console.warn('Element ' + this.element_name + ": that script don't run! ",err);
             return;
         }
-        console.log('Element ' + this.element_name + ": changed stuff is",vars_to_run);
 
         for(let m in vars_to_run) {
             if (!vars_to_run.hasOwnProperty(m)) {continue;}
@@ -191,7 +189,6 @@ function ShellGameElement(raw_input) {
             let found_var = variable_lookup[m];
             found_var.variable_current_value = vars_to_run[m];
         }
-        console.log('Element ' + this.element_name + ": new variables are",this.element_variables);
 
     }
 
