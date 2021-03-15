@@ -65,15 +65,15 @@ game:
       - shell_elements:
           first:
             variables:
-              apple: 1
-              baker: 'some string'
+              apple: -10101
+              baker: 'inititted b'
             gloms:
-              x: null,
-              y: 2
+              x: 28,
+              y: -527
           second:
             variables:
-              xer: 1
-              yer: 1
+              xer: 100
+              yer: -100
             gloms: []
         shell_children:
           other:
@@ -81,8 +81,8 @@ game:
                 first:
                   variables:
                     apple: 25
-                    baker: 'in the baseement'
-                  gloms: {}
+                  gloms:
+                    x: 0.125
             - shell_elements:
                 first:
                   variables:

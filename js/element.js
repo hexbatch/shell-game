@@ -234,7 +234,11 @@ function ShellGameElement(raw_input) {
      * @return {boolean}
      */
     this.check_if_variable_exists = function(variable_name) {
-        return this.element_variables.hasOwnProperty(variable_name);
+        for(let i = 0; i < this.element_variables.length; i++) {
+            let thing = this.element_variables[i];
+            if (thing.variable_name === variable_name) {return true;}
+        }
+        return false;
     }
 
     /**
@@ -242,8 +246,12 @@ function ShellGameElement(raw_input) {
      * @param {string} glom_name
      * @return {boolean}
      */
-    this.check_if_glom_exists = function(glom_name) {
-        return this.element_gloms.hasOwnProperty(glom_name);
+    this.check_if_glom_exists_by_reference_name = function(glom_name) {
+        for(let i = 0; i < this.element_gloms.length; i++) {
+            let thing = this.element_gloms[i];
+            if (thing.glom_reference_name === glom_name) {return true;}
+        }
+        return false;
     }
 
     /**

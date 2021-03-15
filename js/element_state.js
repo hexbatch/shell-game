@@ -43,7 +43,7 @@ function ShellGameElementState(raw_input,element_name,run_object) {
         }
         for(let glom_name in raw_input.gloms) {
             if (!raw_input.gloms.hasOwnProperty(glom_name)) {continue;}
-            if (!da_element.check_if_glom_exists(glom_name)) {
+            if (!da_element.check_if_glom_exists_by_reference_name(glom_name)) {
                 throw new ShellGameElementStateError("element name "+ element_name + " does not have a glom called: " + glom_name);
             }
 

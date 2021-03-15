@@ -201,7 +201,16 @@ function ShellGameShellLib(raw_input, run_object) {
 
             for(let dat_tang = 0; dat_tang < shell_thing_array.length; dat_tang ++) {
                 let shell_thing = shell_thing_array[dat_tang];
-                let alive = this.spawn_shell(shell_name, top_parent,[]); //todo add element states
+                let settings = [];
+                if ('shell_elements' in shell_thing && _.isPlainObject(shell_thing.shell_elements)) {
+                    for(let setting_element_name in shell_thing.shell_elements) {
+                        if (!shell_thing.shell_elements.hasOwnProperty(setting_element_name)) {continue;}
+                        let el_raw = shell_thing.shell_elements[setting_element_name];
+                        let el_setting = new ShellGameElementState(el_raw,setting_element_name,this.run_object);
+                        settings.push( el_setting);
+                    }
+                }
+                let alive = this.spawn_shell(shell_name, top_parent,settings);
 
                 if ('shell_children' in shell_thing) {
                     if (!_.isPlainObject(shell_thing.shell_children)) {

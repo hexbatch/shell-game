@@ -55,7 +55,6 @@ $(function($){
                    throw new ShellGameRunError("yaml does not have a game member");
                }
                run = new ShellGameRun(raw.game);
-               run.init();
                console.log('run', run);
                let da_export = run.export_as_object()
                shell_game_set_editor_value_from_object(da_export,'game');

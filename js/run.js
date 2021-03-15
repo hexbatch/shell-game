@@ -70,9 +70,9 @@ function ShellGameRun(yaml_parsed) {
                 throw new ShellGameRunError("Could not find parent shell to add with , parent name was " + live_parent);
             }
             let found_live_parent = find_live_parent_array[0];
-            return this.shell_lib.spawn_shell(shell_name,found_live_parent,[]); //todo add element states
+            return this.shell_lib.spawn_shell(shell_name,found_live_parent,[]);
         } else if (live_parent instanceof ShellGameShell) {
-            return this.shell_lib.spawn_shell(shell_name,live_parent,[]);//todo add element states
+            return this.shell_lib.spawn_shell(shell_name,live_parent,[]);
         } else {
             throw new ShellGameRunError("Could not add shell, the live parent was not a string or a shell ");
         }
