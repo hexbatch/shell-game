@@ -7,7 +7,7 @@ function ShellGameGlom(raw_input) {
     this.glom_current_value = null;
     this.glom_reference_name = '';
 
-    if (!$.isPlainObject(raw_input)) { throw new ShellGameGlomError("raw_input is not an object");}
+    if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameGlom)) { throw new ShellGameGlomError("raw_input is not an object");}
 
     if ('glom_target_name' in raw_input) {
         if (!(typeof raw_input.glom_target_name === 'string' || raw_input.glom_target_name instanceof String)) {

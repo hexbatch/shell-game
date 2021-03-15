@@ -1,9 +1,10 @@
 author: Will
 date: 2021-03-12
-
-element_lib:
-  first:
-    - element_name: "first"
+notes: first test
+game:
+  element_lib:
+    first:
+      element_name: "first"
       element_variables:
         apple:
          variable_name: apple
@@ -26,47 +27,61 @@ element_lib:
         this.apple = this.x * this.y;
         this.baker = this.y + ' is y value';
 
-  second:
-    element_name: 'second'
-    element_variables:
-      xer:
-        variable_name: xer
-        variable_initial_value: 1
-        variable_current_value: null
-      yer:
-        variable_name: yer
-        variable_initial_value: 1
-        variable_current_value: null
-    element_gloms: [ ]
-    element_script: |
-      this.xer ++;
-      this.yer --;
+    second:
+      element_name: 'second'
+      element_variables:
+        xer:
+          variable_name: xer
+          variable_initial_value: 1
+          variable_current_value: null
+        yer:
+          variable_name: yer
+          variable_initial_value: 1
+          variable_current_value: null
+      element_gloms: {}
+      element_script: |
+        this.xer ++;
+        this.yer --;
 
-shell_lib:
-  main:
-    shell_name: main
-    shell_parent_name: null
-    elements:
-      - element_name: first
-        element_init: new
-      - element_name: second
-        element_init: new
+  shell_lib:
+    main:
+      shell_name: main
+      shell_parent_name: null
+      elements:
+        - element_name: first
+          element_init: new
+        - element_name: second
+          element_init: new
+    other:
+      shell_name: other
+      shell_parent_name: main
+      elements:
+        - element_name: first
+          element_init: find
 
-running_shells:
-  main:
-    shell_elements:
-      first:
-        variables:
-          apple: 1
-          baker: 'some string'
-        gloms:
-          x: null,
-          y: 2
-      second:
-        variables:
-          xer: 1
-          yer: 1
-        gloms: []
 
-notes: first test
+  running_shells:
+    main:
+      shell_elements:
+        first:
+          variables:
+            apple: 1
+            baker: 'some string'
+          gloms:
+            x: null,
+            y: 2
+        second:
+          variables:
+            xer: 1
+            yer: 1
+          gloms: []
+      shell_children:
+        other:
+          shell_elements:
+            first:
+              variables:
+                apple: 25
+                baker: 'in the baseement'
+              gloms: {}
+
 

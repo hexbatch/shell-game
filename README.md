@@ -70,6 +70,9 @@ Then the page will wait for the next step button press
 * [Bootstrap 4 toast wrapper](https://github.com/Script47/Toast)
 * [Yaml Library](https://github.com/nodeca/js-yaml)
 * [Lodash](https://lodash.com/)
+  
+* [JsDoc lookup](https://jsdoc.app/tags-type.html)
+
 
 
 ## Todo

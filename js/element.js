@@ -1,5 +1,5 @@
 /**
- * @param {object} [raw_input]
+ * @param {?object} [raw_input]
  * @constructor
  */
 function ShellGameElement(raw_input) {
@@ -20,23 +20,49 @@ function ShellGameElement(raw_input) {
      */
     this.element_script = '';
 
-    if (!$.isPlainObject(raw_input)) { throw new ShellGameElementError("raw_input is not an object");}
+    if (raw_input === null) {return;}
+
+    if (!$.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameElement)) { throw new ShellGameElementError("raw_input is not a plain object or an Element");}
 
     if ('element_name' in raw_input) {
         if (!(typeof raw_input.element_name === 'string' || raw_input.element_name instanceof String)) {
-            throw "element_name is not a string";
+            throw new ShellGameElementError("element_name is not a string");
         }
         this.element_name = raw_input.element_name;
     }
 
-    if ('element_variables' in raw_input) {
-        if (!Array.isArray(raw_input.element_variables)) { throw new ShellGameElementError('Element ' + this.element_name + ": raw element_variables is not an array");}
+    if (!this.element_name) {
+        throw new ShellGameElementError('No name set for element');
+    }
 
-        for(let i = 0; i < raw_input.element_variables.length; i++) {
-            let pre_node = raw_input.element_variables[i];
-            if (!jQuery.isPlainObject(pre_node)) { throw new ShellGameElementError('Element ' + this.element_name + ": raw element_variables node is not an object");}
-            let variable  = new ShellGameVariable(pre_node);
-            this.element_variables.push(variable);
+    if ('element_variables' in raw_input) {
+        if (_.isPlainObject(raw_input.element_variables)) {
+
+            for (let variable_name in raw_input.element_variables) {
+                if (!raw_input.element_variables.hasOwnProperty(variable_name)) {
+                    continue;
+                }
+                let pre_node = raw_input.element_variables[variable_name];
+                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof ShellGameVariable)) {
+                    throw new ShellGameElementError('Element ' + this.element_name + ": raw element_variables node is not a plain object or a ShellGame Variable");
+                }
+
+                let variable = new ShellGameVariable(pre_node);
+                this.element_variables.push(variable);
+            }
+        } else if (Array.isArray(raw_input.element_variables)) {
+            for(let i = 0; i < raw_input.element_variables.length; i++) {
+                let pre_node = raw_input.element_variables[i];
+                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof ShellGameVariable)) {
+                    throw new ShellGameElementError('Element ' + this.element_name + ": raw element_variables node is not a plain object or a ShellGame Variable (b)");
+                }
+
+                let variable = new ShellGameVariable(pre_node);
+                this.element_variables.push(variable);
+            }
+
+        } else {
+            throw new ShellGameElementError("element_variables is not a plain object or an array");
         }
     }
 
@@ -51,13 +77,31 @@ function ShellGameElement(raw_input) {
     }
 
     if ('element_gloms' in raw_input) {
-        if (!Array.isArray(raw_input.element_gloms)) { throw new ShellGameElementError('Element ' + this.element_name + ": raw element_gloms is not an array");}
+        if (_.isPlainObject(raw_input.element_gloms)) {
 
-        for(let i = 0; i < raw_input.element_gloms.length; i++) {
-            let pre_node = raw_input.element_gloms[i];
-            if (!jQuery.isPlainObject(pre_node)) { throw new ShellGameElementError('Element ' + this.element_name + ": raw element_gloms node is not an object");}
-            let glom  = new ShellGameGlom(pre_node);
-            this.element_gloms.push(glom);
+            for (let glom_name in raw_input.element_gloms) {
+                if (!raw_input.element_gloms.hasOwnProperty(glom_name)) {
+                    continue;
+                }
+                let pre_node = raw_input.element_gloms[glom_name];
+                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof ShellGameGlom)) {
+                    throw new ShellGameElementError('Element ' + this.element_name + ": raw element_gloms node is not a plain object or a Glom");
+                }
+                let glom = new ShellGameGlom(pre_node);
+                this.element_gloms.push(glom);
+            }
+        } else if (Array.isArray(raw_input.element_gloms)) {
+            for(let i = 0; i < raw_input.element_gloms.length; i++) {
+                let pre_node = raw_input.element_gloms[i];
+                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof ShellGameVariable)) {
+                    throw new ShellGameElementError('Element ' + this.element_name + ": raw element_gloms node is not a plain object or a Glom (b)");
+                }
+
+                let glom = new ShellGameGlom(pre_node);
+                this.element_gloms.push(glom);
+            }
+        }else {
+            throw new ShellGameElementError("element_gloms is not a plain object or an array");
         }
     }
 
@@ -149,6 +193,39 @@ function ShellGameElement(raw_input) {
         }
         console.log('Element ' + this.element_name + ": new variables are",this.element_variables);
 
+    }
+
+
+    /**
+     * @return {object}
+     * key by element name and them having keys of variables and gloms
+     *  those keys having the name and value
+     *
+     * @example
+
+     first:
+         variables:
+             apple: 1
+             baker: 'some string'
+         gloms:
+             x: null,
+             y: 2
+
+     */
+    this.export_element = function() {
+        let ret = {};
+        ret[this.element_name] = {gloms: {}, variables: {}};
+        for(let y =0; y < this.element_variables.length; y++) {
+            let node = this.element_variables[y];
+            ret[this.element_name].variables[node.variable_name] = node.variable_current_value;
+        }
+
+        for(let y =0; y < this.element_gloms.length; y++) {
+            let node = this.element_gloms[y];
+            ret[this.element_name].gloms[node.glom_reference_name] = node.glom_current_value;
+        }
+
+        return ret;
     }
 
 

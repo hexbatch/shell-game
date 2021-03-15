@@ -18,7 +18,7 @@ function ShellGameRun(yaml_parsed) {
      */
     this.shell_lib = null;
 
-    if (!$.isPlainObject(yaml_parsed)) { throw new ShellGameRunError("yaml parsed is not an object");}
+    if (!_.isPlainObject(yaml_parsed)) { throw new ShellGameRunError("yaml parsed is not an object");}
     if (!('element_lib' in yaml_parsed)) {throw new ShellGameRunError("yaml parsed does not have an element_lib member");}
     if (!('shell_lib' in yaml_parsed)) {throw new ShellGameRunError("yaml parsed does not have an shell_lib member");}
 
@@ -26,68 +26,107 @@ function ShellGameRun(yaml_parsed) {
 
     this.shell_lib = new ShellGameShellLib(yaml_parsed,this);
 
-
-    let elements_raw = yaml_parsed.elements;
-
     /**
-     * @type {ShellGameElement[]}
+     *
+     * @type {ShellGameShell}
      */
-    this.elements = [];
+    this.main_shell = null;
 
-    for(let i = 0; i < elements_raw.length; i++) {
-        let pre_node = elements_raw[i];
-        if (!$.isPlainObject(pre_node)) { throw "raw element node is not an object";}
-        let element = new ShellGameElement(pre_node);
-        this.elements.push(element);
-    }
-
-    this.init = function() {
-        //step all the functions
-        for(let i = 0; i < this.elements.length ; i++) {
-            this.elements[i].init_element();
+    if ('running_shells' in yaml_parsed) {
+        let tops = this.shell_lib.reconstitute_running(yaml_parsed.running_shells);
+        if (tops.length > 1) {
+          throw new ShellGameRunError('yaml parased has more than one top shell in the running_shells');
+        } else if (tops.length === 1) {
+            //is only one
+            this.main_shell = tops[0];
         }
     }
+
+
+
+    //end constructor stuff
+
+
 
     this.glom = function() {
-        //build a lookup of all the variable values in the run
-        //each value is keyed by the variable name
-        // if there is only one variable by the same name, it will be an array of one
-        //if there is more than one variable value, then the lookup will have an array of more than one value for that variable name
-            // and the gloms will randomly choose which element
-        let lookup = {};
-        for(let e = 0; e < this.elements.length; e++) {
-            let variables = this.elements[e].element_variables;
-            for (let v = 0; v < variables.length; v++) {
-                let variable = variables[v];
-                if (!lookup.hasOwnProperty(variable.variable_name)) {
-                    lookup[variable.variable_name] = [];
-                }
-                lookup[variable.variable_name].push(variable.variable_current_value);
-            }
-        }
-
-        for(let e = 0; e < this.elements.length; e++) {
-            let gloms = this.elements[e].element_gloms;
-            for (let g = 0; g < gloms.length; g++) {
-                let glom = gloms[g];
-                if (lookup.hasOwnProperty(glom.glom_target_name)) {
-                    let ar = lookup[glom.glom_target_name];
-                    glom.glom_current_value = _.sample(ar);
-                } else {
-                    glom.glom_current_value = null;
-                }
-            }
-        }
-
-
+        if (this.main_shell) {this.main_shell.glom(null);}
     }
 
 
-    this.step = function() {
-        //step all the functions
-        for(let i = 0; i < this.elements.length ; i++) {
-            this.elements[i].step_element();
+    /**
+     *
+     * @param {string} shell_name
+     * @param {?(ShellGameShell|string)} [live_parent]
+     */
+    this.add_active_shell = function(shell_name,live_parent) {
+
+        if (live_parent === null) {
+            live_parent = this.shell_lib.get_parent_name_via_child_name(shell_name);
         }
+
+        if (_.isString(live_parent)) {
+            let find_live_parent_array = this.get_live_shells(live_parent);
+            if (!find_live_parent_array.count) {
+                throw new ShellGameRunError("Could not find parent shell to add with , parent name was " + live_parent);
+            }
+            let found_live_parent = find_live_parent_array[0];
+            return this.shell_lib.spawn_shell(shell_name,found_live_parent);
+        } else if (live_parent instanceof ShellGameShell) {
+            return this.shell_lib.spawn_shell(shell_name,live_parent);
+        } else {
+            throw new ShellGameRunError("Could not add shell, the live parent was not a string or a shell ");
+        }
+    }
+
+
+
+    /**
+     *
+     * @param {string} [shell_name]
+     */
+    this.get_live_shells = function(shell_name) {
+        if (this.main_shell) {this.main_shell.list_shells(shell_name);}
+    }
+
+    /**
+     * Steps through each shell, from the innermost to the outermost, and runs their step
+     */
+    this.step = function() {
+        //runs active shells
+        if (this.main_shell) {this.main_shell.step();}
+    }
+
+
+    /**
+     * inits each active shell
+     */
+    this.init = function() {
+        if (this.main_shell) {this.main_shell.init();}
+    }
+
+    /**
+     * returns an object to be used to print out the yaml under the game key
+     * structure
+     *  element_lib with keys for each element name with the element object under that
+     *  shell_lib with keys for each shell name with the shell object under that
+     *  running_shells with key of shell name, and then export data. start with top shell (will be called main no mater what) and children under that
+     *
+     * @return {object}
+     */
+    this.export_as_object = function() {
+        let running = {};
+        if (this.main_shell) {
+            running = this.main_shell.export_shell();
+        }
+
+        let els = this.element_lib.export_lib();
+        let shs = this.shell_lib.export_lib()
+        return {
+            element_lib: els ,
+            shell_lib:shs ,
+            running_shells : running
+        };
+
     }
 
 
