@@ -228,5 +228,53 @@ function ShellGameElement(raw_input) {
         return ret;
     }
 
+    /**
+     *
+     * @param {string} variable_name
+     * @return {boolean}
+     */
+    this.check_if_variable_exists = function(variable_name) {
+        return this.element_variables.hasOwnProperty(variable_name);
+    }
+
+    /**
+     *
+     * @param {string} glom_name
+     * @return {boolean}
+     */
+    this.check_if_glom_exists = function(glom_name) {
+        return this.element_gloms.hasOwnProperty(glom_name);
+    }
+
+    /**
+     *
+     * @param {ShellGameElementState} state
+     */
+    this.restore_element_from_state = function (state) {
+
+        for(let var_name in state.state_variables) {
+            if (!state.state_variables.hasOwnProperty(var_name)) {continue;}
+            for(let i = 0; i < this.element_variables.length ; i++) {
+                let v = this.element_variables[i];
+                if (v.variable_name === var_name) {
+                    v.variable_current_value = state.state_variables[var_name];
+                    break;
+                }
+            }
+        }
+
+
+        for( let glom_name in state.state_gloms) {
+            if (!state.state_gloms.hasOwnProperty(glom_name)) {continue;}
+            for(let g_index = 0; g_index < this.element_gloms.length ; g_index++) {
+                let g = this.element_gloms[g_index];
+                if (g.glom_reference_name === glom_name) {
+                    g.glom_current_value = state.state_gloms[glom_name];
+                    break;
+                }
+            }
+        }
+    }
+
 
 }

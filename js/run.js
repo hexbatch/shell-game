@@ -60,19 +60,19 @@ function ShellGameRun(yaml_parsed) {
      */
     this.add_active_shell = function(shell_name,live_parent) {
 
-        if (live_parent === null) {
+        if (!live_parent) {
             live_parent = this.shell_lib.get_parent_name_via_child_name(shell_name);
         }
 
         if (_.isString(live_parent)) {
             let find_live_parent_array = this.get_live_shells(live_parent);
-            if (!find_live_parent_array.count) {
+            if (!find_live_parent_array.length) {
                 throw new ShellGameRunError("Could not find parent shell to add with , parent name was " + live_parent);
             }
             let found_live_parent = find_live_parent_array[0];
-            return this.shell_lib.spawn_shell(shell_name,found_live_parent);
+            return this.shell_lib.spawn_shell(shell_name,found_live_parent,[]); //todo add element states
         } else if (live_parent instanceof ShellGameShell) {
-            return this.shell_lib.spawn_shell(shell_name,live_parent);
+            return this.shell_lib.spawn_shell(shell_name,live_parent,[]);//todo add element states
         } else {
             throw new ShellGameRunError("Could not add shell, the live parent was not a string or a shell ");
         }
@@ -85,7 +85,7 @@ function ShellGameRun(yaml_parsed) {
      * @param {string} [shell_name]
      */
     this.get_live_shells = function(shell_name) {
-        if (this.main_shell) {this.main_shell.list_shells(shell_name);}
+        if (this.main_shell) {return this.main_shell.list_shells(shell_name);}
     }
 
     /**
@@ -114,18 +114,21 @@ function ShellGameRun(yaml_parsed) {
      * @return {object}
      */
     this.export_as_object = function() {
-        let running = {};
-        if (this.main_shell) {
-            running = this.main_shell.export_shell();
-        }
 
         let els = this.element_lib.export_lib();
-        let shs = this.shell_lib.export_lib()
-        return {
+        let shs = this.shell_lib.export_lib();
+
+        let out = {
             element_lib: els ,
             shell_lib:shs ,
-            running_shells : running
+            running_shells : {}
         };
+
+        if (this.main_shell) {
+            this.main_shell.export_shell(out.running_shells);
+        }
+
+        return out;
 
     }
 

@@ -67,3 +67,10 @@ class ShellGameShellLibError extends Error {
         this.name = "ShellGameShellLibError";
     }
 }
+
+class ShellGameElementStateError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameElementStateError";
+    }
+}

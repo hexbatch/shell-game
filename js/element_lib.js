@@ -32,10 +32,25 @@ function ShellGameElementLib(raw_input) {
         }
     }
 
+    /**
+     *
+     * @param {string} element_name
+     * @return {ShellGameElement|null}
+     */
+    this.get_element = function(element_name) {
+        if (this.check_if_element_exists(element_name)) {
+            return this.elements[element_name];
+        }
+        return null;
+    }
 
+    /**
+     *
+     * @param {string} element_name
+     * @return {boolean}
+     */
     this.check_if_element_exists = function(element_name) {
         return this.elements.hasOwnProperty(element_name);
-
     }
 
     /**

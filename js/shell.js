@@ -47,9 +47,11 @@ function ShellGameElementTemplate(raw_input) {
  * @param {ShellGameRun} [run_object]
  * @param {ShellGameShell} [master]
  * @param {ShellGameShell} [live_parent]
+ * @param {ShellGameElementState[]} [element_states]
  * @constructor
  */
-function ShellGameShell(raw_input,run_object, master,live_parent ) {
+function ShellGameShell(raw_input,run_object,
+                        master,live_parent,element_states ) {
 
     /**
      * @type {ShellGameRun}
@@ -113,13 +115,21 @@ function ShellGameShell(raw_input,run_object, master,live_parent ) {
 
 
 
-
-
+        if (_.isEmpty(element_states)) {element_states = [];}
+        let lookup_element_states = {};
+        for(let z = 0; z < element_states.length ; z++) {
+            let p = element_states[z];
+            lookup_element_states[p.element_name] = p;
+        }
 
         for (let i = 0; i < master.templates.length; i++) {
             let template = master.templates[i];
             if (template.element_init === 'new') {
                 let element_new = this.run_object.element_lib.original_and_init(template.element_name);
+                if (lookup_element_states.hasOwnProperty(element_new.element_name)) {
+                    let ele_state = lookup_element_states[element_new.element_name];
+                    element_new.restore_element_from_state(ele_state);
+                }
                 this.shell_elements.push(element_new);
             } else if (template.element_init === 'find') {
                 //go up through the chain of parents to try to find it
@@ -137,12 +147,18 @@ function ShellGameShell(raw_input,run_object, master,live_parent ) {
 
                 if (found_element) {
                     let element_new = new ShellGameElement(found_element);
+                    if (lookup_element_states.hasOwnProperty(element_new.element_name)) {
+                        let ele_state = lookup_element_states[element_new.element_name];
+                        element_new.restore_element_from_state(ele_state);
+                    }
                     this.shell_elements.push(element_new);
                 }
             } else {
                 throw new ShellGameShellError("Cannot init an element in shell: " + this.shell_name + " --> " + template.element_name );
             }
         }//end template loop when spawning
+
+        //fill in any optionally set values for initial values of gloms and vars
 
     } else if (run_object instanceof  ShellGameRun) {
         /**
@@ -204,14 +220,15 @@ function ShellGameShell(raw_input,run_object, master,live_parent ) {
 
     /**
      * @param {?ShellGameShell} live_parent
+     * @param {ShellGameElementState[]} element_states
      * @return {ShellGameShell}
      */
-    this.spawn = function(live_parent) {
+    this.spawn = function(live_parent,element_states) {
         // make a clone and then either copy the variables from the lib, if new, or find in shell_elements of ancestor chain.
         // If in ancestor chain,  then copy from closet ancestor, or skip
         //put anything found in the clone shell's shell_elements
         //return cloned shell with elements
-        return new ShellGameShell(null,null,this,live_parent);
+        return new ShellGameShell(null,null,this,live_parent,element_states);
     }
 
 
@@ -244,7 +261,7 @@ function ShellGameShell(raw_input,run_object, master,live_parent ) {
 
 
     /**
-     * @param {Object.<string, ShellGameGlom>}  [gloms]
+     * @param {Object.<string, ShellGameGlom[]>}  [gloms]
      */
     this.glom = function(gloms) {
 
@@ -330,6 +347,7 @@ function ShellGameShell(raw_input,run_object, master,live_parent ) {
     }//end glom
 
     /**
+     * @param {?object} [ret]
      * return object with shell name as the only key,
      * under that the shell elements keyed by element name and them having keys of variables and gloms
      *  those keys having the name and value
@@ -350,22 +368,26 @@ function ShellGameShell(raw_input,run_object, master,live_parent ) {
              gloms: []
         shell_children: []
      */
-    this.export_shell = function() {
+    this.export_shell = function(ret) {
 
-        let ret = {};
-        ret[this.shell_name] = {shell_elements: {},shell_children: {}};
+        if (!ret) {ret = {};}
+        if (!ret.hasOwnProperty(this.shell_name)) {
+            ret[this.shell_name] = [];
+        }
+
+        let master_node = {shell_elements: {},shell_children: {}};
         for(let b =0; b < this.shell_elements.length; b++) {
             let node = this.shell_elements[b];
             let top_export = node.export_element();
-            _.merge(ret[this.shell_name].shell_elements, top_export);
+            _.merge(master_node.shell_elements, top_export);
         }
 
         for(let s =0; s < this.shell_children.length; s++) {
             let child_shell = this.shell_children[s];
-            let child_export = child_shell.export_shell();
-            _.merge(ret[this.shell_name].shell_children , child_export );
+            child_shell.export_shell(master_node.shell_children);
         }
 
+        ret[this.shell_name].push(master_node);
 
         return ret;
     }

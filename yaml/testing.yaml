@@ -24,7 +24,7 @@ game:
           glom_current_value: null
           glom_reference_name: 'y'
       element_script: |
-        this.apple = this.x * this.y;
+        this.apple = this.x * this.y + this.apple;
         this.baker = this.y + ' is y value';
 
     second:
@@ -62,26 +62,32 @@ game:
 
   running_shells:
     main:
-      shell_elements:
-        first:
-          variables:
-            apple: 1
-            baker: 'some string'
-          gloms:
-            x: null,
-            y: 2
-        second:
-          variables:
-            xer: 1
-            yer: 1
-          gloms: []
-      shell_children:
-        other:
-          shell_elements:
-            first:
-              variables:
-                apple: 25
-                baker: 'in the baseement'
-              gloms: {}
+      - shell_elements:
+          first:
+            variables:
+              apple: 1
+              baker: 'some string'
+            gloms:
+              x: null,
+              y: 2
+          second:
+            variables:
+              xer: 1
+              yer: 1
+            gloms: []
+        shell_children:
+          other:
+            - shell_elements:
+                first:
+                  variables:
+                    apple: 25
+                    baker: 'in the baseement'
+                  gloms: {}
+            - shell_elements:
+                first:
+                  variables:
+                    apple: 5
+                    baker: 'bottom of the barrel'
+                  gloms: { }
 
 

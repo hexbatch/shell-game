@@ -139,13 +139,14 @@ function ShellGameShellLib(raw_input, run_object) {
     /**
      *
      * @param {string} shell_name
-     * @param {?ShellGameShell?} live_parent
+     * @param {ShellGameShell} live_parent
+     * @param {ShellGameElementState[]} element_states
      * @return {ShellGameShell}
      */
-    this.spawn_shell = function(shell_name,live_parent) {
+    this.spawn_shell = function(shell_name,live_parent,element_states) {
         if (this.shells.hasOwnProperty(shell_name)) {
             let found = this.shells[shell_name];
-            return found.spawn(live_parent);
+            return found.spawn(live_parent,element_states);
         }
         throw new ShellGameElementLibError('Cannot find element of ' + shell_name + " in the library");
     }
@@ -188,19 +189,28 @@ function ShellGameShellLib(raw_input, run_object) {
         let tops = [];
         for(let shell_name in raw_input) {
             if (!raw_input.hasOwnProperty(shell_name)) {continue;}
-            let body = raw_input[shell_name];
+
             if (!this.check_if_shell_exists(shell_name)) {
                 throw new ShellGameShellLibError("Cannot reconstitute shell of name " + shell_name + " as its not in the library");
             }
-            let alive = this.spawn_shell(shell_name,top_parent);
 
-            if ('shell_children' in body) {
-                if (!_.isPlainObject(body.shell_children)) {
-                    throw new ShellGameShellError(shell_name + ".shell_children is not a plain object");
-                }
-                this.reconstitute_running(body.shell_children,alive);
+            let shell_thing_array = raw_input[shell_name];
+            if (!_.isArray(shell_thing_array)) {
+                throw new ShellGameShellError("raw_input is not a plain object");
             }
-            tops.push(alive);
+
+            for(let dat_tang = 0; dat_tang < shell_thing_array.length; dat_tang ++) {
+                let shell_thing = shell_thing_array[dat_tang];
+                let alive = this.spawn_shell(shell_name, top_parent,[]); //todo add element states
+
+                if ('shell_children' in shell_thing) {
+                    if (!_.isPlainObject(shell_thing.shell_children)) {
+                        throw new ShellGameShellError(shell_name + ".shell_children is not a plain object");
+                    }
+                    this.reconstitute_running(shell_thing.shell_children, alive);
+                }
+                tops.push(alive);
+            }
         }
         return tops;
     }
