@@ -7,7 +7,9 @@ function ShellGameVariable(raw_input ) {
     this.variable_initial_value = null;
     this.variable_current_value = null;
 
-    if (!$.isPlainObject(raw_input)) { throw new ShellGameVariableError("raw_input is not an object");}
+    if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameVariable)) {
+        throw new ShellGameVariableError("raw_input is not a plain object or a ShellGame Variable");
+    }
 
     if ('variable_name' in raw_input) {
         if (!(typeof raw_input.variable_name === 'string' || raw_input.variable_name instanceof String)) {

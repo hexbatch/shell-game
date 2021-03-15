@@ -39,3 +39,38 @@ class ShellGameVariableError extends Error {
         this.name = "ShellGameVariableError";
     }
 }
+
+class ShellGameShellError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameShellError";
+    }
+}
+
+class ShellGameElementLibError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameElementLibError";
+    }
+}
+
+class ShellGameElementTemplateError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameElementTemplateError";
+    }
+}
+
+class ShellGameShellLibError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameShellLibError";
+    }
+}
+
+class ShellGameElementStateError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameElementStateError";
+    }
+}
