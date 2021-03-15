@@ -6,7 +6,7 @@ The hexbatch project has code executing as elements inside shells. This program 
 
 This version has the basic storage and operations. Its basically a YAML editor with three buttons
 
-![image](https://user-images.githubusercontent.com/725763/111222848-60ce4f00-85aa-11eb-9f68-78b1f48862a9.png)
+![image](https://user-images.githubusercontent.com/725763/111225950-734a8780-85ae-11eb-86a4-d3b9cbf5d12d.png)
 
 
 The next version after this will have more of a gui. The state will still be stored in the yaml though. 
@@ -15,7 +15,7 @@ So, all the below will be used in the next version.
 The future gui will make it easier to design and test out shell and element concepts, and add in higher order behavior implemented by 
 using the yaml and data structures in this version. As of version 0.2, all the code and yaml works
 
-## First version is pretty bare bones. A yaml editor, a load button and a step button , and a add button
+## First version is pretty bare bones. A YAML editor, a Check button, a Step button , and an Add button
 
 Edit the yaml directly to set things up
 
@@ -29,9 +29,10 @@ Load in index.html in a web browser. You do not need a local server here, just t
 
 #### To use:
 
-* Add in a new yaml or copy and paste it from somewhere, and press the start button to load in the yaml text. 
+* Add in a new yaml or copy and paste it from somewhere, and press the check button or step button. 
 * Watch things change in the yaml by pressing the step button
 * Insert New Shell Copies with the Add Button
+* Do changes by editing the YAML text, use the testing.yaml, if you want , as a starting point
 
 ### Most of the screen has the big yaml editor, to the side are two buttons start and step
 Please refer to the yaml example below at the bottom of the page , or see yaml/testing.yaml 

@@ -52,7 +52,7 @@ $(function($){
 
     function init_event_handlers() {
         $("#shell-game-start").click(function() {
-            do_toast({title:'Staring',subtitle:'Oh Boy!',content: "initializing vars, clearing out gloms", delay:2000,type:'warning'});
+
 
            try {
                let raw = shell_game_get_object_from_editor_value();
@@ -64,6 +64,7 @@ $(function($){
                console.log('run', run);
                let da_export = run.export_as_object()
                shell_game_set_editor_value_from_object(da_export,'game');
+               do_toast({title:'Checked',subtitle:'(its done already)',content: "Read in and then Replaced the YAML", delay:2000,type:'warning'});
                do_test_shell_list();
            } catch (e) {
                console.error(e);

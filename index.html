@@ -37,18 +37,19 @@
         <div class="col col-sm-12 col-md-12 col-lg order-1 order-lg-2 mr-lg-2">
             <div class="card " >
                 <div class="card-body">
-                    <h5 class="card-title">Load From Yaml</h5>
+                    <h5 class="card-title">Check Yaml</h5>
                     <p class="card-text  ">
-                        <label class="bg-warning text-dark p-2">Any glom values will be nulled out, initial variable values set</label>
-                        <button id="shell-game-start" type="button" class="btn btn-warning border border-light">Load</button>
+                        This will load and then write back out to the yaml editor. Nothing will be run
+                        <span style="display: inline-block;width: 100%; border-bottom: 1px solid whitesmoke; margin-top: 0.5em; margin-bottom: 0.5em"></span>
+                        <button id="shell-game-start" type="button" class="btn btn-warning border border-light">Check and Load</button>
                     </p>
                 </div>
 
                 <div class="card-body">
-                    <h5 class="card-title">Continue</h5>
+                    <h5 class="card-title">Execute</h5>
                     <p class="card-text ">
-
-                        <label class="bg-success text-white p-2">Use current variable and glom values</label>
+                        Step through code one turn at a time, each time, the new results will be written out the YAML
+                        <span style="display: inline-block;width: 100%; border-bottom: 1px solid whitesmoke; margin-top: 0.5em; margin-bottom: 0.5em"></span>
                         <button id="shell-game-step" type="button" class="btn btn-success border border-dark">Step</button>
                     </p>
                 </div>
@@ -56,16 +57,15 @@
                 <div class="card-body">
                     <h5 class="card-title">Add Shell with Name</h5>
                     <p class="card-text ">
-
-                        <label for="shell-game-master-list" class="p-2">Pick Name</label>
-                        <select id="shell-game-master-list" class="form-control bg-info"></select>
+                        You can add unlimited shells, the new shells will be inserted under their parent, if their parent shell is running
+                        <span style="display: inline-block;width: 100%; border-bottom: 1px solid whitesmoke; margin-top: 0.5em; margin-bottom: 0.5em"></span>
+                        <select id="shell-game-master-list" class="form-control bg-info" title="Pick Shell" autocomplete="off">
+                            <option value="">(Check or Step First)</option>
+                        </select>
+                        <br>
+                        <button id="shell-game-add" type="button" class="btn btn-info">Add</button>
                     </p>
 
-                    <p class="card-text ">
-
-                        <label class="">Add Selected Shell to Running</label>
-                        <button id="shell-game-add" type="button" class="btn btn-secondary">Add</button>
-                    </p>
                 </div>
 
 
