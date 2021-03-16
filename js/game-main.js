@@ -1,5 +1,9 @@
 
 let shell_game_tokenfield;
+
+let select_elements = null;
+let element_data = [];
+
 /**
  * @var {ShellGameRun}
  */
@@ -7,6 +11,7 @@ let run;
 
 $(function($){
 
+    setup_select2($)
     init_event_handlers();
     shell_game_editor_init($);
 
@@ -149,13 +154,50 @@ $(function($){
         });
 
 
-
-
-
-
-
-
     }
 
 
 });
+
+function setup_select2($) {
+    $.fn.select2.amd.define('select2/data/customAdapter', ['select2/data/array', 'select2/utils'],
+        function (ArrayAdapter, Utils) {
+            function CustomDataAdapter($element, options) {
+                CustomDataAdapter.__super__.constructor.call(this, $element, options);
+            }
+
+            Utils.Extend(CustomDataAdapter, ArrayAdapter);
+            CustomDataAdapter.prototype.updateOptions = function (data) {
+                this.$element.find('option').remove();
+                this.addOptions(this.convertToOptions(data));
+            }
+            return CustomDataAdapter;
+        }
+    );
+
+    let regular_select_element = $('select#shell-game-element-list');
+
+    let customAdapter = $.fn.select2.amd.require('select2/data/customAdapter');
+
+
+    select_elements = regular_select_element.select2({
+        dataAdapter: customAdapter,
+        data: element_data,
+        placeholder: {
+            id: '-1', // the value of the option
+            text: 'Select an Element'
+        },
+        containerCssClass: ''
+    });
+
+    regular_select_element.on('select2:select', function (e) {
+        let data = e.params.data;
+        console.log('selected',data);
+    });
+
+    element_data.push({id:-1,text:" ",notes:"blank line"});
+    element_data.push({id:1,text:"dummy element",upper:false});
+    element_data.push({id:2,text:"dummy element 2",upper:false});
+
+    select_elements.data('select2').dataAdapter.updateOptions(element_data);
+}

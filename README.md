@@ -133,25 +133,28 @@ The select box will list all the non topmost shells, the new shell instance will
 
 ## Development Reference
 
+### JS Libraries
 * [Bootstrap](https://getbootstrap.com/)
-* [Ace JS library](https://ace.c9.io/) 
-* [Making MIT license](https://license-generator.intm.org/)
+* [Ace JS library](https://ace.c9.io/)
 * [Bootstrap 4 toast wrapper](https://github.com/Script47/Toast)
 * [Yaml Library](https://github.com/nodeca/js-yaml)
-    * [Intro To YAML](https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started/)
 * [Lodash](https://lodash.com/)
-* [TokenField](https://kanecohen.github.io/tokenfield/)
-  
+* [TokenField](https://github.com/KaneCohen/tokenfield)
+* [Select2](https://select2.org/)
+
+### Reference
+
+* [Intro To YAML](https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started/)
 * [JsDoc lookup](https://jsdoc.app/tags-type.html)
+* [Making MIT license](https://license-generator.intm.org/)
 
 
-
-## Todo
+### Todo
 
 [Add Badges to other things](https://shields.io/category/version)
 
 
-## Example YAML
+# Example YAML
 
 ```yaml
 author: Will

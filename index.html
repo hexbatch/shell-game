@@ -14,6 +14,9 @@
     <!-- Tokenfield   -->
     <link rel="stylesheet" href="node_modules/tokenfield/dist/tokenfield.css">
 
+    <!-- Select2 -->
+    <link href="node_modules/select2/dist/css/select2.min.css" rel="stylesheet" />
+
     <!-- My Styles-->
     <link rel="stylesheet" href="css/shell-style.css" >
 
@@ -25,21 +28,21 @@
 <div class="container-fluid mx-3 mt-3">
 
     <div class="row">
-        <div class="col col-sm-2 col-md d-flex flex-column justify-content-center">
-            <div class="">
+        <div class="col-sm-12 col-md-3 d-flex flex-column justify-content-center order-2 order-md-1">
+            <div class="pb-1 pb-md-0">
                 <input class="form-control shell-game-text-tagger" placeholder="" title="Enter Tags">
             </div>
         </div>
-        <div class="col col-sm-8 col-md-6">
+        <div class="col-sm-12 col-md-6 order-1 order-md-1">
             <h1>Shell Emulator</h1>
         </div>
-        <div class="col col-sm-2 col-md">
+        <div class="col order-3">
             <!-- space for future -->
         </div>
     </div>
 
     <div class="row">
-        <div class="col col-sm-12 col-md-12 col-lg order-1 order-lg-2 mr-lg-2">
+        <div class="col col-sm-12 col-md-12 col-lg order-1 order-lg-3 mr-lg-2">
             <div class="card " >
                 <div class="card-body">
                     <h5 class="card-title">Check Yaml</h5>
@@ -78,7 +81,18 @@
             </div> <!-- /.card -->
         </div>
 
-        <div class="col-11 col-sm-12 col-md-12 col-lg-10 order-2 order-lg-1">
+        <div class="col-11 col-sm-12 col-md-12 col-lg-3 order-2 order-lg-2">
+            <div class="card " >
+                <div class="card-body">
+                    <h5 class="card-title">Elements</h5>
+                    <div class="card-text shell-game-element-holder">
+                        <select id="shell-game-element-list" title="Elements" class="form-control"></select>
+                    </div> <!-- /.shell-game-holder -->
+                </div> <!-- /.card-body -->
+            </div> <!-- /.card -->
+        </div>
+
+        <div class="col-11 col-sm-12 col-md-12 col-lg-6 order-3 order-lg-1">
             <div class="card " >
                 <div class="card-body">
                     <h5 class="card-title">Yaml Display</h5>
@@ -102,6 +116,7 @@
 <script src="node_modules/js-yaml/dist/js-yaml.min.js"></script>
 <script src="node_modules/lodash/lodash.min.js"></script>
 <script src="node_modules/tokenfield/dist/tokenfield.min.js"></script>
+<script src="node_modules/select2/dist/js/select2.min.js"></script>
 
 <!-- My Stuff-->
 <script src="js/helpers.js"></script>
