@@ -1,5 +1,5 @@
 
-
+let shell_game_tokenfield;
 /**
  * @var {ShellGameRun}
  */
@@ -46,7 +46,9 @@ $(function($){
                 console.error(e);
                 do_toast({title:'Error',subtitle:e.name,content: e.message,delay:0,type:'error'});
             }
-        })
+        });
+
+
     }
 
 
@@ -55,11 +57,18 @@ $(function($){
 
 
            try {
-               let raw = shell_game_get_object_from_editor_value();
+               let raw = shell_game_get_object_from_editor_value(on_tags);
                if (!('game' in raw)) {
                    // noinspection ExceptionCaughtLocallyJS
                    throw new ShellGameRunError("yaml does not have a game member");
                }
+
+               if ('tags' in raw) {
+                   if (_.isArray(raw.tags) && on_tags) {
+                       on_tags(raw.tags);
+                   }
+               }
+
                run = new ShellGameRun(raw.game);
                console.debug('run', run);
                let da_export = run.export_as_object()
@@ -88,6 +97,64 @@ $(function($){
                 do_toast({title:'Error',subtitle:e.name,content: e.message,delay:10000,type:'error'});
             }
         });
+
+        /**
+         * @param {string[]} tags
+         */
+        function on_tags(tags) {
+            let my_tag_array = [];
+            for(let i = 0; i < tags.length; i++) {
+                let node = {
+                  id: i,
+                  name: tags[i],
+                  custom: null
+                };
+                my_tag_array.push(node);
+            }
+            shell_game_tokenfield.setItems(my_tag_array);
+        }
+
+        shell_game_tokenfield = new Tokenfield({
+            el: document.querySelector('.shell-game-text-tagger'),
+            newItems: true,
+            multiple: true,
+            filterSetItems: false,
+            delimiters: [',',';',' '],
+            placeholder: 'Enter Tags',
+            addItemOnBlur: true
+        });
+
+
+        shell_game_tokenfield.on('addedToken' ,(a/*,token_info*/) => {
+            let items = a.getItems();
+            let tag_name_array = [];
+            for(let i = 0; i < items.length; i++) {
+                tag_name_array.push(items[i].name);
+            }
+            shell_game_set_editor_value_from_object(tag_name_array,'tags');
+            console.log(tag_name_array);
+        });
+
+
+
+
+        shell_game_tokenfield.on("removedToken", (a/*,token_info*/) => {
+            let items = a.getItems();
+            let tag_name_array = [];
+            for(let i = 0; i < items.length; i++) {
+                tag_name_array.push(items[i].name);
+            }
+            shell_game_set_editor_value_from_object(tag_name_array,'tags');
+            console.log(tag_name_array);
+        });
+
+
+
+
+
+
+
+
     }
 
 

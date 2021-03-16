@@ -51,3 +51,8 @@ lodash@^4.17.21:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
   integrity sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==
+
+tokenfield@^1.4.4:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/tokenfield/-/tokenfield-1.4.4.tgz#7c4968f36decc004c7fd148e0dd05574257447b7"
+  integrity sha512-GMb8nZH6NUztVu4SH36DQB/vssNrMC1c8wg9PjL+h27ca7esoI//Dh+7N6FRERIfmSq+5Xe6MjpFLFkasp6s0w==

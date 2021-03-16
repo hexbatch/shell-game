@@ -123,6 +123,13 @@ You only need to start with an empty top shell that is running, and then can add
 The select box will list all the non topmost shells, the new shell instance will set its element's variables according to its
 *element_init* setting (new or find)
 
+### Tags can be added and removed
+
+* Adding tags is done by either modifying a tag array in the yaml , next to the game (or adding one if missing). 
+  Or by adding tags in the tag input at the top
+  
+* When adding editing the yaml , the tags will be synced when the yaml is loaded
+
 
 ## Development Reference
 
@@ -133,6 +140,7 @@ The select box will list all the non topmost shells, the new shell instance will
 * [Yaml Library](https://github.com/nodeca/js-yaml)
     * [Intro To YAML](https://www.cloudbees.com/blog/yaml-tutorial-everything-you-need-get-started/)
 * [Lodash](https://lodash.com/)
+* [TokenField](https://kanecohen.github.io/tokenfield/)
   
 * [JsDoc lookup](https://jsdoc.app/tags-type.html)
 
