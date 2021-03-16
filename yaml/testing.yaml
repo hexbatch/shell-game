@@ -1,6 +1,11 @@
 author: Will
 date: 2021-03-14
 notes: first test
+tags:
+  - rabbit
+  - steak
+  - pie
+  - help
 game:
   element_lib:
     first:
