@@ -59,6 +59,12 @@ function ShellGameShell(raw_input,run_object,
     this.run_object = null;
 
     /**
+     *
+     * @type {?string}
+     */
+    this.guid = null;
+
+    /**
      * @type {string}
      */
     this.shell_name = '';
@@ -94,6 +100,8 @@ function ShellGameShell(raw_input,run_object,
         this.run_object = master.run_object;
         this.shell_name = master.shell_name;
 
+        this.guid = 'shell-'+uuid.v4();
+
 
         if (live_parent) {
             //check for recursion before it has a chance to happen
@@ -107,6 +115,7 @@ function ShellGameShell(raw_input,run_object,
             this.shell_parent_name = master.shell_parent_name;
             this.shell_parent = live_parent;
             this.shell_parent.shell_children.push(this);
+
         } else {
             this.shell_parent_name = null;
             this.shell_parent = null;
@@ -180,6 +189,13 @@ function ShellGameShell(raw_input,run_object,
 
         if (!this.shell_name) {
             throw new ShellGameShellError("no name set for shell in shell_name");
+        }
+
+        if ('guid' in raw_input) {
+            if (!(typeof raw_input.guid === 'string' || raw_input.guid instanceof String)) {
+                throw new ShellGameShellError("guid is not a string");
+            }
+            this.guid = raw_input.guid;
         }
 
 
@@ -375,7 +391,7 @@ function ShellGameShell(raw_input,run_object,
             ret[this.shell_name] = [];
         }
 
-        let master_node = {shell_elements: {},shell_children: {}};
+        let master_node = {guid: this.guid,shell_elements: {},shell_children: {}};
         for(let b =0; b < this.shell_elements.length; b++) {
             let node = this.shell_elements[b];
             let top_export = node.export_element();

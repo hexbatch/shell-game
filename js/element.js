@@ -5,6 +5,13 @@
 function ShellGameElement(raw_input) {
 
     this.element_name = '';
+
+    /**
+     * @type {?string}
+     */
+    this.guid = null;
+
+
     /**
      * @type {ShellGameVariable[]}
      */
@@ -103,6 +110,20 @@ function ShellGameElement(raw_input) {
         }else {
             throw new ShellGameElementError("element_gloms is not a plain object or an array");
         }
+    }
+
+    if ('guid' in raw_input) {
+        if (!(typeof raw_input.guid === 'string' || raw_input.guid instanceof String || (raw_input.guid === null)) ) {
+            throw new ShellGameElementError("element guid is not a string or null");
+        }
+        if (raw_input.guid) {
+            this.guid = raw_input.guid;
+        } else {
+            this.guid = 'element-'+uuid.v4();
+        }
+
+    } else {
+        this.guid = 'element-'+uuid.v4();
     }
 
     //check to make sure all gloms have a unique name AND do not have a variable name
@@ -211,7 +232,7 @@ function ShellGameElement(raw_input) {
      */
     this.export_element = function() {
         let ret = {};
-        ret[this.element_name] = {gloms: {}, variables: {}};
+        ret[this.element_name] = {guid: this.guid,gloms: {}, variables: {}};
         for(let y =0; y < this.element_variables.length; y++) {
             let node = this.element_variables[y];
             ret[this.element_name].variables[node.variable_name] = node.variable_current_value;
@@ -284,6 +305,13 @@ function ShellGameElement(raw_input) {
      * @param {ShellGameElementState} state
      */
     this.restore_element_from_state = function (state) {
+
+
+        if (state.guid) {
+            this.guid = state.guid;
+        } else {
+            this.guid = 'element-'+uuid.v4();
+        }
 
         for(let var_name in state.state_variables) {
             if (!state.state_variables.hasOwnProperty(var_name)) {continue;}

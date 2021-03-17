@@ -141,6 +141,7 @@ The select box will list all the non topmost shells, the new shell instance will
 * [Lodash](https://lodash.com/)
 * [TokenField](https://github.com/KaneCohen/tokenfield)
 * [Select2](https://select2.org/)
+* [Uuid](https://github.com/uuidjs/uuid)
 
 ### Reference
 

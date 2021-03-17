@@ -8,6 +8,13 @@
 function ShellGameElementState(raw_input,element_name,run_object) {
     this.state_variables = {};
     this.state_gloms = {};
+
+    /**
+     *
+     * @type {?string}
+     */
+    this.guid = null;
+
     this.element_name = element_name;
     if (!this.element_name) {
         throw new ShellGameElementStateError("element name is empty ");
@@ -20,6 +27,16 @@ function ShellGameElementState(raw_input,element_name,run_object) {
 
     if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameElementState)) {
         throw new ShellGameElementStateError("raw_input is not a plain object or a ShellGame Ele State");
+    }
+
+    if ('guid' in raw_input) {
+        if (!(typeof raw_input.guid === 'string' || raw_input.guid instanceof String || raw_input.guid === null )) {
+            throw new ShellGameElementStateError("element guid is not a string or null (b)");
+        }
+
+        this.guid = raw_input.guid;
+
+
     }
 
     if ('variables' in raw_input && (! _.isEmpty(raw_input.variables))) {

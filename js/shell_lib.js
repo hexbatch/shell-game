@@ -211,6 +211,7 @@ function ShellGameShellLib(raw_input, run_object) {
                     }
                 }
                 let alive = this.spawn_shell(shell_name, top_parent,settings);
+                alive.guid = shell_thing.guid;
 
                 if ('shell_children' in shell_thing) {
                     if (!_.isPlainObject(shell_thing.shell_children)) {
