@@ -78,14 +78,32 @@ function ShellGameRun(yaml_parsed) {
         }
     }
 
+    /**
+     *
+     * @param {string} [shell_search]
+     * @param {number} [limit] default 1
+     */
+    this.pop_active_shell = function(shell_search, limit) {
+        if (!shell_search) {return;}
+        if (!this.main_shell) {return;}
+        let my_limit = limit || 1;
+        let shells = this.main_shell.list_shells(shell_search,my_limit);
+        for(let i = 0; i < shells.length; i++) {
+            let shell = shells[i];
+            shell.pop_shell();
+        }
+    }
+
 
 
     /**
      *
      * @param {string} [shell_name]
+     * @param {number} [limit] default 1
      */
-    this.get_live_shells = function(shell_name) {
-        if (this.main_shell) {return this.main_shell.list_shells(shell_name);}
+    this.get_live_shells = function(shell_name, limit) {
+        let my_limit = limit || 1;
+        if (this.main_shell) {return this.main_shell.list_shells(shell_name,my_limit);}
     }
 
     /**
@@ -97,12 +115,6 @@ function ShellGameRun(yaml_parsed) {
     }
 
 
-    /**
-     * inits each active shell
-     */
-    this.init = function() {
-        if (this.main_shell) {this.main_shell.init();}
-    }
 
     /**
      * returns an object to be used to print out the yaml under the game key

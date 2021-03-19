@@ -289,6 +289,20 @@ function ShellGameElement(raw_input) {
 
     /**
      *
+     * @param {string} variable_name
+     * @return {ShellGameVariable}
+     */
+    this.get_variable = function(variable_name) {
+
+        for(let i = 0; i < this.element_variables.length; i++) {
+            let thing = this.element_variables[i];
+            if (thing.variable_name === variable_name) {return thing;}
+        }
+        throw new ShellGameElementError("Variable name of '"+ variable_name+"' does not exist in this element of guid " + this.guid);
+    }
+
+    /**
+     *
      * @param {string} glom_name
      * @return {boolean}
      */

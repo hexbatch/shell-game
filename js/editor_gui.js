@@ -42,7 +42,7 @@ function shell_game_set_editor_value_from_object(thing_which_is_object,key_to_re
 
 /**
  *
- * @return {Object}
+ * @return {ShellGameRawInput}
  */
 function shell_game_get_object_from_editor_value() {
     /**

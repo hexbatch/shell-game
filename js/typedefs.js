@@ -12,3 +12,11 @@
  * @param {string[]} tags
  *
  */
+
+
+/**
+ * Raw input possible keys
+ * @typedef {Object} ShellGameRawInput
+ * @property {object} [game] - optional
+ * @property {string[]} [tags] - optional
+ */

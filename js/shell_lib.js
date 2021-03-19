@@ -85,7 +85,7 @@ function ShellGameShellLib(raw_input, run_object) {
             let node = {shell_name: shell.shell_name, shell_parent_name: shell.shell_parent_name,elements: []};
             for (let t = 0; t < shell.templates.length; t++) {
                 let da_tempest = shell.templates[t];
-                let mini = {element_name: da_tempest.element_name, element_init: da_tempest.element_init}
+                let mini = {element_name: da_tempest.element_name, element_init: da_tempest.element_init,element_end: da_tempest.element_end}
                 node.elements.push(mini);
             }
             ret[node.shell_name] = node;

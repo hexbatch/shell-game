@@ -6,6 +6,7 @@
 function ShellGameElementTemplate(raw_input) {
     this.element_name = '';
     this.element_init = '';
+    this.element_end = '';
 
     if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameElementTemplate)) {
         throw new ShellGameShellError("raw_input is not a plain object or a ShellGame Ele Template");
@@ -33,12 +34,38 @@ function ShellGameElementTemplate(raw_input) {
                 break
             }
             default: {
-                throw new ShellGameElementTemplateError("wrong init plan set for template in element_init. Needed new|find but got: " + raw_input.shell_name);
+                throw new ShellGameElementTemplateError("wrong init plan set for template in element_init. Needed new|find but got: " + raw_input.element_init);
             }
         }
 
     } else {
         throw new ShellGameElementTemplateError("no init plan set for template in element_init");
+    }
+
+
+    if ('element_end' in raw_input) {
+        if (!(typeof raw_input.element_end === 'string' || raw_input.element_end instanceof String)) {
+            throw new ShellGameElementTemplateError("element_end is not a string");
+        }
+        switch (raw_input.element_end) {
+
+            case null:
+            case '':
+            case 'void': {
+                this.element_end = 'void';
+                break;
+            }
+            case 'return': {
+                this.element_end = raw_input.element_end;
+                break
+            }
+            default: {
+                throw new ShellGameElementTemplateError("wrong end plan set for template in element_end. Needed void|return but got: " + raw_input.element_end);
+            }
+        }
+
+    } else {
+        this.element_end = 'void';
     }
 }
 
@@ -79,6 +106,12 @@ function ShellGameShell(raw_input,run_object,
      */
     this.shell_parent = null;
 
+
+    /**
+     * @type {ShellGameShell}
+     */
+    this.shell_master = null;
+
     /**
      * @type {ShellGameShell[]}
      */
@@ -95,8 +128,30 @@ function ShellGameShell(raw_input,run_object,
     this.shell_elements = [];
 
 
+    /**
+     *
+     * @param {string} search_for_element_name
+     * @return {ShellGameElement}
+     */
+    this.find_first_element_in_ancestor_chain = function(search_for_element_name){
+        let par = this.shell_parent;
+        let found_element = null;
+        while (par && (found_element === null)) {
+            for (let u = 0; u < par.shell_elements.length; u++) {
+                let test_element = par.shell_elements[u];
+                if (test_element.element_name === search_for_element_name) {
+                    found_element = test_element;
+                    break;
+                }
+            }
+        }
+        return found_element;
+    }
+
+
     if (master instanceof ShellGameShell && (live_parent instanceof  ShellGameShell || !live_parent  )) {
 
+        this.shell_master = master;
         this.run_object = master.run_object;
         this.shell_name = master.shell_name;
 
@@ -142,17 +197,7 @@ function ShellGameShell(raw_input,run_object,
                 this.shell_elements.push(element_new);
             } else if (template.element_init === 'find') {
                 //go up through the chain of parents to try to find it
-                let par = this.shell_parent;
-                let found_element = null;
-                while(par && (found_element === null)) {
-                    for (let u = 0; u < par.shell_elements.length; u++) {
-                        let test_element = par.shell_elements[u];
-                        if (test_element.element_name === template.element_name) {
-                            found_element = test_element;
-                            break;
-                        }
-                    }
-                }
+                let found_element = this.find_first_element_in_ancestor_chain(template.element_name);
 
                 if (found_element) {
                     let element_new = new ShellGameElement(found_element);
@@ -272,6 +317,69 @@ function ShellGameShell(raw_input,run_object,
         for(let i = 0; i < this.shell_elements.length ; i++) {
             this.shell_elements[i].init_element();
         }
+    }
+
+
+
+
+    /**
+     *
+     * @param {string} search_for_element_name
+     * @return {ShellGameElement}
+     */
+    this.find_this_element = function(search_for_element_name){
+        let ret = null;
+        for(let i = 0; i < this.shell_elements.length ; i++) {
+            if (this.shell_elements[i].element_name === search_for_element_name) {
+                ret = this.shell_elements[i];
+                break;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * For any elements that have element_end of return, then find the element in the ancestor chain, starting with the parent,
+     * and overwrite the first found element's value to be what this value is
+     *
+     * Remove it from the parent's shell_children, set the shell_parent to null
+     */
+    this.pop_shell = function() {
+        if (!this.shell_parent) {return;}
+
+        for (let i = 0; i < this.shell_master.templates.length; i++) {
+            let template = this.shell_master.templates[i];
+            if (template.element_end === 'return') {
+                let found_element = this.find_first_element_in_ancestor_chain(template.element_name);
+
+
+                if (found_element) {
+                    let our_element = this.find_this_element(template.element_name);
+                    if (!our_element) {throw new ShellGameShellError("Cannot find element of '"+template.element_name+"' even though its in the template");}
+                    for(let variable_index = 0; variable_index <  our_element.element_variables.length; variable_index++) {
+                        let da_var = our_element.element_variables[variable_index];
+                        let dat_var = found_element.get_variable(da_var.variable_name);
+                        dat_var.variable_current_value = da_var.variable_current_value;
+                    }
+                }
+            }
+        }//end template loop when ending
+
+        //remove self from parent's child list
+        let found_index = -1;
+        for(let shell_child_index = 0; shell_child_index < this.shell_parent.shell_children.length; shell_child_index++) {
+            let is_it_me = this.shell_parent.shell_children[shell_child_index];
+            if (is_it_me.guid === this.guid) {
+                found_index = shell_child_index;
+                break;
+            }
+        }
+
+        if (found_index >= 0) {
+            this.shell_parent.shell_children.splice(found_index, 1);
+        }
+        this.shell_parent = null;
+
     }
 
 
@@ -409,48 +517,58 @@ function ShellGameShell(raw_input,run_object,
     }
 
     /**
-     *
-     * @param {string} [shell_name] optional name to search for
+     * returns up to limit results from search, a blank search means include everything, starts from top and works from walks the tree from left to right to fill up the slots
+     * @param {string} [shell_search] optional name or guid to search for
+     * @param {number} [limit] default 1
+     * @param {ShellGameShell[]} [found_list]
      * @return {ShellGameShell[]} returns 0 or more in an array
      */
-    this.list_shells = function(shell_name) {
+    this.list_shells = function(shell_search,limit,found_list) {
 
-        if (shell_name) {
-            if (shell_name === this.shell_name) {
-                return [this];
+        if (_.isEmpty(found_list)) {
+            found_list = [];
+        }
+
+        if (shell_search) {
+            if (shell_search === this.shell_name || shell_search === this.guid) {
+                !_.includes(found_list,this) && found_list.push(this);
+                if (found_list.length >= limit) {return found_list;}
             }
             for (let i = 0; i < this.shell_children.length; i++) {
                 let child = this.shell_children[i];
-                if (shell_name === child.shell_name) {
-                    return [child];
+                if (shell_search === child.shell_name || shell_search === child.guid) {
+                    !_.includes(found_list,child) && found_list.push(child);
+                    if (found_list.length >= limit) {return found_list;}
                 }
             }
 
             for (let i = 0; i < this.shell_children.length; i++) {
-                let maybe_ret = this.shell_children[i].list_shells(shell_name);
-                if (maybe_ret.length) {
-                    return maybe_ret;
-                }
+                let sub_search = this.shell_children[i].list_shells(shell_search,limit - found_list.length,found_list);
+                found_list = _.union(found_list,sub_search);
+                if (found_list.length >= limit) {return found_list;}
             }
         } else {
-            let ret = [];
-            ret.push(this);
+
+            found_list.push(this);
+            if (found_list.length >= limit) {return found_list;}
             for (let i = 0; i < this.shell_children.length; i++) {
-                ret.push(this.shell_children[i])
+                let das_child = this.shell_children[i]
+                !_.includes(found_list,das_child) &&  found_list.push(das_child);
+                if (found_list.length >= limit) {return found_list;}
             }
 
             for (let i = 0; i < this.shell_children.length; i++) {
-                let child_ret = this.shell_children[i].list_shells(shell_name);
+                let child_ret = this.shell_children[i].list_shells(shell_search,limit - found_list.length,found_list);
                 for(let u = 0; u < child_ret.length; u ++) {
                     let mini_me = child_ret[u];
-                    ret.push(mini_me);
+                    !_.includes(found_list,mini_me) &&  found_list.push(mini_me);
+                    if (found_list.length >= limit) {return found_list;}
                 }
             }
 
-            return ret;
-
-
         }
+
+        return found_list;
 
 
     }

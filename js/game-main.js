@@ -62,7 +62,7 @@ $(function($){
 
 
            try {
-               let raw = shell_game_get_object_from_editor_value(on_tags);
+               let raw = shell_game_get_object_from_editor_value();
                if (!('game' in raw)) {
                    // noinspection ExceptionCaughtLocallyJS
                    throw new ShellGameRunError("yaml does not have a game member");
