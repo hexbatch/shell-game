@@ -4,10 +4,7 @@ let shell_game_tokenfield;
 let select_elements = null;
 let element_data = [];
 
-/**
- * @var {ShellGameRun}
- */
-let run;
+
 
 $(function($){
 
@@ -15,8 +12,10 @@ $(function($){
     init_event_handlers();
     shell_game_editor_init($);
 
+    let sel = $('select#shell-game-master-list');
+
     function do_test_shell_list() {
-        let sel = $('select#shell-game-master-list');
+
         sel.html('');
         sel.append($('<option>', {
                 value: null,
@@ -41,17 +40,7 @@ $(function($){
             );
         }
 
-        $('button#shell-game-add').click(function() {
-            let shell_name = sel.val();
-            if (!shell_name) {return;}
-            try {
-                run.add_active_shell(shell_name);
-                shell_game_set_editor_value_from_object(run.export_as_object(), 'game');
-            } catch (e) {
-                console.error(e);
-                do_toast({title:'Error',subtitle:e.name,content: e.message,delay:0,type:'error'});
-            }
-        });
+
 
 
     }
@@ -100,6 +89,24 @@ $(function($){
             } catch (e) {
                 console.error(e);
                 do_toast({title:'Error',subtitle:e.name,content: e.message,delay:10000,type:'error'});
+            }
+        });
+
+        $('button#shell-game-add').click(function() {
+            console.log("I was clicked");
+            let shell_name = sel.val();
+            if (!shell_name) {return;}
+            try {
+                do_toast({title:'I was clicked',subtitle:'???',content: 'bitch',delay:2000,type:'info'});
+                run.add_active_shell(shell_name);
+                let out = run.export_as_object();
+                out.random = { when: Date.now(), rand : Math.random()};
+                shell_game_set_editor_value_from_object(out, 'game');
+                console.log("I added and updated vvbc");
+
+            } catch (e) {
+                console.error(e);
+                do_toast({title:'Error',subtitle:e.name,content: e.message,delay:0,type:'error'});
             }
         });
 

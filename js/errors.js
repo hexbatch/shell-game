@@ -74,3 +74,17 @@ class ShellGameElementStateError extends Error {
         this.name = "ShellGameElementStateError";
     }
 }
+
+class ShellGameEventHookError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameEventHookError";
+    }
+}
+
+class ShellGameKeeperError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "ShellGameKeeperError";
+    }
+}

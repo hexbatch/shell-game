@@ -1,6 +1,6 @@
 
 /**
- * @param {object} yaml_parsed
+ * @param {ShellGameSerialized} yaml_parsed
  * @constructor
  *
  * Yaml String is array of ShellGameVariable
@@ -25,6 +25,7 @@ function ShellGameRun(yaml_parsed) {
     this.element_lib = new ShellGameElementLib(yaml_parsed);
 
     this.shell_lib = new ShellGameShellLib(yaml_parsed,this);
+    this.shell_lib.add_shells_to_lookup();
 
     /**
      *
@@ -55,8 +56,8 @@ function ShellGameRun(yaml_parsed) {
 
     /**
      *
-     * @param {string} shell_name
-     * @param {?(ShellGameShell|string)} [live_parent]
+     * @param {string} shell_name , the name of the shell to add
+     * @param {?(ShellGameShell|string)} [live_parent] optional guid of the parent to add, if multiple possible parents in play
      */
     this.add_active_shell = function(shell_name,live_parent) {
 
@@ -90,7 +91,7 @@ function ShellGameRun(yaml_parsed) {
         let shells = this.main_shell.list_shells(shell_search,my_limit);
         for(let i = 0; i < shells.length; i++) {
             let shell = shells[i];
-            shell.pop_shell();
+            shell.pop_shell(this);
         }
     }
 

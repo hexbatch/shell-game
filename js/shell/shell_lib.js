@@ -7,6 +7,21 @@
  */
 function ShellGameShellLib(raw_input, run_object) {
 
+
+    /**
+     * Holds all shells, running and master
+     * @type {Object.<string, ShellGameShell>}
+     */
+    this.shell_guid_lookup = {};
+
+
+    /**
+     * Holds master shells
+     * @type {Object.<string, ShellGameShell>}
+     */
+    this.master_shell_guid_lookup = {};
+
+
     /**
      * @type {ShellGameRun}
      */
@@ -72,6 +87,21 @@ function ShellGameShellLib(raw_input, run_object) {
         node.shell_parent = parent_to_set;
     }
 
+    /**
+     * Adds the master shells
+     */
+    this.add_shells_to_lookup = function() {
+        for(let shell_name in this.shells) {
+            if (!this.shells.hasOwnProperty(shell_name)) {continue;}
+            let shell = this.shells[shell_name];
+            if (!shell.guid) {
+                throw new ShellGameShellLibError('Shell of ' + shell.shell_name + ' does not have a guid');
+            }
+            this.shell_guid_lookup[shell.guid] = shell;
+            this.master_shell_guid_lookup[shell.guid] = shell;
+        }
+    }
+
 
     /**
      * @return {Object.<string, ShellGameShell>}
@@ -82,7 +112,7 @@ function ShellGameShellLib(raw_input, run_object) {
         for(let shell_name in this.shells) {
             if (!this.shells.hasOwnProperty(shell_name)) {continue;}
             let shell = this.shells[shell_name];
-            let node = {shell_name: shell.shell_name, shell_parent_name: shell.shell_parent_name,elements: []};
+            let node = {shell_name: shell.shell_name, guid: shell.guid, shell_parent_name: shell.shell_parent_name,elements: []};
             for (let t = 0; t < shell.templates.length; t++) {
                 let da_tempest = shell.templates[t];
                 let mini = {element_name: da_tempest.element_name, element_init: da_tempest.element_init,element_end: da_tempest.element_end}
@@ -146,7 +176,7 @@ function ShellGameShellLib(raw_input, run_object) {
     this.spawn_shell = function(shell_name,live_parent,element_states) {
         if (this.shells.hasOwnProperty(shell_name)) {
             let found = this.shells[shell_name];
-            return found.spawn(live_parent,element_states);
+            return found.spawn(this.run_object,live_parent,element_states);
         }
         throw new ShellGameElementLibError('Cannot find element of ' + shell_name + " in the library");
     }
@@ -211,7 +241,20 @@ function ShellGameShellLib(raw_input, run_object) {
                     }
                 }
                 let alive = this.spawn_shell(shell_name, top_parent,settings);
-                alive.guid = shell_thing.guid;
+                if (!alive.guid) {
+                    throw new ShellGameShellLibError('Running Shell of ' + alive.shell_name + ' does not have a guid');
+                }
+                if ('guid' in shell_thing && shell_thing.guid) {
+                    delete run_object.shell_lib.shell_guid_lookup[alive.guid];
+                    alive.guid = shell_thing.guid;
+                    for(let j = 0; j < alive.shell_elements.length; j++) {
+                        alive.shell_elements[j].owning_shell_guid = alive.guid;
+                    }
+                    if (!run_object.shell_lib.shell_guid_lookup.hasOwnProperty(alive.guid)) {
+                        run_object.shell_lib.shell_guid_lookup[alive.guid] = alive;
+                    }
+                }
+
 
                 if ('shell_children' in shell_thing) {
                     if (!_.isPlainObject(shell_thing.shell_children)) {

@@ -1,8 +1,9 @@
 /**
- * @param {?object} [raw_input]
+ * @param {?object} raw_input
+ * @param {?ShellGameElement} element_master
  * @constructor
  */
-function ShellGameElement(raw_input) {
+function ShellGameElement(raw_input,element_master) {
 
     this.element_name = '';
 
@@ -27,7 +28,20 @@ function ShellGameElement(raw_input) {
      */
     this.element_script = '';
 
+    /**
+     * @type {?string}
+     */
+    this.owning_shell_guid = null;
+
+
+    /**
+     * @type {?ShellGameElement}
+     */
+    this.element_master = null;
+
     if (raw_input === null) {return;}
+
+    this.element_master = element_master;
 
     if (!$.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameElement)) { throw new ShellGameElementError("raw_input is not a plain object or an Element");}
 
@@ -119,11 +133,20 @@ function ShellGameElement(raw_input) {
         if (raw_input.guid) {
             this.guid = raw_input.guid;
         } else {
-            this.guid = 'element-'+uuid.v4();
+            if (this.element_master) {
+                this.guid = 'element-'+uuid.v4();
+            } else {
+                this.guid = 'element-master-'+uuid.v4();
+            }
+
         }
 
     } else {
-        this.guid = 'element-'+uuid.v4();
+        if (this.element_master) {
+            this.guid = 'element-'+uuid.v4();
+        } else {
+            this.guid = 'element-master-'+uuid.v4();
+        }
     }
 
     //check to make sure all gloms have a unique name AND do not have a variable name
@@ -248,6 +271,7 @@ function ShellGameElement(raw_input) {
 
     this.export_element_definition = function() {
         let ret = {
+            guid: this.guid,
             element_name: this.element_name,
             element_variables: {},
             element_gloms: {},
