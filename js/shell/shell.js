@@ -541,8 +541,8 @@ function ShellGameShell(raw_input,run_object,
      * returns up to limit results from search, a blank search means include everything, starts from top and works from walks the tree from left to right to fill up the slots
      * @param {string} [element_search] optional name or guid to search for
      * @param {number} [limit] default 1
-     * @param {ShellGameShell[]} [found_list]
-     * @return {ShellGameShell[]} returns 0 or more in an array
+     * @param {ShellGameElement[]} [found_list]
+     * @return {ShellGameElement[]} returns 0 or more in an array
      */
     this.list_running_elements = function(element_search, limit, found_list) {
 
@@ -556,7 +556,7 @@ function ShellGameShell(raw_input,run_object,
                 if ((element_search !== el.element_name) && (element_search !== el.guid) ) {continue;}
             }
 
-            !_.includes(found_list,this) && found_list.push(this);
+            !_.includes(found_list,el) && found_list.push(el);
             if (found_list.length >= limit) {return found_list;}
         }
 

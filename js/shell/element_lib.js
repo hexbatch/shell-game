@@ -9,6 +9,7 @@ function ShellGameElementLib(raw_input) {
 
     if (!$.isPlainObject(raw_input) ) { throw new ShellGameElementLibError("raw_input is not a plain object");}
     /**
+     * contains only master elements by name
      * @type {Object.<string, ShellGameElement>}
      */
     this.elements = {};
