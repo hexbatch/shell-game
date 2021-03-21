@@ -104,7 +104,7 @@ function ShellGameShellLib(raw_input, run_object) {
 
 
     /**
-     * @return {Object.<string, ShellGameShell>}
+     * @return {Object.<string, ShellGameSerializedShell>}
      * returns an object with keys of all the shell names with values of the raw shell objects
      */
     this.export_lib = function() {
@@ -112,59 +112,38 @@ function ShellGameShellLib(raw_input, run_object) {
         for(let shell_name in this.shells) {
             if (!this.shells.hasOwnProperty(shell_name)) {continue;}
             let shell = this.shells[shell_name];
-            let node = {shell_name: shell.shell_name, guid: shell.guid, shell_parent_name: shell.shell_parent_name,elements: []};
+
+            let node = new ShellGameSerializedShell();
+            node.guid = shell.guid;
+            node.shell_name = shell.shell_name;
+            node.shell_parent_name = shell.shell_parent_name;
             for (let t = 0; t < shell.templates.length; t++) {
                 let da_tempest = shell.templates[t];
-                let mini = {element_name: da_tempest.element_name, element_init: da_tempest.element_init,element_end: da_tempest.element_end}
-                node.elements.push(mini);
+                let mote = new ShellGameSerializedShellElement();
+                mote.element_name = da_tempest.element_name;
+                mote.element_init = da_tempest.element_init;
+                mote.element_end = da_tempest.element_end;
+
+                node.elements.push(mote);
             }
             ret[node.shell_name] = node;
         }
         return ret;
     };
 
-    /**
-     *
-     * @return {[]}
-     */
-    this.export_lib_as_parent_list = function() {
-        let ret = [];
-        for(let shell_name in this.shells) {
-            if (!this.shells.hasOwnProperty(shell_name)) {continue;}
-            let shell = this.shells[shell_name];
-            let par_name = shell.shell_parent_name;
-            let node = {shell_name: shell.shell_name, parents: []};
-            while(par_name) {
-                node.parents.push(par_name);
-                par_name = this.get_parent_name_via_child_name(par_name);
-            }
-            ret.push(node);
-        }
-        return ret;
-    }
+
 
     /**
      *
      * @param {string} shell_name
      * @return {boolean}
      */
-    this.check_if_shell_exists = function(shell_name) {
+    this.check_if_shell_exists_by_name = function(shell_name) {
         return this.shells.hasOwnProperty(shell_name);
 
     }
 
-    /**
-     *
-     * @param {string} shell_name
-     * @return {string}
-     */
-    this.get_parent_name_via_child_name = function(shell_name) {
-        if (this.check_if_shell_exists(shell_name)) {
-            let child_shell = this.shells[shell_name];
-            return child_shell.shell_parent_name;
-        }
-        throw new ShellGameShellLibError("Shell not found in library: " + shell_name);
-    }
+
 
     /**
      *
@@ -220,7 +199,7 @@ function ShellGameShellLib(raw_input, run_object) {
         for(let shell_name in raw_input) {
             if (!raw_input.hasOwnProperty(shell_name)) {continue;}
 
-            if (!this.check_if_shell_exists(shell_name)) {
+            if (!this.check_if_shell_exists_by_name(shell_name)) {
                 throw new ShellGameShellLibError("Cannot reconstitute shell of name " + shell_name + " as its not in the library");
             }
 

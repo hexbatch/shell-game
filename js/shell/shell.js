@@ -431,7 +431,8 @@ function ShellGameShell(raw_input,run_object,
     }//end glom
 
     /**
-     * @param {?object} [ret]
+     * @param {? Object.<string, ShellGameSerializedRunningShell[]>} [ret]
+     *
      * return object with shell name as the only key,
      * under that the shell elements keyed by element name and them having keys of variables and gloms
      *  those keys having the name and value
@@ -452,23 +453,25 @@ function ShellGameShell(raw_input,run_object,
              gloms: []
         shell_children: []
      */
-    this.export_shell = function(ret) {
+    this.export_running_shell = function(ret) {
 
         if (!ret) {ret = {};}
         if (!ret.hasOwnProperty(this.shell_name)) {
             ret[this.shell_name] = [];
         }
 
-        let master_node = {guid: this.guid,shell_elements: {},shell_children: {}};
+        let master_node = new ShellGameSerializedRunningShell();
+        master_node.guid = this.guid;
+
         for(let b =0; b < this.shell_elements.length; b++) {
             let node = this.shell_elements[b];
-            let top_export = node.export_element();
+            let top_export = node.export_running_shell_element();
             _.merge(master_node.shell_elements, top_export);
         }
 
         for(let s =0; s < this.shell_children.length; s++) {
             let child_shell = this.shell_children[s];
-            child_shell.export_shell(master_node.shell_children);
+            child_shell.export_running_shell(master_node.shell_children);
         }
 
         ret[this.shell_name].push(master_node);

@@ -24,6 +24,11 @@ function ShellGameEventHook(event_type,target,callback) {
     this.current_value = null;
 
     /**
+     * @type {string}
+     */
+    this.event_type = '';
+
+    /**
      * @type {?string}
      */
     this.last_digest_hash = null;
@@ -36,6 +41,8 @@ function ShellGameEventHook(event_type,target,callback) {
         case 'on_change_running_shell':
         case 'on_change_master_element':
         case 'on_change_running_element':
+        case 'on_refresh':
+        case 'on_pre':
         case 'on_step':
         case 'on_load': {
             this.event_type = event_type;
@@ -93,6 +100,7 @@ function ShellGameEventHook(event_type,target,callback) {
         if (!this.keeper) {return;}
 
         let that = this;
+
 
         switch (this.event_type) {
             case 'on_change_input_key': {
@@ -171,9 +179,26 @@ function ShellGameEventHook(event_type,target,callback) {
                 break;
             }
 
+
             case 'on_load': {
                 if (this.keeper.is_loading) {
                     this.current_value = this.keeper.run.export_as_object();
+                    this.callback(this);
+                }
+                break;
+            }
+
+            case 'on_refresh': {
+                if (this.keeper.is_refreshing) {
+                    this.current_value = this.keeper.last_raw;
+                    this.callback(this);
+                }
+                break;
+            }
+
+            case 'on_pre': {
+                if (this.keeper.is_pre) {
+                    this.current_value = this.keeper.last_raw;
                     this.callback(this);
                 }
                 break;

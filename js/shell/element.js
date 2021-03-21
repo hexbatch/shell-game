@@ -238,7 +238,7 @@ function ShellGameElement(raw_input,element_master) {
 
 
     /**
-     * @return {object}
+     * @return {Object.<string,ShellGameSerializedRunningShellElement>}
      * key by element name and them having keys of variables and gloms
      *  those keys having the name and value
      *
@@ -253,46 +253,52 @@ function ShellGameElement(raw_input,element_master) {
              y: 2
 
      */
-    this.export_element = function() {
-        let ret = {};
-        ret[this.element_name] = {guid: this.guid,gloms: {}, variables: {}};
-        for(let y =0; y < this.element_variables.length; y++) {
-            let node = this.element_variables[y];
-            ret[this.element_name].variables[node.variable_name] = node.variable_current_value;
-        }
-
-        for(let y =0; y < this.element_gloms.length; y++) {
-            let node = this.element_gloms[y];
-            ret[this.element_name].gloms[node.glom_reference_name] = node.glom_current_value;
-        }
-
-        return ret;
-    }
-
-    this.export_element_definition = function() {
-        let ret = {
-            guid: this.guid,
-            element_name: this.element_name,
-            element_variables: {},
-            element_gloms: {},
-            element_script: this.element_script
-        };
-
+    this.export_running_shell_element = function() {
+        let node = new ShellGameSerializedRunningShellElement();
+        node.guid = this.guid;
 
         for(let y =0; y < this.element_variables.length; y++) {
             let da_var = this.element_variables[y];
-            ret.element_variables[ da_var.variable_name] = {
-                variable_name: da_var.variable_name,
-                variable_initial_value: da_var.variable_initial_value
-            };
+            node[this.element_name].variables[da_var.variable_name] = da_var.variable_current_value;
         }
 
         for(let y =0; y < this.element_gloms.length; y++) {
             let da_glom = this.element_gloms[y];
-            ret.element_gloms[da_glom.glom_reference_name] = {
-                glom_target_name: da_glom.glom_target_name,
-                glom_reference_name: da_glom.glom_reference_name
-            };
+            node[this.element_name].gloms[da_glom.glom_reference_name] = da_glom.glom_current_value;
+        }
+
+        let ret = {};
+        ret[this.element_name] = node;
+
+        return ret;
+    }
+
+    /**
+     *
+     * @return {ShellGameSerializedElement}
+     */
+    this.export_element_definition = function() {
+
+        let ret = new ShellGameSerializedElement();
+        ret.guid = this.guid;
+        ret.element_name = this.element_name;
+        ret.element_script = this.element_script;
+
+        for(let y =0; y < this.element_variables.length; y++) {
+            let da_var = this.element_variables[y];
+            let node = new ShellGameSerializedVariable();
+            node.variable_initial_value = da_var.variable_initial_value;
+            node.variable_name = da_var.variable_name;
+            ret.element_variables[da_var.variable_name] = node;
+
+        }
+
+        for(let y =0; y < this.element_gloms.length; y++) {
+            let da_glom = this.element_gloms[y];
+            let node = new ShellGameSerializedGlom();
+            node.glom_reference_name = da_glom.glom_reference_name;
+            node.glom_target_name = da_glom.glom_target_name;
+            ret.element_gloms[da_glom.glom_reference_name] = node;
         }
 
         return ret;

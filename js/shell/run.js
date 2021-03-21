@@ -56,27 +56,47 @@ function ShellGameRun(yaml_parsed) {
 
     /**
      *
-     * @param {string} shell_name , the name of the shell to add
+     * @param {string} shell_name_or_guid , the name of the shell to add
      * @param {?(ShellGameShell|string)} [live_parent] optional guid of the parent to add, if multiple possible parents in play
      */
-    this.add_active_shell = function(shell_name,live_parent) {
+    this.add_active_shell = function(shell_name_or_guid,live_parent) {
 
-        if (!live_parent) {
-            live_parent = this.shell_lib.get_parent_name_via_child_name(shell_name);
+        let master_shell;
+        if (this.shell_lib.master_shell_guid_lookup.hasOwnProperty(shell_name_or_guid)) {
+            master_shell = this.shell_lib.master_shell_guid_lookup[shell_name_or_guid];
+        } else if (this.shell_lib.shells.hasOwnProperty(shell_name_or_guid)) {
+            master_shell = this.shell_lib.shells[shell_name_or_guid]
+        } else {
+            throw new ShellGameRunError("Cannot find master shell by name or guid")
         }
 
+        if (!live_parent && master_shell.shell_parent_name) {
+            if (this.shell_lib.shells.hasOwnProperty(master_shell.shell_parent_name)) {
+                let parent_master_shell = this.shell_lib.shells[master_shell.shell_parent_name];
+                live_parent = parent_master_shell.shell_name;
+            } else {
+                throw new ShellGameRunError("Cannot find master shell by name or guid")
+            }
+        }
+
+        let found_live_parent;
         if (_.isString(live_parent)) {
-            let find_live_parent_array = this.get_live_shells(live_parent);
+            let find_live_parent_array = this.get_live_shells(live_parent,1);
             if (!find_live_parent_array.length) {
                 throw new ShellGameRunError("Could not find parent shell to add with , parent name was " + live_parent);
             }
-            let found_live_parent = find_live_parent_array[0];
-            return this.shell_lib.spawn_shell(shell_name,found_live_parent,[]);
+             found_live_parent = find_live_parent_array[0];
+
         } else if (live_parent instanceof ShellGameShell) {
-            return this.shell_lib.spawn_shell(shell_name,live_parent,[]);
+            found_live_parent = live_parent ;
         } else {
             throw new ShellGameRunError("Could not add shell, the live parent was not a string or a shell ");
         }
+        if (master_shell.shell_parent_name !== found_live_parent.shell_name) {
+            throw new ShellGameRunError("Spawned shell must have proper parent");
+        }
+
+        return this.shell_lib.spawn_shell(shell_name_or_guid,found_live_parent,[]);
     }
 
     /**
@@ -124,21 +144,17 @@ function ShellGameRun(yaml_parsed) {
      *  shell_lib with keys for each shell name with the shell object under that
      *  running_shells with key of shell name, and then export data. start with top shell (will be called main no mater what) and children under that
      *
-     * @return {object}
+     * @return {ShellGameSerialized}
      */
     this.export_as_object = function() {
 
-        let els = this.element_lib.export_lib();
-        let shs = this.shell_lib.export_lib();
 
-        let out = {
-            element_lib: els ,
-            shell_lib:shs ,
-            running_shells : {}
-        };
+        let out = new ShellGameSerialized();
+        out.element_lib = this.element_lib.export_lib();
+        out.shell_lib = this.shell_lib.export_lib();
 
         if (this.main_shell) {
-            this.main_shell.export_shell(out.running_shells);
+            this.main_shell.export_running_shell(out.running_shells);
         }
 
         return out;

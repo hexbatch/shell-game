@@ -17,6 +17,12 @@ function ShellGameKeeper() {
 
     /**
      *
+     * @type {?ShellGameSerialized}
+     */
+    this.serialized_game = null;
+
+    /**
+     *
      * @type {boolean}
      */
     this.is_loading = false;
@@ -29,9 +35,34 @@ function ShellGameKeeper() {
 
 
     /**
+     *
+     * @type {boolean}
+     */
+    this.is_refreshing = false;
+
+    /**
+     *
+     * @type {boolean}
+     */
+    this.is_pre = false;
+
+
+    /**
      * @type {Object.<string, ShellGameEventHook>}
      */
     this.event_hooks = {};
+
+
+
+    this.add_shell = function(guid_or_name,parent_guid) {
+        this.run.add_active_shell(guid_or_name,parent_guid);
+        this.refresh();
+    }
+
+    this.pop_shell = function(guid) {
+        this.run.pop_active_shell(guid);
+        this.refresh();
+    }
 
 
 
@@ -40,25 +71,46 @@ function ShellGameKeeper() {
      */
     this.load = function(raw) {
         this.is_loading = true;
+        if (!('game' in raw)) {
+            // noinspection ExceptionCaughtLocallyJS
+            throw new ShellGameRunError("yaml does not have a game member");
+        }
         this.last_raw = raw;
         this.run = new ShellGameRun(this.last_raw.game);
+        this.serialized_game = this.run.export_as_object();
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = this.serialized_game;
 
         for(let event_hook_guid in this.event_hooks) {
             if (!this.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
+            if (!(this.event_hooks[event_hook_guid].event_type === 'on_load')) { continue;}
             this.event_hooks[event_hook_guid].do_event_hook(this);
         }
 
         this.is_loading = false;
+        this.refresh();
     }
 
     this.step = function() {
         if (!this.run) {
-            // noinspection ExceptionCaughtLocallyJS
             throw new ShellGameKeeperError("Please Load First");
+        }
+
+        if (this.is_loading) {
+            throw new ShellGameKeeperError("Loading was interrupted, please load again");
         }
         this.is_stepping = true;
         this.run.glom();
         this.run.step();
+        this.serialized_game = this.run.export_as_object();
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = this.serialized_game;
 
         for(let event_hook_guid in this.event_hooks) {
             if (!this.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
@@ -66,6 +118,65 @@ function ShellGameKeeper() {
         }
 
         this.is_stepping = false;
+        this.refresh();
+    }
+
+    let that = this;
+    function pre_refresh() {
+        that.is_pre = true;
+
+        for(let event_hook_guid in that.event_hooks) {
+            if (!that.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
+            if (!(that.event_hooks[event_hook_guid].event_type === 'on_pre')) { continue;}
+            that.event_hooks[event_hook_guid].do_event_hook(this);
+        }
+
+        that.is_pre = false;
+    }
+
+    this.refresh = function() {
+
+        pre_refresh();
+
+        this.is_refreshing = true;
+
+        for(let event_hook_guid in this.event_hooks) {
+            if (!this.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
+            if (!(this.event_hooks[event_hook_guid].event_type === 'on_refresh')) { continue;}
+            this.event_hooks[event_hook_guid].do_event_hook(this);
+        }
+
+        this.is_refreshing = false;
+    }
+
+    /**
+     *
+     * @param {string} top_key
+     * @param {object} node
+     * @param {boolean} [b_refresh]
+     */
+    this.add_top_key = function(top_key,node,b_refresh) {
+        if (top_key === 'game') {
+            throw new ShellGameKeeperError("Cannot set game key this way");
+        }
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        if (_.isEmpty(top_key) || !_.isString(top_key)) {
+            throw new ShellGameKeeperError("Top key needs to be a string");
+        }
+        if (typeof b_refresh === 'undefined') {
+            b_refresh = true;
+        }
+        b_refresh = !!b_refresh;
+
+        this.last_raw[top_key] = node;
+        this.serialized_game = this.run.export_as_object();
+        this.last_raw.game = this.serialized_game;
+        if (b_refresh) {
+            this.refresh();
+        }
+
     }
 
     /**

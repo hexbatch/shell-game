@@ -111,7 +111,7 @@ function ShellGameElementLib(raw_input) {
     }
 
     /**
-     * @return {Object.<string, ShellGameElement>}
+     * @return {Object.<string, ShellGameSerializedElement>}
      * returns an object with keys of all the element names with values of the raw element objects
      */
     this.export_lib = function() {

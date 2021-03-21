@@ -21,6 +21,14 @@
     <link rel="stylesheet" href="css/shell-style.css" >
 
     <title>Shell Game</title>
+
+    <script>
+        /**
+         * The object which holds the game
+         * @type {ShellGameKeeper}
+         */
+        let shell_game_thing;
+    </script>
 </head>
 <body>
 
@@ -49,7 +57,7 @@
                     <p class="card-text  ">
                         This will load and then write back out to the yaml editor. Nothing will be run
                         <span style="display: inline-block;width: 100%; border-bottom: 1px solid whitesmoke; margin-top: 0.5em; margin-bottom: 0.5em"></span>
-                        <button id="shell-game-start" type="button" class="btn btn-warning border border-light">Check and Load</button>
+                        <button id="shell-game-load" type="button" class="btn btn-warning border border-light">Check and Load</button>
                     </p>
                 </div>
 
@@ -124,6 +132,7 @@
 <script src="js/gui/helpers.js"></script>
 
 
+<script src="js/shell/shell-game-serialized.js"></script>
 <script src="js/shell/glom.js"></script>
 <script src="js/shell/variable.js"></script>
 <script src="js/shell/element.js"></script>
@@ -140,6 +149,7 @@
 
 
 <script src="js/gui/editor_gui.js"></script>
+<script src="js/gui/gui_init.js"></script>
 <script src="js/gui/game-main.js"></script>
 </body>
 </html>
