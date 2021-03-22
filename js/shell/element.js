@@ -259,12 +259,12 @@ function ShellGameElement(raw_input,element_master) {
 
         for(let y =0; y < this.element_variables.length; y++) {
             let da_var = this.element_variables[y];
-            node[this.element_name].variables[da_var.variable_name] = da_var.variable_current_value;
+            node.variables[da_var.variable_name] = da_var.variable_current_value;
         }
 
         for(let y =0; y < this.element_gloms.length; y++) {
             let da_glom = this.element_gloms[y];
-            node[this.element_name].gloms[da_glom.glom_reference_name] = da_glom.glom_current_value;
+            node.gloms[da_glom.glom_reference_name] = da_glom.glom_current_value;
         }
 
         let ret = {};

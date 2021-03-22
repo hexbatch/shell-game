@@ -5,12 +5,15 @@ let shell_game_editor;
 const SHELL_GAME_STORAGE_KEY = 'hexbatch-shell-game-version-1';
 const SHELL_GAME_STORAGE_BACKUP_KEY = 'hexbatch-shell-game-backup-version-1';
 
-function shell_game_editor_init($) {
+jQuery(function ($){
+
     shell_game_editor = ace.edit("shell-game-editor");
     shell_game_editor.setTheme("ace/theme/monokai");
     shell_game_editor.session.setMode("ace/mode/yaml");
     shell_game_editor_setup_save($);
-}
+
+});
+
 
 /**
  * @return {string}
@@ -95,3 +98,15 @@ function shell_game_editor_setup_save($) {
 
     });
 }
+
+jQuery(function(){
+    //synchronize yaml editor after refresh
+    shell_game_thing.add_event(new ShellGameEventHook(
+        'on_refresh',
+        null,
+        function (hook) {
+            let out = hook.current_value;
+            shell_game_set_editor_value_from_object(out);
+        }
+    ));
+});

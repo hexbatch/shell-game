@@ -48,19 +48,31 @@ function ShellGameKeeper() {
 
 
     /**
-     * @type {Object.<string, ShellGameEventHook>}
+     * @type {ShellGameEventHook[]}
      */
-    this.event_hooks = {};
+    this.event_hooks = [];
 
 
 
     this.add_shell = function(guid_or_name,parent_guid) {
         this.run.add_active_shell(guid_or_name,parent_guid);
+        this.serialized_game = this.run.export_as_object();
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = this.serialized_game;
         this.refresh();
     }
 
     this.pop_shell = function(guid) {
         this.run.pop_active_shell(guid);
+        this.serialized_game = this.run.export_as_object();
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = this.serialized_game;
         this.refresh();
     }
 
@@ -84,10 +96,10 @@ function ShellGameKeeper() {
         }
         this.last_raw.game = this.serialized_game;
 
-        for(let event_hook_guid in this.event_hooks) {
-            if (!this.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
-            if (!(this.event_hooks[event_hook_guid].event_type === 'on_load')) { continue;}
-            this.event_hooks[event_hook_guid].do_event_hook(this);
+        for(let event_hook_index = 0; event_hook_index < this.event_hooks.length; event_hook_index++ ) {
+            let my_hook = this.event_hooks[event_hook_index];
+            if (!(my_hook.event_type === 'on_load')) { continue;}
+            my_hook.do_event_hook(this);
         }
 
         this.is_loading = false;
@@ -112,9 +124,9 @@ function ShellGameKeeper() {
         }
         this.last_raw.game = this.serialized_game;
 
-        for(let event_hook_guid in this.event_hooks) {
-            if (!this.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
-            this.event_hooks[event_hook_guid].do_event_hook(this);
+        for(let event_hook_index = 0; event_hook_index < this.event_hooks.length; event_hook_index++ ) {
+            let my_hook = this.event_hooks[event_hook_index];
+            my_hook.do_event_hook(this);
         }
 
         this.is_stepping = false;
@@ -125,10 +137,10 @@ function ShellGameKeeper() {
     function pre_refresh() {
         that.is_pre = true;
 
-        for(let event_hook_guid in that.event_hooks) {
-            if (!that.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
-            if (!(that.event_hooks[event_hook_guid].event_type === 'on_pre')) { continue;}
-            that.event_hooks[event_hook_guid].do_event_hook(this);
+        for(let event_hook_index = 0; event_hook_index < that.event_hooks.length; event_hook_index++ ) {
+            let my_hook = that.event_hooks[event_hook_index];
+            if (!(my_hook.event_type === 'on_pre')) { continue;}
+            my_hook.do_event_hook(this);
         }
 
         that.is_pre = false;
@@ -140,10 +152,10 @@ function ShellGameKeeper() {
 
         this.is_refreshing = true;
 
-        for(let event_hook_guid in this.event_hooks) {
-            if (!this.event_hooks.hasOwnProperty(event_hook_guid)) {continue;}
-            if (!(this.event_hooks[event_hook_guid].event_type === 'on_refresh')) { continue;}
-            this.event_hooks[event_hook_guid].do_event_hook(this);
+        for(let event_hook_index = 0; event_hook_index < this.event_hooks.length; event_hook_index++ ) {
+            let my_hook = this.event_hooks[event_hook_index];
+            if (!(my_hook.event_type === 'on_refresh')) { continue;}
+            my_hook.do_event_hook(this);
         }
 
         this.is_refreshing = false;
@@ -171,8 +183,6 @@ function ShellGameKeeper() {
         b_refresh = !!b_refresh;
 
         this.last_raw[top_key] = node;
-        this.serialized_game = this.run.export_as_object();
-        this.last_raw.game = this.serialized_game;
         if (b_refresh) {
             this.refresh();
         }
@@ -185,7 +195,7 @@ function ShellGameKeeper() {
      */
     this.add_event = function(hook) {
         hook.keeper = this;
-        this.event_hooks[hook.guid] = hook;
+        this.event_hooks.push(hook);
     }
 
     /**
@@ -193,7 +203,14 @@ function ShellGameKeeper() {
      * @param {string} hook_guid
      */
     this.remove_event = function(hook_guid) {
-        delete this.event_hooks[hook_guid];
+        for(let event_hook_index = 0; event_hook_index < this.event_hooks.length; event_hook_index++ ) {
+            let my_hook = this.event_hooks[event_hook_index];
+            if (my_hook.guid === hook_guid) {
+                this.event_hooks.splice(event_hook_index,1);
+                return;
+            }
+        }
+        throw new ShellGameKeeperError("Could not find hook of " + hook_guid);
     }
 
     /**

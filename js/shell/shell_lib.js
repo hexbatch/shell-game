@@ -153,11 +153,17 @@ function ShellGameShellLib(raw_input, run_object) {
      * @return {ShellGameShell}
      */
     this.spawn_shell = function(shell_name,live_parent,element_states) {
+        let found;
         if (this.shells.hasOwnProperty(shell_name)) {
-            let found = this.shells[shell_name];
-            return found.spawn(this.run_object,live_parent,element_states);
+            found = this.shells[shell_name];
+        } else if (this.master_shell_guid_lookup.hasOwnProperty(shell_name)) {
+            found = this.master_shell_guid_lookup[shell_name];
+        } else {
+            throw new ShellGameElementLibError('Cannot find element of ' + shell_name + " in the library");
         }
-        throw new ShellGameElementLibError('Cannot find element of ' + shell_name + " in the library");
+
+
+        return found.spawn(this.run_object,live_parent,element_states);
     }
 
     /**

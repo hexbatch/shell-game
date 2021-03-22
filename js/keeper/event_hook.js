@@ -100,6 +100,7 @@ function ShellGameEventHook(event_type,target,callback) {
         if (!this.keeper) {return;}
 
         let that = this;
+        let b_do_callback_with_change_only = false;
 
 
         switch (this.event_type) {
@@ -109,7 +110,7 @@ function ShellGameEventHook(event_type,target,callback) {
                 if (_.isObject(this.keeper.last_raw) && ( this.target in this.keeper.last_raw)) {
                     this.current_value = this.keeper.last_raw[this.target];
                 }
-
+                b_do_callback_with_change_only = true;
                 break;
             }
 
@@ -118,7 +119,7 @@ function ShellGameEventHook(event_type,target,callback) {
                 if (this.keeper.run.shell_lib.master_shell_guid_lookup.hasOwnProperty(this.target)) {
                     this.current_value = this.keeper.run.shell_lib.master_shell_guid_lookup[this.target];
                 }
-
+                b_do_callback_with_change_only = true;
                 break;
 
             }
@@ -135,7 +136,7 @@ function ShellGameEventHook(event_type,target,callback) {
                 if (looking_for_shell_array.length) {
                     this.current_value = looking_for_shell_array;
                 }
-
+                b_do_callback_with_change_only = true;
                 break;
 
             }
@@ -146,7 +147,7 @@ function ShellGameEventHook(event_type,target,callback) {
                 if (this.keeper.run.element_lib.master_element_guid_lookup.hasOwnProperty(this.target)) {
                     this.current_value = this.keeper.run.element_lib.master_element_guid_lookup[this.target];
                 }
-
+                b_do_callback_with_change_only = true;
                 break;
 
             }
@@ -166,14 +167,14 @@ function ShellGameEventHook(event_type,target,callback) {
                 if (looking_for_element_array.length) {
                     this.current_value = looking_for_element_array;
                 }
-
+                b_do_callback_with_change_only = true;
                 break;
 
             }
 
             case 'on_step': {
                 if (this.keeper.is_stepping) {
-                    this.current_value = this.keeper.run.export_as_object();
+                    this.current_value = this.keeper.serialized_game;
                     this.callback(this);
                 }
                 break;
@@ -182,7 +183,7 @@ function ShellGameEventHook(event_type,target,callback) {
 
             case 'on_load': {
                 if (this.keeper.is_loading) {
-                    this.current_value = this.keeper.run.export_as_object();
+                    this.current_value = this.keeper.serialized_game;
                     this.callback(this);
                 }
                 break;
@@ -209,13 +210,15 @@ function ShellGameEventHook(event_type,target,callback) {
             }
         } //end switch
 
-        let current_text = safe_to_string(this.current_value);
-        make_sha_256_hash(current_text, function(da_new_hash) {
-            if (that.last_digest_hash !== da_new_hash) {
-                that.last_digest_hash = da_new_hash;
-                that.callback(that);
-            }
-        });
+        if (b_do_callback_with_change_only) {
+            let current_text = safe_to_string(this.current_value);
+            make_sha_256_hash(current_text, function (da_new_hash) {
+                if (that.last_digest_hash !== da_new_hash) {
+                    that.last_digest_hash = da_new_hash;
+                    that.callback(that);
+                }
+            });
+        }
 
 
     }

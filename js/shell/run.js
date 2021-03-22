@@ -57,9 +57,9 @@ function ShellGameRun(yaml_parsed) {
     /**
      *
      * @param {string} shell_name_or_guid , the name of the shell to add
-     * @param {?(ShellGameShell|string)} [live_parent] optional guid of the parent to add, if multiple possible parents in play
+     * @param {?string} [live_parent_name_or_guid] optional guid of the parent to add, or add name and first match in running will be used
      */
-    this.add_active_shell = function(shell_name_or_guid,live_parent) {
+    this.add_active_shell = function(shell_name_or_guid,live_parent_name_or_guid) {
 
         let master_shell;
         if (this.shell_lib.master_shell_guid_lookup.hasOwnProperty(shell_name_or_guid)) {
@@ -70,25 +70,26 @@ function ShellGameRun(yaml_parsed) {
             throw new ShellGameRunError("Cannot find master shell by name or guid")
         }
 
-        if (!live_parent && master_shell.shell_parent_name) {
+
+
+        if (!live_parent_name_or_guid && master_shell.shell_parent_name) {
+            //get the name of the parent
             if (this.shell_lib.shells.hasOwnProperty(master_shell.shell_parent_name)) {
                 let parent_master_shell = this.shell_lib.shells[master_shell.shell_parent_name];
-                live_parent = parent_master_shell.shell_name;
+                live_parent_name_or_guid = parent_master_shell.shell_name;
             } else {
                 throw new ShellGameRunError("Cannot find master shell by name or guid")
             }
         }
 
         let found_live_parent;
-        if (_.isString(live_parent)) {
-            let find_live_parent_array = this.get_live_shells(live_parent,1);
+        if (_.isString(live_parent_name_or_guid)) {
+            let find_live_parent_array = this.get_live_shells(live_parent_name_or_guid,1);
             if (!find_live_parent_array.length) {
-                throw new ShellGameRunError("Could not find parent shell to add with , parent name was " + live_parent);
+                throw new ShellGameRunError("Could not find parent shell to add with , parent name was " + live_parent_name_or_guid);
             }
              found_live_parent = find_live_parent_array[0];
 
-        } else if (live_parent instanceof ShellGameShell) {
-            found_live_parent = live_parent ;
         } else {
             throw new ShellGameRunError("Could not add shell, the live parent was not a string or a shell ");
         }
