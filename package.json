@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.3",
     "@popperjs/core": "^2.8.6",
     "ace-builds": "^1.4.12",
     "bootstrap": "^4.6.0",

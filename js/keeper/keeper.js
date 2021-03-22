@@ -52,6 +52,22 @@ function ShellGameKeeper() {
      */
     this.event_hooks = [];
 
+    /**
+     *
+     * @param {string} guid
+     * @return {ShellGameSerializedElement}
+     */
+    this.get_element_by_guid = function(guid) {
+        if (!this.run.element_lib.element_guid_lookup.hasOwnProperty(guid)) {
+            throw new ShellGameKeeperError("Cannot find element of guid "+ guid);
+        }
+        let element_name = this.run.element_lib.element_guid_lookup[guid].element_name;
+
+        if (!this.serialized_game.element_lib.hasOwnProperty(element_name)) {
+            throw new ShellGameKeeperError("Cannot find element of name "+ element_name);
+        }
+        return this.serialized_game.element_lib[element_name];
+    }
 
     /**
      *
@@ -549,12 +565,12 @@ function ShellGameKeeper() {
 
 
     /**
-     * @param {string} element_search , either the master element guid or the running element guid
+     * @param {string} starting_element_guid , either the master element guid or the running element guid
      * @param {string} glom_reference_filter , the name of the reference for the glom in this element(s), if set to null, or missing, then will get info for all the gloms in the element(s)
      * @return {ShellGameGlomReference[]}
      *
      */
-    this.get_glom_template_targets = function(element_search,glom_reference_filter) {
+    this.get_glom_template_targets = function(starting_element_guid,glom_reference_filter) {
         /*
             get array of found elements (allowing master names like in the reference)
             for each element, get its name, then get a list of all the shells that has the element name in their templates
@@ -562,28 +578,16 @@ function ShellGameKeeper() {
             return the array of glom references with the: starting element, the starting element shell, target element, the target element shell, glom reference name, and the variable target name
          */
 
-        let lookup_value = element_search;
-        if (this.run.element_lib.master_element_guid_lookup.hasOwnProperty(element_search)) {
-            let master_element = this.run.element_lib.master_element_guid_lookup[lookup_value];
-            lookup_value = master_element.element_name;
+        let starting_element_name;
+        if (this.run.element_lib.master_element_guid_lookup.hasOwnProperty(starting_element_guid)) {
+            let master_element = this.run.element_lib.master_element_guid_lookup[starting_element_name];
+            starting_element_name = master_element.element_name;
+        } else {
+            throw new ShellGameKeeperError(`Cannot find ${starting_element_guid} in master guid list`)
         }
 
-        let looking_for_element_array = this.run.main_shell.list_running_elements(lookup_value);
-        /**
-         *
-         * @type {Object.<string, number>}
-         */
-        let name_dictionary = {}
+        let looking_for_element_array = this.run.main_shell.list_running_elements(starting_element_name);
 
-        for(let k = 0; k < looking_for_element_array.length; k ++) {
-            let el = looking_for_element_array[k];
-            if (name_dictionary.hasOwnProperty(el.element_name)) {
-                name_dictionary[el.element_name] ++;
-            } else {
-                name_dictionary[el.element_name] = 1;
-            }
-            name_dictionary[el.element_name] = el.element_name;
-        }
 
 
         /**
@@ -616,7 +620,7 @@ function ShellGameKeeper() {
         }).bind(this)
 
 
-
+        //this-task convert to using the glom for the one element in the param above, and find matching vars in the master elements based on the position of the master shells
 
         for(let element_name in name_dictionary) {
             if (!name_dictionary.hasOwnProperty(element_name)) {continue;}

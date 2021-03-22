@@ -173,6 +173,7 @@ The select box will list all the non topmost shells, the new shell instance will
 * [Select2](https://select2.org/)
 * [Uuid](https://github.com/uuidjs/uuid)
 * [Tingle](https://tingle.robinparisi.com/)
+* [Font Awesome](https://fontawesome.com/)
 
 ### Reference
 

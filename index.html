@@ -20,6 +20,9 @@
     <!-- Tingle -->
     <link href="node_modules/tingle.js/dist/tingle.min.css" rel="stylesheet" />
 
+    <!-- Font Awesome -->
+    <link href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet" />
+
     <!-- My Styles-->
     <link rel="stylesheet" href="css/shell-style.css" >
 
@@ -117,28 +120,114 @@
     </div>
 
 </div>
+
+
+
+
+
+
+
+
+
+
+
 <div style="display: none">
+
+<!--    ------------------------------------- Element Editor -------------------------------------------------       -->
 
     <div class="shell-game-element-editor">
 
-        <div class="container-fluid mx-3 mt-3">
+        <input type="hidden" class="shell-game-edit-element-this">
+        <div class="container-fluid">
 
-            <div class="row">
+            <div class="card " >
+                <div class="card-body">
+                    <div class="card-text">
+                        <div class="row">
+                            <div class="col-sm-12 col-md-6">
+                                <div class="">
+                                    <input type="text" value="" title="Element Name" class="shell-game-edit-element-name form-control">
+                                </div>
+                            </div>
+
+                            <div class="col-sm-12 col-md-6 d-flex flex-column justify-content-center">
+                                <small class="text-center">
+                                    <span class="shell-game-edit-element-guid border text-monospace text-break align-top p-2"></span>
+                                </small>
+                            </div>
+                        </div>
+                    </div> <!-- /.shell-game-holder -->
+                </div> <!-- /.card-body -->
+            </div> <!-- /.card -->
+
+
+
+            <div class="row mt-1">
+
+
                 <div class="col-sm-12 col-md-6">
-                    <div class="">
-                        <input type="text" value="" title="Element Name" class="shell-game-edit-name form-control">
-                    </div>
+                    <div class="card " >
+                        <div class="card-body">
+                            <h5 class="card-title">Variables</h5>
+                            <div class="card-text">
+                               <table class="table table-striped table-success shell-game-edit-element-variables">
+                                   <thead>
+                                   <tr>
+                                       <th scope="col">Name</th>
+                                       <th scope="col">Initial Value</th>
+                                       <th scope="col">Delete</th>
+                                   </tr>
+                                   </thead>
+                                   <tbody></tbody>
+                               </table>
+                                <div class="text-right">
+                                    <button id="shell-game-edit-new-element-variable" type="button" class="btn btn-light">New Variable</button>
+                                </div>
+                            </div> <!-- /.shell-game-holder -->
+                        </div> <!-- /.card-body -->
+                    </div> <!-- /.card -->
+                </div> <!-- /.col -->
+
+                <div class="col-sm-12 col-md-6">
+                    <div class="card " >
+                        <div class="card-body">
+                            <h5 class="card-title">Gloms</h5>
+                            <div class="card-text">
+                                <table class="table table-striped table-info shell-game-edit-element-gloms">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Reference</th>
+                                        <th scope="col">Target</th>
+                                        <th scope="col">Delete</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                                <div class="text-right">
+                                    <button id="shell-game-edit-new-element-glom" type="button" class="btn btn-dark">New Glom</button>
+                                </div>
+                            </div> <!-- /.shell-game-holder -->
+                        </div> <!-- /.card-body -->
+                    </div> <!-- /.card -->
+                </div> <!-- /.col -->
+
+
+                <div class="col-12 col-sm-12 col-md-12">
+                    <div class="card " >
+                        <div class="card-body">
+                            <h5 class="card-title">Script Editor</h5>
+                            <div class="card-text shell-game-edit-script-holder">
+                                <div id="shell-game-edit-element-script"></div>
+                            </div> <!-- /.shell-game-holder -->
+                        </div> <!-- /.card-body -->
+                    </div> <!-- /.card -->
                 </div>
 
-                <div class="col-sm-12 col-md-6">
-                    <div class="">
-                        <span class="shell-game-edit-guid"></span>
-                    </div>
-                </div>
-            </div>
+
+            </div><!-- /.row -->
         </div>
 
-    </div>
+    </div> <!-- /.shell-game-element-editor-->
 
 </div>
 
@@ -181,6 +270,7 @@
 <script src="js/gui/editor_gui.js"></script>
 
 <script src="js/gui/gui-select-shell.js"></script>
+<script src="js/gui/edit-element.js"></script>
 <script src="js/gui/gui-select-element.js"></script>
 <script src="js/gui/gui-tags.js"></script>
 <script src="js/gui/load.js"></script>
