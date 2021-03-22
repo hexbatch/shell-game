@@ -43,7 +43,8 @@ function ShellGameElement(raw_input,element_master) {
 
     this.element_master = element_master;
 
-    if (!$.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameElement)) { throw new ShellGameElementError("raw_input is not a plain object or an Element");}
+    if (!$.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameElement) && (!raw_input instanceof  ShellGameSerializedElement)) {
+        throw new ShellGameElementError("raw_input is not a plain object or an Element");}
 
     if ('element_name' in raw_input) {
         if (!(typeof raw_input.element_name === 'string' || raw_input.element_name instanceof String)) {

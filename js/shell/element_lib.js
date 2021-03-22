@@ -28,6 +28,27 @@ function ShellGameElementLib(raw_input) {
      */
     this.master_element_guid_lookup = {};
 
+    /**
+     *
+     * @param {ShellGameElement} element
+     */
+    this.add_master_element = function(element) {
+
+        if (this.elements.hasOwnProperty(element.element_name)) {
+            throw new ShellGameElementLibError("Already have an existing master element of the name of " + element.element_name);
+        }
+
+        if (!this.element_guid_lookup.hasOwnProperty(element.guid)) {
+            this.element_guid_lookup[element.guid] = element;
+        }
+
+        if (!this.master_element_guid_lookup.hasOwnProperty(element.guid)) {
+            this.master_element_guid_lookup[element.guid] = element;
+        }
+        this.elements[element.element_name] = element;
+    }
+
+
     if ('element_lib' in raw_input) {
         if (!$.isPlainObject(raw_input.element_lib) && (!raw_input.element_lib instanceof  ShellGameElementLib)) {
             throw new ShellGameElementLibError( "raw element_lib is not a plain object or an Element Library");
@@ -43,16 +64,12 @@ function ShellGameElementLib(raw_input) {
             if (i !== element.element_name) {
                 throw new ShellGameElementLibError( "raw element_lib node has a key of "+ i + " and a name of " + element.element_name +" but they need to be the same");
             }
-            if (!this.element_guid_lookup.hasOwnProperty(element.guid)) {
-                this.element_guid_lookup[element.guid] = element;
-            }
 
-            if (!this.master_element_guid_lookup.hasOwnProperty(element.guid)) {
-                this.master_element_guid_lookup[element.guid] = element;
-            }
-            this.elements[i] = element;
+            this.add_master_element(element);
         }
     }
+
+
 
     /**
      *
@@ -91,6 +108,7 @@ function ShellGameElementLib(raw_input) {
         return this.elements.hasOwnProperty(element_name);
     }
 
+
     /**
      *
      * @param element_name
@@ -123,6 +141,8 @@ function ShellGameElementLib(raw_input) {
         }
         return ret;
     };
+
+
 
 }
 

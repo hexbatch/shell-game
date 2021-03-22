@@ -53,6 +53,261 @@ function ShellGameKeeper() {
     this.event_hooks = [];
 
 
+    /**
+     *
+     * @param {ShellGameSerializedElement} el
+     * @return {string} the guid of the new element
+     */
+    this.add_element = function(el) {
+        if (!el.element_name) {throw new ShellGameKeeperError("Added element needs a name");}
+        let element = new ShellGameElement(el,null);
+        this.run.element_lib.add_master_element(element);
+        this.serialized_game = this.run.export_as_object();
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = this.serialized_game;
+        this.refresh();
+        return element.guid;
+
+    }
+
+    /**
+     *
+     * @param {string} name_or_guid
+     */
+    this.delete_element = function(name_or_guid) {
+        let element ;
+        if (this.run.element_lib.elements.hasOwnProperty(name_or_guid) ) {
+            element = this.run.element_lib.elements[name_or_guid];
+        } else if (this.run.element_lib.master_element_guid_lookup.hasOwnProperty(name_or_guid)) {
+            element = this.run.element_lib.master_element_guid_lookup[name_or_guid];
+        }else {
+            throw new ShellGameKeeperError("Cannot find element of " + name_or_guid);
+        }
+        /**
+         * To delete the element, need to find all things that use it as a master, and remove them from a copy of the serialized_game,
+         *  then reload using that altered copy, the gui will be updated via the load events going out
+         *
+         * + Remove the element master from the elementLib
+         * + Go through the running shells, and whenever see the name, remove it
+         *
+         */
+        let element_name_to_remove = element.element_name;
+        let element_guid_to_remove = element.guid;
+
+        /**
+         * @type {ShellGameSerialized}
+         */
+        let copy = _.cloneDeep(this.serialized_game);
+        delete copy.element_lib[element_guid_to_remove];
+
+        /**
+         * @param {string} element_name_to_delete
+         * @param {ShellGameSerializedRunningShell} shell
+         */
+        function remove_element_from_running_shells(element_name_to_delete, shell) {
+            if (shell.shell_elements.hasOwnProperty(element_name_to_delete)) {
+                delete shell.shell_elements[element_name_to_delete];
+            }
+            for(let child_shell_name in shell.shell_children) {
+                if (!shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
+                let child_array_of_shells = shell.shell_children[child_shell_name];
+                for(let child_shell_index = 0; child_shell_index < child_array_of_shells.length; child_shell_index++) {
+                    let child_shell = child_array_of_shells[child_shell_index];
+                    remove_element_from_running_shells(element_name_to_delete,child_shell);
+                }
+            }
+        }
+
+        for(let top_shell_name in copy.running_shells) {
+            if (!copy.running_shells.hasOwnProperty(top_shell_name)) {continue;}
+            let top_shell_array = copy.running_shells[top_shell_name];
+            for(let i = 0; i < top_shell_array.length; i++) {
+                let running_shell = top_shell_array[i];
+                remove_element_from_running_shells(element_name_to_remove,running_shell);
+            }
+        }
+
+        //reload the game
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = copy;
+        this.load(this.last_raw);
+
+    }
+
+
+    /**
+     * Can update its name, or the guid, but not both at the same time or cannot find it to edit
+     * @param {ShellGameSerializedElement} edited_element
+     */
+    this.edit_element = function(edited_element) {
+        if (!edited_element.element_name) {throw new ShellGameKeeperError("Edited element needs a name");}
+        let element ;
+        if (this.run.element_lib.elements.hasOwnProperty(edited_element.element_name) ) {
+            element = this.run.element_lib.elements[edited_element.element_name];
+        } else if (this.run.element_lib.master_element_guid_lookup.hasOwnProperty(edited_element.guid)) { //because can change its name
+            element = this.run.element_lib.master_element_guid_lookup[edited_element.guid];
+        }else {
+            throw new ShellGameKeeperError("Cannot find element by name of " + edited_element.element_name + " or by guid of "  + edited_element.guid);
+        }
+
+        /**
+         * To edit the element, replace it wherever its mentioned from a copy of the serialized_game
+         *
+         *  then reload using that altered copy, the gui will be updated via the load events going out
+         *
+         * + Directly replace the element master from the elementLib, if name has changed then delete the old name and add the new name
+         *
+         * + if the name has changed, Go through the Shell Library, looking for the old element name, and whenever see the old name replace the key with the new name
+         *
+         *
+         *
+         * + Go through the running shells, and whenever see the old name:
+         *      update its variables
+         *          If a var is missing , then remove the reference
+         *          If a new var, then assign value to it with just initial value, it has not had a chance to have the find policy set in the shell
+         *
+         *      update its gloms
+         *          if a glom is now missing, then remove that reference
+         *          if a glom is new, then add it and the value is always null as it will be found next step naturally
+         *
+         *
+         *      if the name has changed, delete the old name key and add this under the new name key
+         *
+         */
+        let old_element_name = element.element_name;
+        let new_element_name = edited_element.element_name;
+
+        /**
+         * @type {ShellGameSerialized}
+         */
+        let copy = _.cloneDeep(this.serialized_game);
+        if (old_element_name === new_element_name) {
+            copy.element_lib[old_element_name] = edited_element;
+        } else {
+            delete copy.element_lib[old_element_name];
+            copy.element_lib[new_element_name] = edited_element;
+
+            //rename in shell library
+            for(let lib_shell_name in copy.shell_lib) {
+                if (!copy.shell_lib.hasOwnProperty(lib_shell_name)) {continue;}
+                let lib_shell = copy.shell_lib[lib_shell_name];
+                for( let u = 0; u < lib_shell.elements.length; u++) {
+                    let shell_element = lib_shell.elements[u];
+                    if (shell_element.element_name === old_element_name) {
+                        shell_element.element_name = new_element_name;
+                    }
+                }
+            }
+
+        }
+
+
+
+
+
+        /**
+         *
+         * @param {ShellGameSerializedRunningShell} shell
+         */
+        function edit_element_in_running_shells(shell) {
+
+            if (shell.shell_elements.hasOwnProperty(old_element_name)) {
+                let in_place = shell.shell_elements[old_element_name];
+
+                /**
+                 @type {Object.<string, string>}
+                 */
+                let new_var_entries = {};
+
+                for(let edited_variable_name in edited_element.element_variables) {
+                    if (!edited_element.element_variables.hasOwnProperty(edited_variable_name)) {continue;}
+                    let edited_variable = edited_element.element_variables[edited_variable_name];
+
+                    if (!in_place.variables.hasOwnProperty(edited_variable_name)) {
+                        //add it to thing to merge in later
+                        new_var_entries[edited_variable_name] = edited_variable.variable_initial_value;
+                    }
+                }
+
+                in_place.variables = _.merge(in_place.variables,new_var_entries);
+
+                for(let shell_variable_name in in_place.variables) {
+                    if (!in_place.variables.hasOwnProperty(shell_variable_name)) {continue;}
+                    if (!edited_element.element_variables.hasOwnProperty(shell_variable_name)) {
+                        delete in_place.variables[shell_variable_name];
+                    }
+                }
+
+                //edit the gloms
+
+                /**
+                 @type {Object.<string, ?string>}
+                 */
+                let new_glom_entries = {};
+
+                for(let edited_glom_name in edited_element.element_gloms) {
+                    if (!edited_element.element_gloms.hasOwnProperty(edited_glom_name)) {continue;}
+
+                    if (!in_place.gloms.hasOwnProperty(edited_glom_name)) {
+                        //add it to thing to merge in later
+                        new_glom_entries[edited_glom_name] = null;
+                    }
+                }
+
+                in_place.gloms = _.merge(in_place.gloms,new_glom_entries);
+
+                for(let shell_glom_name in in_place.gloms) {
+                    if (!in_place.gloms.hasOwnProperty(shell_glom_name)) {continue;}
+                    if (!edited_element.element_gloms.hasOwnProperty(shell_glom_name)) {
+                        delete in_place.gloms[shell_glom_name];
+                    }
+                }
+                if (old_element_name !== new_element_name) {
+                    delete shell.shell_elements[old_element_name];
+                    shell.shell_elements[new_element_name] = in_place;
+                }
+
+            }
+
+
+            for(let child_shell_name in shell.shell_children) {
+                if (!shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
+                let child_array_of_shells = shell.shell_children[child_shell_name];
+                for(let child_shell_index = 0; child_shell_index < child_array_of_shells.length; child_shell_index++) {
+                    let child_shell = child_array_of_shells[child_shell_index];
+                    edit_element_in_running_shells(child_shell);
+                }
+            }
+        }
+
+
+        for(let top_shell_name in copy.running_shells) {
+            if (!copy.running_shells.hasOwnProperty(top_shell_name)) {continue;}
+            let top_shell_array = copy.running_shells[top_shell_name];
+            for(let i = 0; i < top_shell_array.length; i++) {
+                let running_shell = top_shell_array[i];
+                edit_element_in_running_shells(running_shell);
+            }
+        }
+
+        //reload the game
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = copy;
+        this.load(this.last_raw);
+
+    }
+
+
+
 
     this.add_shell = function(guid_or_name,parent_guid) {
         this.run.add_active_shell(guid_or_name,parent_guid);

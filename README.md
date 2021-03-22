@@ -2,12 +2,13 @@
 
 The hexbatch project has code executing as elements inside shells. This program is used to test some concepts
 
-### Version 0.2
+### Version 0.3
 
 This version has the basic storage and operations. Its basically a YAML editor with three buttons
 
 ![image](https://user-images.githubusercontent.com/725763/111225950-734a8780-85ae-11eb-86a4-d3b9cbf5d12d.png)
 
+[//]: # (TODO: update screenshot)
 
 The next version after this will have more of a gui. The state will still be stored in the yaml though. 
 So, all the below will be used in the next version. 
@@ -171,6 +172,7 @@ The select box will list all the non topmost shells, the new shell instance will
 * [TokenField](https://github.com/KaneCohen/tokenfield)
 * [Select2](https://select2.org/)
 * [Uuid](https://github.com/uuidjs/uuid)
+* [Tingle](https://tingle.robinparisi.com/)
 
 ### Reference
 

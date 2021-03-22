@@ -1,3 +1,6 @@
+let select_for_master_shells = null;
+let select_for_master_shells_data = [];
+
 jQuery(function ($) {
     $.fn.select2.amd.define('select2/data/customAdapter', ['select2/data/array', 'select2/utils'],
         function (ArrayAdapter, Utils) {
