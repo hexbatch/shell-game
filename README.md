@@ -46,6 +46,8 @@ Please refer to the yaml example below at the bottom of the page , or see yaml/t
     
     * `element_name`
         * The name of the element needs to be unique, its an error to name two different elements the same name
+    
+    * `guid` this is automatically generated, but if provided it will be used instead. Must be unique if provided
       
     * `element_variables`
         * The Variables used in the element are defined here. Each variable is entered under its name 
@@ -73,18 +75,23 @@ Please refer to the yaml example below at the bottom of the page , or see yaml/t
   * `shell_lib` Defines the shells that can be used. Each shell has a parent, and name, and a list of variables it uses. 
     Each shell is entered under its own name and has the following keys
     * `shell_name` the name of the shell
+    * `guid` this is automatically generated, but if provided it will be used instead. Must be unique if provided  
     * `shell_parent_name` all shells, except a top shell, has a parent
     * `elements` an array of elements it uses, each element object here has two keys
       * `element_name` The name of the element which is already defined in the *element_lib* section
       * `element_init`  Has two possible values, **new** or **find** , if new , then the variable is initilized fresh 
         (using the init value defined above for it), if find then the element is only added if it exists in a parent or ancestor already
         If the variable is found ok, then it has the same starting value as the current one it finds.
-        The search will go from the parent on to the top shell and stop as soon as it finds a match 
+        The search will go from the parent on to the top shell and stop as soon as it finds a match
+      * `element_end` Has two possible values, **void** or **return**, and tells of what happens with the values in the element when the 
+        shell is popped (removed). If void , then nothing happens. If return, then the nearest element with the same name, in the ancestor chain,
+        is updated with the element's values that will be erased
         
   * `running_shells` stores the current information for the stepping, it is refreshed in the yaml after each step, automatically.
      And when the *Load* button is pressed the next step will read from whatever state is in the running_shells now
      Each shell is entered under its own name, and if more than one shell is there, then this is an array of objects under the key
      . Each running shell entry has the following keys
+    * `guid` this is automatically generated, but if provided it will be used instead. Must be unique if provided
     * `shell_elements` contains the current state of the elements and all its variables and gloms. Each element is entered under its name
       . Each element object here has the following keys
       * `gloms` under which are key values with the glom reference name, and its current value. Unset gloms are always null
@@ -129,6 +136,28 @@ The select box will list all the non topmost shells, the new shell instance will
   Or by adding tags in the tag input at the top
   
 * When adding editing the yaml , the tags will be synced when the yaml is loaded
+
+
+### Event system connects the shell data to the gui, there are several callback events, including on change for different parts
+
+* *on_change_input_key* 
+  * When a non game key is changed in the text input
+* *on_change_master_shell*
+  * When a master shell changes its defination from the last time. Master shells are the ones defined in the shell_lib
+* *on_change_running_shell*
+  * When a shell, or its elements or the variables inside the elements change. Also when any child shells change. Called only if changes
+* *on_change_master_element*
+  * When the definition of a master element, the elements defined in the element_lib, are changed from last time
+* *on_change_running_element*
+  * When an element inside a running shell is changed from the last time
+* *on_refresh*
+  * When the output is refreshed, this is also how the yaml editor knows to update its own text
+* *on_pre*
+  * Fired before the refresh, useful to update non game keys or other meta data
+* *on_step*
+  * Fired after each step
+* *on_load*
+  * Fired after the shells load from the source  
 
 
 ## Development Reference
