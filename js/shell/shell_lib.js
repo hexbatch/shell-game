@@ -27,7 +27,7 @@ function ShellGameShellLib(raw_input, run_object) {
      */
     this.run_object = run_object;
 
-    if (!$.isPlainObject(raw_input)) { throw new ShellGameShellLibError("raw_input is not an object");}
+    if (!_.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameSerialized)) { throw new ShellGameRunError("raw_input is not a ShellGameSerialized or plain object");}
     /**
      * @type {Object.<string, ShellGameShell>}
      */

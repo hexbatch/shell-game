@@ -25,6 +25,10 @@
 
     <!-- My Styles-->
     <link rel="stylesheet" href="css/shell-style.css" >
+    <link rel="stylesheet" href="css/common.css" >
+    <link rel="stylesheet" href="css/main-screen.css" >
+    <link rel="stylesheet" href="css/edit-element.css" >
+
 
     <title>Shell Game</title>
 
@@ -102,6 +106,24 @@
                     <div class="card-text shell-game-element-holder">
                         <select id="shell-game-element-list" title="Elements" class="form-control"></select>
                     </div> <!-- /.shell-game-holder -->
+                    <p>
+                        <button class="btn btn-sm btn-outline-info" id="shell-game-edit-selected-element">
+                            Edit
+                        </button>
+                    </p>
+                </div> <!-- /.card-body -->
+
+                <div class="card-body">
+                    <h5 class="card-title">Inspect</h5>
+                    <div class="card-text">
+                        <label for="shell-game-inspect-box">Enter Guid</label>
+                        <input class="form-control" id="shell-game-inspect-box" title="Enter GUID here" placeholder="GUID-xxxx-xx...">
+                    </div> <!-- /.shell-game-holder -->
+                    <p>
+                        <button class="btn btn-sm btn-outline-info" id="shell-game-inspect-with">
+                            Inspect
+                        </button>
+                    </p>
                 </div> <!-- /.card-body -->
             </div> <!-- /.card -->
         </div>
@@ -139,21 +161,35 @@
 
         <input type="hidden" class="shell-game-edit-element-this">
         <div class="container-fluid">
+            <div class="row">
 
+            </div>
             <div class="card " >
                 <div class="card-body">
                     <div class="card-text">
                         <div class="row">
                             <div class="col-sm-12 col-md-6">
-                                <div class="">
-                                    <input type="text" value="" title="Element Name" class="shell-game-edit-element-name form-control">
-                                </div>
+                                    <div class="input-group mb-3">
+
+                                        <input type="text" value="" title="Element Name" placeholder="Element Name" class="shell-game-edit-element-name form-control ">
+                                       <input type="color" class="form-control shell-game-edit-element-color" title="Element Color">
+                                    </div>
+                                <small class="">
+                                    <code class=" shell-game-edit-element-guid border text-monospace text-break align-top p-2 "></code>
+                                </small>
+
                             </div>
 
-                            <div class="col-sm-12 col-md-6 d-flex flex-column justify-content-center">
-                                <small class="text-center">
-                                    <span class="shell-game-edit-element-guid border text-monospace text-break align-top p-2"></span>
-                                </small>
+
+                            <div class="col">
+                                <div class="btn-group float-right">
+                                    <button type="button" class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        History
+                                    </button>
+                                    <div class="dropdown-menu shell-game-element-history">
+                                        <div class="dropdown-divider"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div> <!-- /.shell-game-holder -->
@@ -170,7 +206,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Variables</h5>
                             <div class="card-text">
-                               <table class="table table-striped table-success shell-game-edit-element-variables">
+                               <table class="table table-striped table-light shell-game-edit-element-variables">
                                    <thead>
                                    <tr>
                                        <th scope="col">Name</th>
@@ -181,7 +217,7 @@
                                    <tbody></tbody>
                                </table>
                                 <div class="text-right">
-                                    <button id="shell-game-edit-new-element-variable" type="button" class="btn btn-light">New Variable</button>
+                                    <button id="shell-game-edit-new-element-variable" type="button" class="btn btn-outline-success">New Variable</button>
                                 </div>
                             </div> <!-- /.shell-game-holder -->
                         </div> <!-- /.card-body -->
@@ -193,7 +229,7 @@
                         <div class="card-body">
                             <h5 class="card-title">Gloms</h5>
                             <div class="card-text">
-                                <table class="table table-striped table-info shell-game-edit-element-gloms">
+                                <table class="table table-striped table-light shell-game-edit-element-gloms">
                                     <thead>
                                     <tr>
                                         <th scope="col">Reference</th>
@@ -204,7 +240,7 @@
                                     <tbody></tbody>
                                 </table>
                                 <div class="text-right">
-                                    <button id="shell-game-edit-new-element-glom" type="button" class="btn btn-dark">New Glom</button>
+                                    <button id="shell-game-edit-new-element-glom" type="button" class="btn btn-outline-success">New Glom</button>
                                 </div>
                             </div> <!-- /.shell-game-holder -->
                         </div> <!-- /.card-body -->
@@ -216,7 +252,7 @@
                     <div class="card " >
                         <div class="card-body">
                             <h5 class="card-title">Script Editor</h5>
-                            <div class="card-text shell-game-edit-script-holder">
+                            <div class="card-text shell-game-edit-element-script-holder">
                                 <div id="shell-game-edit-element-script"></div>
                             </div> <!-- /.shell-game-holder -->
                         </div> <!-- /.card-body -->
@@ -233,8 +269,7 @@
 
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="node_modules/jquery/dist/jquery.min.js" ></script>
-<script src="node_modules/@popperjs/core/dist/umd/popper.min.js" ></script>
-<script src="node_modules/bootstrap/dist/js/bootstrap.min.js" ></script>
+<script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js" ></script>
 <script src="node_modules/ace-builds/src-min-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 <script src="node_modules/bs4-toast/dist/toast.min.js"></script>
 <script src="node_modules/js-yaml/dist/js-yaml.min.js"></script>
@@ -261,7 +296,8 @@
 <script src="js/shell/shell_lib.js"></script>
 
 <script src="js/keeper/event_hook.js"></script>
-<script src="js/keeper/glom_reference.js"></script>
+<script src="js/keeper/glom_library_reference.js"></script>
+<script src="js/keeper/glom_running_reference.js"></script>
 <script src="js/keeper/keeper.js"></script>
 
 

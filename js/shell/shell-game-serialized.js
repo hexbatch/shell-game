@@ -22,8 +22,12 @@ function ShellGameSerialized() {
     this.running_shells = {};
 }
 
-
-function ShellGameSerializedRunningShell() {
+/**
+ *
+ * @param {ShellGameShell} [real_shell]
+ * @constructor //todo implement copy constructor for serialized running shell
+ */
+function ShellGameSerializedRunningShell(real_shell) {
     /**
      * @type {string}
      */
@@ -40,10 +44,32 @@ function ShellGameSerializedRunningShell() {
      * @type {Object.<string, ShellGameSerializedRunningShell[]>}
      */
     this.shell_children = {};
+
+    if (real_shell) {
+        this.guid = real_shell.guid;
+
+        for(let i =0; i <  real_shell.shell_elements.length; i++) {
+            let da_el = real_shell.shell_elements[i];
+            this.shell_elements[da_el.element_name] = new ShellGameSerializedRunningShellElement(da_el);
+        }
+
+        for(let i = 0; i < real_shell.shell_children; i++) {
+            let da_shell = real_shell.shell_children[i];
+            if (!this.shell_children.hasOwnProperty(da_shell.shell_name) ) {
+                this.shell_children[da_shell.shell_name] = [];
+            }
+            let node = new ShellGameSerializedRunningShell(da_shell);
+            this.shell_children[da_shell].push(node);
+        }
+    }
 }
 
 
-function ShellGameSerializedRunningShellElement() {
+/**
+ * @param {ShellGameElement} [real_element]
+ * @constructor
+ */
+function ShellGameSerializedRunningShellElement(real_element) {
     /**
      * @type {string}
      */
@@ -60,6 +86,19 @@ function ShellGameSerializedRunningShellElement() {
      * @type {Object.<string, string>}
      */
     this.gloms = {};
+
+    if (real_element) {
+        this.guid = real_element.guid;
+        for(let i = 0; i <  real_element.element_variables.length ; i++) {
+            let da_var = real_element.element_variables[i];
+            this.variables[da_var.variable_name] = da_var.variable_current_value;
+        }
+
+        for(let i = 0; i <  real_element.element_gloms.length ; i++) {
+            let da_glom = real_element.element_gloms[i];
+            this.gloms[da_glom.glom_reference_name] = da_glom.glom_current_value;
+        }
+    }
 }
 
 

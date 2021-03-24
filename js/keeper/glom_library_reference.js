@@ -1,31 +1,31 @@
 
 
-function ShellGameGlomReference() {
+function ShellGameGlomLibraryReference() {
     /*
     starting element, the starting element shell, the target element, the target element shell, glom reference name, and variable target name
      */
 
     /**
      *
-     * @type {ShellGameElement}
+     * @type {ShellGameSerializedElement}
      */
     this.starting_element = null;
 
     /**
      *
-     * @type {ShellGameShell}
+     * @type {ShellGameSerializedShell}
      */
     this.starting_shell = null;
 
     /**
      *
-     * @type {ShellGameElement}
+     * @type {ShellGameSerializedElement}
      */
     this.target_element = null;
 
     /**
      *
-     * @type {ShellGameShell}
+     * @type {ShellGameSerializedShell}
      */
     this.target_shell = null;
 

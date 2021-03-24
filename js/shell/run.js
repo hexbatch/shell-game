@@ -18,7 +18,7 @@ function ShellGameRun(yaml_parsed) {
      */
     this.shell_lib = null;
 
-    if (!_.isPlainObject(yaml_parsed)) { throw new ShellGameRunError("yaml parsed is not an object");}
+    if (!_.isPlainObject(yaml_parsed) && (!yaml_parsed instanceof  ShellGameSerialized)) { throw new ShellGameRunError("yaml parsed is not a ShellGameSerialized or plain object");}
     if (!('element_lib' in yaml_parsed)) {throw new ShellGameRunError("yaml parsed does not have an element_lib member");}
     if (!('shell_lib' in yaml_parsed)) {throw new ShellGameRunError("yaml parsed does not have an shell_lib member");}
 

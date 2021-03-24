@@ -4,6 +4,27 @@ jQuery(function(){
 
     shell_game_thing = new ShellGameKeeper();
 
+    $('#shell-game-inspect-with').click(function() {
+       let thing = $('#shell-game-inspect-box').val();
+       let things = thing.split(/\s+/);
+       let thing1 = things[0];
+       let thing2 = null;
+       if (things.length > 1) {thing2 = things[1];}
+       let what = shell_game_thing.get_glom_targets(thing1,thing2);
+        console.debug('inspected',thing1,thing2);
+       for(let i  = 0; i < what.length; i++) {
+           let hm = what[i];
+           console.debug('Glom Ref Name',hm.glom_reference_name);
+           console.debug('Variable Target Name',hm.variable_target_name);
+           console.debug('Starting Shell',hm.starting_running_shell);
+           console.debug('Starting Element',hm.starting_running_element);
+           console.debug('Running Shell',hm.target_running_shell);
+           console.debug('Running Element',hm.target_running_element);
+
+       }
+
+    });
+
 });
 
 

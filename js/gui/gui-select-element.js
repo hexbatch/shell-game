@@ -24,12 +24,24 @@ jQuery(function ($) {
 
     regular_select_element.on('select2:select', function (e) {
 
-        /**
-         * @var {ShellGameSerializedElement}
-         */
-        element_to_edit = e.params.data.data;
-        if (!element_to_edit) {return;}
-        shell_game_edit_element(element_to_edit.guid);
+        try {
+            /**
+             * @var {ShellGameSerializedElement}
+             */
+            element_to_edit = e.params.data.data;
+            if (!element_to_edit) {
+                return;
+            }
+            if ('make_new' in element_to_edit) {
+                shell_game_edit_element('new');
+            } else {
+                shell_game_edit_element(element_to_edit.guid);
+            }
+        } catch (e) {
+            console.error(e);
+            do_toast({title:'Error For Editing Element',subtitle:e.name,content: e.message,delay:0,type:'error'});
+        }
+
 
     });
 
@@ -37,13 +49,14 @@ jQuery(function ($) {
 
     //fill in element list
     shell_game_thing.add_event(new ShellGameEventHook(
-        'on_load',
+        'on_refresh',
         null,
         function (hook) {
             let game = hook.keeper.serialized_game;
             select_for_master_elements_data = [];
 
-            select_for_master_elements_data.push({id:-1,text:"(choose element)",notes:"blank line", data: null});
+            select_for_master_elements_data.push({id:"0",text:" -- Choose Element -- ",notes:"blank line", data: {}});
+            select_for_master_elements_data.push({id:"new",text:" *** New Element *** ",notes:"For New", data: {make_new: true}});
             for(let element_name in game.element_lib) {
                 if (!game.element_lib.hasOwnProperty(element_name)) {continue;}
                 let element = game.element_lib[element_name];
@@ -53,6 +66,19 @@ jQuery(function ($) {
 
         }
     ));
+
+    $("#shell-game-edit-selected-element").click(function() {
+        let element_guid = regular_select_element.val();
+        if (!element_guid) {return;}
+        try {
+            shell_game_edit_element(element_guid);
+
+
+        } catch (e) {
+            console.error(e);
+            do_toast({title:'Error For Editing Element',subtitle:e.name,content: e.message,delay:0,type:'error'});
+        }
+    });
 
 
 

@@ -11,8 +11,9 @@
 /**
  * Raw input possible keys
  * @typedef {Object} ShellGameRawInput
- * @property {ShellGameSerialized} [game] - optional
- * @property {string[]} [tags] - optional
+ * @property {ShellGameSerialized} [game]
+ * @property {string[]} [tags]
+ * @property {Object.<string, {}>} [meta]
  */
 
 

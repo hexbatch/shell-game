@@ -100,7 +100,9 @@ Please refer to the yaml example below at the bottom of the page , or see yaml/t
     * `shell_children` has any child shells defined under here. So, because there is only one top shell, it means all the other shells will 
       be entered under the top shell shell_children, or nested further on down in other levels after that
 
-
+* There can be other sections besides the game key. Any new key can be added to store information. There are some keys used like this for the editors
+  * `colors` is a dictionary of uuids (found above) as the keys, and css colors. used to remember color preferences for the different elements and shells
+  * `tags` is a string array, and is used to fill in a tag display at the top, to help sort test scripts
       
 
 ### Pressing the Load button will parse the yaml from text and build up the objects in the javascript

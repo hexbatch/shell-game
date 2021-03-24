@@ -7,7 +7,7 @@
 function ShellGameElementLib(raw_input) {
 
 
-    if (!$.isPlainObject(raw_input) ) { throw new ShellGameElementLibError("raw_input is not a plain object");}
+    if (!_.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameSerialized)) { throw new ShellGameRunError("raw_input is not a ShellGameSerialized or plain object");}
     /**
      * contains only master elements by name
      * @type {Object.<string, ShellGameElement>}
