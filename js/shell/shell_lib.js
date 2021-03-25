@@ -1,4 +1,12 @@
 
+const SHELL_GAME_COMPONENT_INIT_STATE = [
+    'new', 'find'
+];
+
+const SHELL_GAME_COMPONENT_END_STATE = [
+    'void', 'return'
+];
+
 /**
  * @param {Object} raw_input
  * @param {ShellGameRun} run_object
@@ -6,6 +14,8 @@
  
  */
 function ShellGameShellLib(raw_input, run_object) {
+
+
 
 
     /**

@@ -25,7 +25,7 @@ function ShellGameSerialized() {
 /**
  *
  * @param {ShellGameShell} [real_shell]
- * @constructor //todo implement copy constructor for serialized running shell
+ * @constructor
  */
 function ShellGameSerializedRunningShell(real_shell) {
     /**
@@ -83,7 +83,7 @@ function ShellGameSerializedRunningShellElement(real_element) {
 
     /**
      *
-     * @type {Object.<string, string>}
+     * @type {Object.<string, ?string>}
      */
     this.gloms = {};
 

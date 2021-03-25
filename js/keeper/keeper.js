@@ -52,6 +52,301 @@ function ShellGameKeeper() {
      */
     this.event_hooks = [];
 
+
+
+    /**
+     *
+     * @param {string} guid
+     * @return {ShellGameSerializedShell}
+     */
+    this.get_shell_by_guid = function(guid) {
+        if (!this.run.shell_lib.shell_guid_lookup.hasOwnProperty(guid)) {
+            throw new ShellGameKeeperError("Cannot find shell of guid "+ guid);
+        }
+        let shell_name = this.run.shell_lib.shell_guid_lookup[guid].shell_name;
+
+        if (!this.serialized_game.shell_lib.hasOwnProperty(shell_name)) {
+            throw new ShellGameKeeperError("Cannot find shell of name "+ shell_name);
+        }
+        return this.serialized_game.shell_lib[shell_name];
+    }
+
+
+    /**
+     *
+     * @param {ShellGameSerializedShell} edited_shell
+     */
+    this.edit_shell = function(edited_shell) {
+        //todo implement this
+        /*
+            find older shell via its guid,
+
+            check for valid name and not used by any other shells
+
+            copy the serialized
+            get the old version of the shell,
+                a)  make a list of components added and removed
+                b)  see if the parent changed
+
+            switch out the changed shell in the shell library in copy
+            go through the running shells,
+                a) if the parent has changed remove it, as it does not belong there anymore
+                b) find each place this may be running, add or remove elements (components) as needed
+
+           reload using the new serialized
+         */
+
+
+        if (!edited_shell.shell_name) {throw new ShellGameKeeperError("Edited Shell needs a name");}
+        let shell ;
+        if (this.run.shell_lib.shells.hasOwnProperty(edited_shell.shell_name) ) {
+            shell = this.run.shell_lib.shells[edited_shell.shell_name];
+        } else if (this.run.shell_lib.master_shell_guid_lookup.hasOwnProperty(edited_shell.guid)) { //because can change its name
+            shell = this.run.shell_lib.master_shell_guid_lookup[edited_shell.guid];
+        }else {
+            throw new ShellGameKeeperError("Cannot find Shell by name of " + edited_shell.shell_name + " or by guid of "  + edited_shell.guid);
+        }
+
+
+        let old_shell_name = shell.shell_name;
+        let new_shell_name = edited_shell.shell_name;
+
+        if (old_shell_name !== new_shell_name) {
+            if (this.serialized_game.shell_lib.hasOwnProperty(new_shell_name)) {
+                throw new ShellGameKeeperError("The shell name of " + new_shell_name + " is already being used. Cannot change name to this");
+            }
+        }
+
+        let name_regex = /^[a-zA-Z_]+$/;
+        if (!name_regex.test(new_shell_name)) {
+            throw new ShellGameKeeperError("Only names with letters and underscore is allowed: " + new_shell_name);
+        }
+
+
+        /**
+         * For looking up below
+         * @type {Object.<string, ShellGameSerializedShellElement>}
+         */
+        let new_components = {};
+
+        for(let i = 0; i < edited_shell.elements.length ; i++) {
+            new_components[edited_shell.elements[i].element_name] = edited_shell.elements[i];
+        }
+
+        /**
+         * For looking up below
+         * @type {Object.<string, ShellGameSerializedShellElement>}
+         */
+        let old_components = {};
+
+        for(let i = 0; i < shell.elements.length ; i++) {
+            old_components[shell.elements[i].element_name] = shell.elements[i];
+        }
+
+        /**
+         * If new has elements old does not then list here keyed by element name
+         * find by going through new, and if old does not match then add
+         * @type {Object.<string, ShellGameSerializedShellElement>}
+         */
+        let components_added = {};
+
+        for(let component_name in new_components) {
+            if (!new_components.hasOwnProperty(component_name)) {continue;}
+            if (!old_components.hasOwnProperty(component_name)) {
+                components_added[component_name] = new_components[component_name];
+            }
+        }
+
+
+
+        /**
+         * If new has removed elements that old still has then catalog here keyed by element name
+         * find by going through old, and if new does not match then add
+         @type {Object.<string, ShellGameSerializedShellElement>}
+         */
+        let components_removed = {};
+
+        for(let component_name in old_components) {
+            if (!old_components.hasOwnProperty(component_name)) {continue;}
+            if (!new_components.hasOwnProperty(component_name)) {
+                components_removed[component_name] = old_components[component_name];
+            }
+        }
+
+        let b_parent_changed = false;
+        if (shell.shell_parent_name !== edited_shell.shell_parent_name) {b_parent_changed = true;}
+
+        /**
+         *
+         * @type {ShellGameSerialized}
+         */
+        let copy = _.cloneDeep(this.serialized_game);
+        if (old_shell_name !== new_shell_name) {
+            delete copy.shell_lib[old_shell_name];
+        }
+        copy.shell_lib[new_shell_name] = edited_shell;
+
+
+        let that = this;
+
+        /**
+         *
+         * @param {ShellGameSerializedRunningShell} running_shell
+         * @param {string} element_name
+         * @return {ShellGameSerializedRunningShellElement}
+         */
+        function find_closest_element(running_shell,element_name) {
+            if (!that.run.shell_lib.shell_guid_lookup.hasOwnProperty(running_shell.guid)) {throw new ShellGameKeeperError("Uh, houston, we have a problem... cannot find guid when we damn well shoudl have");}
+            let real_shells_for_real_men = that.run.shell_lib.shell_guid_lookup[running_shell.guid] ;
+            let closet_element = real_shells_for_real_men.find_first_element_in_ancestor_chain(element_name);
+            let ret = new ShellGameSerializedRunningShellElement(closet_element);
+            return ret;
+
+        }
+
+
+        /**
+         * //this-task fix up
+         *
+         *
+         * @param  {?ShellGameSerializedRunningShell} parent
+         * @param {string} running_shell_name
+         * @param {ShellGameSerializedRunningShell} running_shell
+         */
+        function edit_shell_from_running_shells(parent,running_shell_name, running_shell) {
+            if (running_shell_name === old_shell_name) {
+                if (b_parent_changed) {
+                    delete parent.shell_children[old_shell_name];//todo parent can be null, so this will not work
+                } else {
+                    if (old_shell_name !== new_shell_name) {
+                        let temp = running_shell.shell_children[old_shell_name]; //todo not compatible with above null or logic
+                        delete running_shell.shell_children[old_shell_name];
+                        running_shell.shell_children[new_shell_name] = temp;
+                    }
+                    for(let i = 0; i < running_shell.shell_children[new_shell_name]; i++) {
+                        let spawn  = running_shell.shell_children[new_shell_name][i];
+                        for(let component_name in  spawn.shell_elements) {
+                            if (!spawn.shell_elements.hasOwnProperty(component_name)) {continue;}
+                            if (components_removed.hasOwnProperty(component_name)) {
+                                delete spawn.shell_elements[component_name];
+                            }
+                        }
+
+                        for(let component_name in components_added) {
+                            if (!components_added.hasOwnProperty(component_name)) {continue;}
+                            let component_dets = components_added[component_name];
+                            /**
+                             * @type {ShellGameSerializedRunningShellElement}
+                             */
+                            let node ;
+                            if (component_dets.element_init === 'find') {
+                                let node  = find_closest_element(running_shell,component_name);
+                                for(let glom_ref_name in node.gloms) {
+                                    if (! node.gloms.hasOwnProperty(glom_ref_name)) {continue; }
+                                    node.gloms[glom_ref_name] = null;
+                                }
+                            } else {
+                                node = new ShellGameSerializedRunningShellElement();
+                                let el_my_hell = copy.element_lib[component_name];
+                                for(let glommy_phonome in el_my_hell.element_gloms) {
+                                    if (!el_my_hell.element_gloms.hasOwnProperty(glommy_phonome)) {continue; /*..bitch I hate this code*/}
+                                    node.gloms[glommy_phonome] = null;
+                                }
+
+                                for(let varmy_patruski in el_my_hell.element_variables) {
+                                    if (!el_my_hell.element_variables.hasOwnProperty(varmy_patruski)) {continue; /*..bitch I hate this code*/}
+                                    let victory_is_mine = el_my_hell.element_variables[varmy_patruski];
+                                    node.variables[varmy_patruski] = victory_is_mine.variable_initial_value;
+                                }
+                            }
+
+
+                            spawn[component_name] = node;
+                        } //end each component added
+                    } //end each shell child being looked at
+                } //end parent name not changed for this child stack
+            }
+            for(let child_shell_name in shell.shell_children) {
+                if (!shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
+                let child_array_of_shells = shell.shell_children[child_shell_name];
+                for(let child_shell_index = 0; child_shell_index < child_array_of_shells.length; child_shell_index++) {
+                    let child_shell = child_array_of_shells[child_shell_index];
+                    edit_shell_from_running_shells(shell,child_shell_name,child_shell);
+                }
+            }
+        }
+
+        for(let top_shell_name in copy.running_shells) {
+            if (!copy.running_shells.hasOwnProperty(top_shell_name)) {continue;}
+            let top_shell_array = copy.running_shells[top_shell_name];
+            for(let i = 0; i < top_shell_array.length; i++) {
+                let running_shell = top_shell_array[i];
+                edit_shell_from_running_shells(null,top_shell_name,running_shell);
+            }
+        }
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = copy;
+
+
+        this.load(this.last_raw);
+
+    }
+
+
+    /**
+     *
+     * @param {string} name_or_guid
+     */
+    this.delete_shell = function(name_or_guid) {
+        //todo implement delete shell
+        /**
+         * to delete the shell, find all the things using it as the master, and remove them from a cloned serialized,
+         * then reload
+         */
+    }
+
+    /**
+     *
+     * @param {ShellGameSerializedShell} shell
+     * @param {string} element_color  css color with a # in front
+     * @return {string} the guid of the new shell
+     */
+    this.add_shell = function(shell,element_color) {
+        if (!shell.shell_name) {throw new ShellGameKeeperError("Added shell needs a name");}
+
+        let name_regex = /^[a-zA-Z_]+$/;
+        if (!name_regex.test(shell.shell_name)) {
+            throw new ShellGameKeeperError("Only in shell names with letters and underscore is allowed");
+        }
+
+        if (this.serialized_game.shell_lib.hasOwnProperty(shell.shell_name)) {
+            throw new ShellGameKeeperError("The shell name of " + shell.shell_name + " is already being used");
+        }
+
+        this.serialized_game.shell_lib[shell.shell_name] = shell;
+        this.last_raw.game = this.serialized_game;
+        this.load(this.last_raw);
+
+        let new_guid = this.serialized_game.shell_lib[shell.shell_name].guid;
+
+        let colors ;
+        if (!('colors' in this.last_raw)) {
+            colors = {};
+        } else {
+            colors = this.last_raw.colors;
+        }
+
+        colors[new_guid] = element_color;
+        this.last_raw.colors = colors;
+
+
+        this.refresh();
+        return shell.guid;
+    }
+
     /**
      *
      * @param {string} guid
@@ -81,6 +376,10 @@ function ShellGameKeeper() {
         let name_regex = /^[a-zA-Z_]+$/;
         if (!name_regex.test(el.element_name)) {
             throw new ShellGameKeeperError("Only names with letters and underscore is allowed");
+        }
+
+        if (this.serialized_game.element_lib.hasOwnProperty(el.element_name)) {
+            throw new ShellGameKeeperError("The element name of " + el.element_name + " is already being used");
         }
 
         let element = new ShellGameElement(el,null);
@@ -233,6 +532,17 @@ function ShellGameKeeper() {
         let old_element_name = element.element_name;
         let new_element_name = edited_element.element_name;
 
+        if (old_element_name !== new_element_name) {
+            if (this.serialized_game.element_lib.hasOwnProperty(new_element_name)) {
+                throw new ShellGameKeeperError("The element name of " + new_element_name + " is already being used. Cannot change name to this");
+            }
+        }
+
+        let name_regex = /^[a-zA-Z_]+$/;
+        if (!name_regex.test(new_element_name)) {
+            throw new ShellGameKeeperError("Only names with letters and underscore is allowed: " + new_element_name);
+        }
+
         /**
          * @type {ShellGameSerialized}
          */
@@ -359,16 +669,7 @@ function ShellGameKeeper() {
 
 
 
-    this.add_shell = function(guid_or_name,parent_guid) {
-        this.run.add_active_shell(guid_or_name,parent_guid);
-        this.serialized_game = this.run.export_as_object();
 
-        if (!_.isObject(this.last_raw)) {
-            this.last_raw = {};
-        }
-        this.last_raw.game = this.serialized_game;
-        this.refresh();
-    }
 
     this.pop_shell = function(guid) {
         this.run.pop_active_shell(guid);
@@ -453,6 +754,7 @@ function ShellGameKeeper() {
 
     this.refresh = function() {
 
+        if (this.is_refreshing || this.is_loading || this.is_pre) {return;} //do not allow nested refreshes
         pre_refresh();
 
         this.is_refreshing = true;

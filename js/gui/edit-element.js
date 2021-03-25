@@ -17,17 +17,21 @@ jQuery(function ($) {
     function make_var_tr(da_var) {
         let row_html =
             `
-                    <tr>
-                        <td>
-                          <input type="text" class="form-control" name="shell_game_edit_element_var_name[]" value="${da_var.variable_name}">      
-                        </td>
-                        <td>
-                          <input type="text" class="form-control" name="shell_game_edit_element_var_init_value[]" value="${da_var.variable_initial_value}">      
-                        </td>
-                        <td>
-                            <i class="fas fa-trash text-muted shell-game-edit-element-delete-var shell-game-action-link"></i>
-                        </td>
-                    </tr>`;
+            <tr>
+                <td colspan="3">
+                     <div class="input-group input-group-sm">
+                        <input type="text" class="form-control" name="shell_game_edit_element_var_name[]" value="${da_var.variable_name}">
+                        <input type="text" class="form-control" name="shell_game_edit_element_var_init_value[]" value="${da_var.variable_initial_value}">
+                        <div class="input-group-append">
+                            <button class="btn btn-sm  shell-game-edit-element-delete-var " >
+                                <i class="fas fa-trash text-muted"></i>
+                            </button>
+                        </div>
+                    </div> <!-- /.input-group -->
+                </td>
+                
+            </tr>
+            `;
         return row_html;
     }
 
@@ -51,7 +55,7 @@ jQuery(function ($) {
                 let a_ref = refs[i];
                 let line = `
                     <div class="border rounded lighten m-1 shell-game-edit-element-glom-trace">
-                         <span 
+                         <small><span 
                             class="rounded shell-name-blurb"
                             data-shell_guid="${a_ref.starting_shell.guid}"
                             data-element_guid="${a_ref.starting_element.guid}"
@@ -59,11 +63,11 @@ jQuery(function ($) {
                              ${a_ref.starting_shell.shell_name}
                              <span><i class="fas fa-angle-double-right"></i></span> 
                              <span class="font-weight-bold">|</span>
-                        </span>
+                        </span></small>
                         
                         
                         
-                        <span 
+                        <small><span 
                             class="rounded var-name-blurb"
                             data-variable_name="${a_ref.variable_target_name.guid}"
                         >
@@ -82,7 +86,7 @@ jQuery(function ($) {
                             <i class="far fa-dot-circle shell-game-action-link shell-game-shell-link "
                                        data-shell_guid="${a_ref.target_shell.guid}" 
                             ></i>
-                        </span>
+                        </span></small>
                         
                     
                     </div>
@@ -90,21 +94,23 @@ jQuery(function ($) {
                 refs_lines.push(line.trim());
             }
             let lines_now = refs_lines.join("\n");
-            refs_cell = `<td colspan="3">${lines_now}\n</td>`;
+            refs_cell = `${lines_now}\n`;
         }
         let row_html =
             `
                     <tr>
-                        <td>
-                          <input type="text" class="form-control" name="shell_game_edit_element_glom_ref[]" value="${da_glom.glom_reference_name}">      
+                        <td colspan="3">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control" name="shell_game_edit_element_glom_ref[]" value="${da_glom.glom_reference_name}"> 
+                                <input type="text" class="form-control" name="shell_game_edit_element_glom_target[]" value="${da_glom.glom_target_name}"> 
+                                <div class="input-group-append">
+                                    <button class="btn btn-sm  shell-game-edit-element-delete-glom " >
+                                        <i class="fas fa-trash text-muted"></i>
+                                    </button>
+                                </div>
+                            </div> <!-- /.input-group -->
+                            ${refs_cell}
                         </td>
-                        <td>
-                          <input type="text" class="form-control" name="shell_game_edit_element_glom_target[]" value="${da_glom.glom_target_name}">      
-                        </td>
-                        <td>
-                            <i class="fas fa-trash text-muted shell-game-edit-element-delete-glom shell-game-action-link"></i>
-                        </td>
-                        ${refs_cell}
                     </tr>`;
         row_html = row_html.trim();
         return row_html;
@@ -116,14 +122,14 @@ jQuery(function ($) {
      */
     shell_game_edit_element = function(element_guid) {
         // set content
-        if (element_guid === undefined || !element_guid) {return;}
+        if (element_guid === undefined || !element_guid || element_guid==="0") {return;}
         let element_to_edit;
         if (element_guid === 'new') {
             element_to_edit = null;
             editing_div.find('input.shell-game-edit-element-name').val('');
             editing_div.find('input.shell-game-edit-element-this').val('');
             editing_div.find('.shell-game-edit-element-guid').text('').hide();
-            editing_div.find('input.shell-game-edit-element-color').val('');
+            editing_div.find('input.shell-game-edit-element-color').val('#EEEEEE');
             table_body_var.html('');
             table_body_glom.html('');
             if (js_editor) {
@@ -207,28 +213,26 @@ jQuery(function ($) {
                 js_editor.session.setMode("ace/mode/javascript");
             }
             let element_guid = editing_div.find('input.shell-game-edit-element-this').val();
+
+
+
+
+
+            //set history
+            let history = $('div.shell-game-element-history');
+            let last_item = history.find('div.shell-game-current-element').detach();
+            last_item.removeClass('shell-game-current-element');
+            last_item.addClass('shell-game-element-link');
+
             if (element_guid) { //it can be a new element
                 let element_to_edit = shell_game_thing.get_element_by_guid(element_guid);
                 js_editor.setValue(element_to_edit.element_script, 1);
 
-                //set history
-                let history = $('div.shell-game-element-history');
-                let last_item = history.find('div.shell-game-current-element').detach();
-                last_item.removeClass('shell-game-current-element');
-                last_item.addClass('shell-game-element-link');
 
 
-                let count_history = history.find('div.shell-game-action-link').length;
-                const MAX_HISTORY_LENGTH = 20;
-                if (count_history > MAX_HISTORY_LENGTH) {
-                    let number_to_trim = count_history - MAX_HISTORY_LENGTH;
-                    history.find(`div.shell-game-action-link:nth-last-child(-n+${number_to_trim})`).remove();
-                }
 
                 //any with same guid as that being added will be removed also
                 history.find(`div[data-element_guid="${element_to_edit.guid}"]`).remove();
-
-                history.prepend(last_item);
 
 
                 let new_menu_item = $(
@@ -239,20 +243,32 @@ jQuery(function ($) {
                         let color = shell_game_thing.last_raw.colors[element_guid];
                         new_menu_item.css('background-color', color)
                     }
+                } //todo somewhere am not removing or am duplicating entry
+
+                let count_history = history.find('div.shell-game-action-link').length;
+                const MAX_HISTORY_LENGTH = 20;
+                if (count_history > MAX_HISTORY_LENGTH) {
+                    let number_to_trim = count_history - MAX_HISTORY_LENGTH;
+                    history.find(`div.shell-game-action-link:nth-last-child(-n+${number_to_trim})`).remove();
                 }
 
                 history.append(new_menu_item);
+
+            } else {
+                let last_item_guid = last_item.data('element_guid');
+                if (last_item_guid) {
+                    history.find(`div[data-element_guid="${last_item_guid}"]`).remove();
+                }
             }
+            history.prepend(last_item);
+
 
 
         },
         onClose: function() {
-            console.log('modal closed');
-            //modal.destroy();
+            //do not destroy this
         },
         beforeClose: function() {
-            // here's goes some logic
-            // e.g. save content before closing the modal
             return true; // close the modal
             // return false; // nothing happens
         }
@@ -279,8 +295,7 @@ jQuery(function ($) {
             let name = tr.find("input[name='shell_game_edit_element_var_name[]']").val().trim();
             let init_value = tr.find("input[name='shell_game_edit_element_var_init_value[]']").val();
             if (!init_value) {init_value = null;}
-            if (!_.isNaN(parseInt(init_value))) {init_value = parseInt(init_value);}
-            else if (!_.isNaN(parseFloat(init_value))) {init_value = parseFloat(init_value);}
+            if (!_.isNaN(parseFloat(init_value))) {init_value = parseFloat(init_value);}
             if (name) {
                 let node = new ShellGameSerializedVariable();
                 node.variable_initial_value = init_value;
@@ -365,12 +380,12 @@ jQuery(function ($) {
         table_body_var.append(row_html);
     });
 
-    $('body').on('click','i.shell-game-edit-element-delete-var',function() {
+    $('body').on('click','.shell-game-edit-element-delete-var',function() {
        let row = $(this).closest('tr');
        row.remove();
     });
 
-    $('body').on('click','i.shell-game-edit-element-delete-glom',function() {
+    $('body').on('click','.shell-game-edit-element-delete-glom',function() {
         let row = $(this).closest('tr');
         row.remove();
     });

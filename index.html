@@ -24,7 +24,7 @@
     <link href="node_modules/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet" />
 
     <!-- My Styles-->
-    <link rel="stylesheet" href="css/shell-style.css" >
+    <link rel="stylesheet" href="css/edit-shell.css" >
     <link rel="stylesheet" href="css/common.css" >
     <link rel="stylesheet" href="css/main-screen.css" >
     <link rel="stylesheet" href="css/edit-element.css" >
@@ -43,10 +43,10 @@
 <body>
 
 
-<div class="container-fluid mx-3 mt-3">
+<div class="container-fluid mx-lg-3 mt-lg-3 shell-game-main-page">
 
     <div class="row">
-        <div class="col-sm-12 col-md-3 d-flex flex-column justify-content-center order-2 order-md-1">
+        <div class="col-12 col-sm-12 col-md-3 d-flex flex-column justify-content-center order-2 order-md-1">
             <div class="pb-1 pb-md-0">
                 <input class="form-control shell-game-text-tagger" placeholder="" title="Enter Tags">
             </div>
@@ -60,8 +60,10 @@
     </div>
 
     <div class="row">
-        <div class="col col-sm-12 col-md-12 col-lg order-1 order-lg-3 mr-lg-2">
-            <div class="card " >
+
+        <div class="col-12 col-sm-12 col-md-12 col-lg order-1 order-lg-3 mr-lg-2">
+            <div class="card shell-game-control-card" >
+
                 <div class="card-body">
                     <h5 class="card-title">Check Yaml</h5>
                     <p class="card-text  ">
@@ -80,55 +82,61 @@
                     </p>
                 </div>
 
-                <div class="card-body">
-                    <h5 class="card-title">Add Shell with Name</h5>
-                    <p class="card-text ">
-                        You can add unlimited shells, the new shells will be inserted under their parent, if their parent shell is running
-                        <span style="display: inline-block;width: 100%; border-bottom: 1px solid whitesmoke; margin-top: 0.5em; margin-bottom: 0.5em"></span>
-                        <select id="shell-game-master-list" class="form-control bg-info" title="Pick Shell" autocomplete="off">
-                            <option value="">(Check or Step First)</option>
-                        </select>
-                        <br>
-                        <button id="shell-game-add" type="button" class="btn btn-info">Add</button>
-                    </p>
-
-                </div>
 
 
-
-            </div> <!-- /.card -->
+            </div> <!-- /.card.shell-game-control-card -->
         </div>
 
-        <div class="col-11 col-sm-12 col-md-12 col-lg-3 order-2 order-lg-2">
+        <div class=" col-sm-12 col-md-12 col-lg-4 order-2 order-lg-2">
             <div class="card " >
-                <div class="card-body">
+
+                <div class="card-body shell-game-edit-element-card">
                     <h5 class="card-title">Elements</h5>
                     <div class="card-text shell-game-element-holder">
                         <select id="shell-game-element-list" title="Elements" class="form-control"></select>
                     </div> <!-- /.shell-game-holder -->
                     <p>
-                        <button class="btn btn-sm btn-outline-info" id="shell-game-edit-selected-element">
+                        <button class="mt-1 btn btn-sm btn-outline-info" id="shell-game-edit-selected-element">
                             Edit
                         </button>
                     </p>
-                </div> <!-- /.card-body -->
+                </div> <!-- /.card-body.shell-game-edit-element-card -->
 
-                <div class="card-body">
-                    <h5 class="card-title">Inspect</h5>
-                    <div class="card-text">
-                        <label for="shell-game-inspect-box">Enter Guid</label>
-                        <input class="form-control" id="shell-game-inspect-box" title="Enter GUID here" placeholder="GUID-xxxx-xx...">
+
+                <div class="card-body shell-game-edit-shell-card">
+                    <h5 class="card-title">Shells</h5>
+                    <div class="card-text shell-game-shell-holder">
+                        <select id="shell-game-edit-shell-master-list" title="Shells" class="form-control"></select>
                     </div> <!-- /.shell-game-holder -->
                     <p>
-                        <button class="btn btn-sm btn-outline-info" id="shell-game-inspect-with">
-                            Inspect
+                        <button class="mt-1 btn btn-sm btn-outline-info" id="shell-game-edit-selected-shell">
+                            Edit
                         </button>
                     </p>
-                </div> <!-- /.card-body -->
+                </div> <!-- /.card-body.shell-game-edit-shell-card -->
+
+
+
+                <div class="card-body shell-game-inspection-card">
+                    <h5 class="card-title">Enter a Guid to Inspect</h5>
+                    <div class="card-text">
+                        <div class="input-group input-group-sm">
+                            <input class="form-control" id="shell-game-inspect-box" title="Enter GUID here" placeholder="element|shell-master-37b51e83-ca21-4819-adf1-f46ab49fbb67">
+                            <div class="input-group-append">
+                                <button class="btn btn-sm btn-outline-info" id="shell-game-inspect-with">
+                                    Inspect
+                                </button>
+                            </div>
+                        </div>
+                    </div> <!-- /.shell-game-holder -->
+
+                </div> <!-- /.card-body.shell-game-inspection-card -->
+
+
             </div> <!-- /.card -->
         </div>
 
-        <div class="col-11 col-sm-12 col-md-12 col-lg-6 order-3 order-lg-1">
+        <div class="col-12 col-sm-12 col-md-12 col-lg-6 order-3 order-lg-1 shell-game-yaml-outer-holder">
             <div class="card " >
                 <div class="card-body">
                     <h5 class="card-title">Yaml Display</h5>
@@ -137,11 +145,11 @@
                     </div> <!-- /.shell-game-holder -->
                 </div> <!-- /.card-body -->
             </div> <!-- /.card -->
-        </div>
+        </div> <!-- /.shell-game-yaml-outer-holder -->
 
     </div>
 
-</div>
+</div> <!-- /.shell-game-main-page -->
 
 
 
@@ -161,37 +169,41 @@
 
         <input type="hidden" class="shell-game-edit-element-this">
         <div class="container-fluid">
-            <div class="row">
 
-            </div>
             <div class="card " >
-                <div class="card-body">
+                <div class="card-body p-2">
                     <div class="card-text">
-                        <div class="row">
-                            <div class="col-sm-12 col-md-6">
-                                    <div class="input-group mb-3">
 
-                                        <input type="text" value="" title="Element Name" placeholder="Element Name" class="shell-game-edit-element-name form-control ">
-                                       <input type="color" class="form-control shell-game-edit-element-color" title="Element Color">
-                                    </div>
-                                <small class="">
-                                    <code class=" shell-game-edit-element-guid border text-monospace text-break align-top p-2 "></code>
-                                </small>
-
-                            </div>
-
-
-                            <div class="col">
-                                <div class="btn-group float-right">
-                                    <button type="button" class="btn btn-outline-info dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        History
+                        <div class="row p-0" style="position: relative">
+                            <div class="shell-game-edit-element-history-holder">
+                                <div class="btn-group ">
+                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-history"></i>
                                     </button>
                                     <div class="dropdown-menu shell-game-element-history">
                                         <div class="dropdown-divider"></div>
                                     </div>
                                 </div>
+                            </div><!-- /.history-holder -->
+
+                            <div class="col-12 col-sm-12 col-md-12 order-1 p-0">
+
+                                <div class="input-group col-12 col-md-12 col-lg-6">
+
+                                   <input type="text" value="" title="Element Name" placeholder="Element Name" class="shell-game-edit-element-name form-control ">
+                                   <input type="color" class="form-control shell-game-edit-element-color"  maxlength="3" title="Element Color">
+
+                                </div>
+
+                                <div class="col-12 col-md-12 col-lg-6 mt-1 pt-2 mt-lg-0">
+                                    <small class="">
+                                        <code class=" shell-game-edit-element-guid border text-monospace text-break align-top border-0"></code>
+                                    </small>
+                                </div>
+
                             </div>
-                        </div>
+
+                        </div> <!-- /.row -->
                     </div> <!-- /.shell-game-holder -->
                 </div> <!-- /.card-body -->
             </div> <!-- /.card -->
@@ -201,9 +213,9 @@
             <div class="row mt-1">
 
 
-                <div class="col-sm-12 col-md-6">
+                <div class="col-sm-12 col-md-12 col-lg-6">
                     <div class="card " >
-                        <div class="card-body">
+                        <div class="card-body p-2">
                             <h5 class="card-title">Variables</h5>
                             <div class="card-text">
                                <table class="table table-striped table-light shell-game-edit-element-variables">
@@ -211,7 +223,7 @@
                                    <tr>
                                        <th scope="col">Name</th>
                                        <th scope="col">Initial Value</th>
-                                       <th scope="col">Delete</th>
+                                       <th scope="col"></th>
                                    </tr>
                                    </thead>
                                    <tbody></tbody>
@@ -224,9 +236,9 @@
                     </div> <!-- /.card -->
                 </div> <!-- /.col -->
 
-                <div class="col-sm-12 col-md-6">
+                <div class="col-sm-12 col-md-12 col-lg-6">
                     <div class="card " >
-                        <div class="card-body">
+                        <div class="card-body p-2">
                             <h5 class="card-title">Gloms</h5>
                             <div class="card-text">
                                 <table class="table table-striped table-light shell-game-edit-element-gloms">
@@ -234,7 +246,7 @@
                                     <tr>
                                         <th scope="col">Reference</th>
                                         <th scope="col">Target</th>
-                                        <th scope="col">Delete</th>
+                                        <th scope="col"></th>
                                     </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -250,7 +262,7 @@
 
                 <div class="col-12 col-sm-12 col-md-12">
                     <div class="card " >
-                        <div class="card-body">
+                        <div class="card-body p-2">
                             <h5 class="card-title">Script Editor</h5>
                             <div class="card-text shell-game-edit-element-script-holder">
                                 <div id="shell-game-edit-element-script"></div>
@@ -264,6 +276,117 @@
         </div>
 
     </div> <!-- /.shell-game-element-editor-->
+
+<!--    ------------------------------------- END Element Editor ---------------------------------------------       -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--    ------------------------------------- Shell Editor -------------------------------------------------       -->
+
+    <div class="shell-game-shell-editor">
+
+        <input type="hidden" class="shell-game-edit-shell-this">
+        <div class="container-fluid">
+
+
+            <div class="card " >
+                <div class="card-body p-2">
+                    <div class="card-text">
+
+                        <div class="row p-0" style="position: relative">
+                            <div class="shell-game-edit-shell-history-holder">
+                                <div class="btn-group ">
+                                    <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <i class="fas fa-history"></i>
+                                    </button>
+                                    <div class="dropdown-menu shell-game-shell-history">
+                                        <div class="dropdown-divider"></div>
+                                    </div>
+                                </div>
+                            </div><!-- /.history-holder -->
+
+                            <div class="col-12 col-sm-12 col-md-12 order-1 p-0">
+
+                                <div class="input-group col-12 col-md-12 col-lg-6">
+
+                                    <input type="text" value="" title="Shell Name" placeholder="Shell Name" class="shell-game-edit-shell-name form-control ">
+                                    <input type="color" class="form-control shell-game-edit-shell-color"  maxlength="3" title="Shell Color">
+
+                                </div>
+
+                                <div class="col-12 col-md-12 col-lg-6 mt-1 pt-2 mt-lg-0">
+                                    <small class="">
+                                        <code class=" shell-game-edit-shell-guid border text-monospace text-break align-top border-0"></code>
+                                    </small>
+                                </div>
+
+                            </div><!-- /.col  -->
+
+                            <div class="col-sm-12 col-md-12 col-lg-6">
+
+                                <div class="input-group ">
+                                    <div class="input-group-prepend">
+                                        <label class="input-group-text" for="shell-game-edit-shell-parent-list">Parent</label>
+                                    </div>
+                                    <select id="shell-game-edit-shell-parent-list" class="shell-game-edit-shell-parent-list form-control bg-info" title="Parent Shell" autocomplete="off">
+                                        <option value="">(Uninitialized)</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div> <!-- /.row -->
+                    </div> <!-- /.shell-game-holder -->
+                </div> <!-- /.card-body -->
+            </div> <!-- /.card -->
+
+
+
+            <div class="row mt-1">
+
+
+                <div class="col-sm-12 col-md-12">
+
+                    <div class="card " >
+                        <div class="card-body p-2">
+                            <h5 class="card-title">Components</h5>
+                            <div class="card-text">
+                               <table class="table table-striped table-light shell-game-edit-shell-components">
+                                   <thead>
+                                   <tr>
+                                       <th scope="col">Element Name</th>
+                                       <th scope="col">Initial Policy</th>
+                                       <th scope="col">End Strategy</th>
+                                   </tr>
+                                   </thead>
+                                   <tbody></tbody>
+                               </table>
+                                <div class="text-right">
+                                    <button id="shell-game-edit-new-shell-component" type="button" class="btn btn-outline-success">New Component</button>
+                                </div>
+                            </div> <!-- /.shell-game-holder -->
+                        </div> <!-- /.card-body -->
+                    </div> <!-- /.card -->
+                </div> <!-- /.col -->
+
+
+
+            </div><!-- /.row -->
+        </div>
+
+    </div> <!-- /.shell-game-shell-editor-->
+
+<!--    ------------------------------------- END Shell Editor ---------------------------------------------       -->
 
 </div>
 
@@ -303,11 +426,15 @@
 
 
 <script src="js/gui/game-main.js"></script>
-<script src="js/gui/editor_gui.js"></script>
+<script src="js/gui/text_editor_gui.js"></script>
 
-<script src="js/gui/gui-select-shell.js"></script>
+<script src="js/gui/gui-select-master-shell.js"></script>
 <script src="js/gui/edit-element.js"></script>
 <script src="js/gui/gui-select-element.js"></script>
+
+<script src="js/gui/edit-shell.js"></script>
+
+
 <script src="js/gui/gui-tags.js"></script>
 <script src="js/gui/load.js"></script>
 <script src="js/gui/step.js"></script>

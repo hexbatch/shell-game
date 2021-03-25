@@ -1,0 +1,40 @@
+
+/*css*/
+
+
+div.shell-game-shell-popup div.tingle-modal-box__content {
+    padding: 3rem 1.5rem;
+}
+
+div.shell-game-edit-shell-history-holder {
+    position: absolute;
+    top: -3rem;
+    right: 0.5rem;
+}
+
+
+code.shell-game-edit-shell-guid {
+    font-size: 0.45rem;
+}
+
+
+@media (min-width: 992px) {
+    code.shell-game-edit-shell-guid {
+        font-size: 0.65rem;
+    }
+}
+
+
+
+.shell-name-blurb {
+    display: inline-block;
+    padding: 0.25em;
+    background-color: yellow;
+}
+
+.var-name-blurb {
+    display: inline-block;
+    padding: 0.25em;
+    background-color: greenyellow;
+}
+

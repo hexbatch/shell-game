@@ -8,7 +8,7 @@ function ShellGameElementTemplate(raw_input) {
     this.element_init = '';
     this.element_end = '';
 
-    if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameElementTemplate)) {
+    if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameElementTemplate) && (!raw_input instanceof  ShellGameSerializedShellElement)) {
         throw new ShellGameShellError("raw_input is not a plain object or a ShellGame Ele Template");
     }
 

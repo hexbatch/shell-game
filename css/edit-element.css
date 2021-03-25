@@ -1,0 +1,49 @@
+
+div.shell-game-element-popup div.tingle-modal-box__content {
+    padding: 3rem 1.5rem;
+}
+
+code.shell-game-edit-element-guid {
+    font-size: 0.45rem;
+}
+
+@media (min-width: 992px) {
+    code.shell-game-edit-element-guid {
+        font-size: 0.65rem;
+    }
+}
+
+div.shell-game-edit-element-history-holder {
+    position: absolute;
+    top: -3rem;
+    right: 0.5rem;
+}
+
+
+/*for the popup js holder*/
+div.shell-game-edit-element-script-holder {
+    position: relative;
+    width: 100%;
+    height: 25vh;
+}
+
+/*medium screens on down should have a taller text editor for scripts*/
+@media (max-width: 991px) {
+    div.shell-game-edit-element-script-holder {
+        height: 80vh;
+    }
+}
+
+#shell-game-edit-element-script {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+}
+
+
+div.shell-game-edit-element-glom-trace {
+    white-space: nowrap;
+    width: fit-content;
+}

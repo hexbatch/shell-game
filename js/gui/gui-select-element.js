@@ -14,8 +14,8 @@ jQuery(function ($) {
         dataAdapter: customAdapter,
         data: select_for_master_elements_data,
         placeholder: {
-            id: '-1', // the value of the option
-            text: 'Select an Element'
+            id: '0', // the value of the option
+            text: 'Select Element To Edit'
         },
         containerCssClass: 'form-control'
     });
@@ -55,7 +55,6 @@ jQuery(function ($) {
             let game = hook.keeper.serialized_game;
             select_for_master_elements_data = [];
 
-            select_for_master_elements_data.push({id:"0",text:" -- Choose Element -- ",notes:"blank line", data: {}});
             select_for_master_elements_data.push({id:"new",text:" *** New Element *** ",notes:"For New", data: {make_new: true}});
             for(let element_name in game.element_lib) {
                 if (!game.element_lib.hasOwnProperty(element_name)) {continue;}

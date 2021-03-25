@@ -162,7 +162,7 @@ function ShellGameShell(raw_input,run_object,
         this.run_object = run_object;
 
 
-        if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameShell)) {
+        if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameShell) && (!raw_input instanceof ShellGameSerializedShell)) {
             throw new ShellGameShellError("raw_input is not a plain object or a Shell");
         }
 
@@ -201,7 +201,7 @@ function ShellGameShell(raw_input,run_object,
 
             for (let i = 0; i < raw_input.elements.length; i++) {
                 let pre_node = raw_input.elements[i];
-                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof  ShellGameElementTemplate)) {
+                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof  ShellGameElementTemplate) && (!pre_node instanceof  ShellGameSerializedShellElement)) {
                     throw new ShellGameShellError("raw templates node is not a plain object or a Element Template");
                 }
                 let template = new ShellGameElementTemplate(pre_node);

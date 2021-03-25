@@ -26,3 +26,8 @@
 
 
 
+.select2-container {
+    width: auto !important;
+    min-width: 15em;
+}
+
