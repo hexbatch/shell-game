@@ -171,7 +171,11 @@ main:
           element_end: void
  */
 
-function ShellGameSerializedShell() {
+/**
+ * * @param {ShellGameShell} [real_shell]
+ * @constructor
+ */
+function ShellGameSerializedShell(real_shell) {
     /**
      * @type {string}
      */
@@ -193,10 +197,25 @@ function ShellGameSerializedShell() {
      */
     this.elements = [];
 
+    if (real_shell) {
+        this.guid = real_shell.guid;
+        this.shell_name = real_shell.shell_name;
+        this.shell_parent_name = real_shell.shell_parent_name;
+        for(let k = 0; k < real_shell.templates.length; k ++) {
+            let template = real_shell.templates[k];
+            let el_me_my = new ShellGameSerializedShellElement(template);
+            this.elements.push(el_me_my);
+        }
+    }
+
 }
 
 
-function ShellGameSerializedShellElement() {
+/**
+ * * @param {ShellGameElementTemplate} [real_template]
+ * @constructor
+ */
+function ShellGameSerializedShellElement(real_template) {
     /**
      * @type {string}
      */
@@ -212,6 +231,12 @@ function ShellGameSerializedShellElement() {
      * @type {string}
      */
     this.element_end = '';
+
+    if (real_template) {
+        this.element_name = real_template.element_name;
+        this.element_init = real_template.element_init;
+        this.element_end = real_template.element_end;
+    }
 
 
 }

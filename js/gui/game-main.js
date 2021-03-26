@@ -1,4 +1,6 @@
 
+const DEFAULT_ELEMENT_COLOR = '#eeeeee';
+const DEFAULT_SHELL_COLOR = '#99bdff'
 
 jQuery(function(){
 

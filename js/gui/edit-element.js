@@ -129,7 +129,7 @@ jQuery(function ($) {
             editing_div.find('input.shell-game-edit-element-name').val('');
             editing_div.find('input.shell-game-edit-element-this').val('');
             editing_div.find('.shell-game-edit-element-guid').text('').hide();
-            editing_div.find('input.shell-game-edit-element-color').val('#EEEEEE');
+            editing_div.find('input.shell-game-edit-element-color').val(DEFAULT_ELEMENT_COLOR);
             table_body_var.html('');
             table_body_glom.html('');
             if (js_editor) {
@@ -151,7 +151,7 @@ jQuery(function ($) {
                 }
             }
             if (!color) {
-                editing_div.find('input.shell-game-edit-element-color').val('')
+                editing_div.find('input.shell-game-edit-element-color').val(DEFAULT_ELEMENT_COLOR)
             }
 
             table_body_var.html('');
@@ -243,7 +243,7 @@ jQuery(function ($) {
                         let color = shell_game_thing.last_raw.colors[element_guid];
                         new_menu_item.css('background-color', color)
                     }
-                } //todo somewhere am not removing or am duplicating entry
+                }
 
                 let count_history = history.find('div.shell-game-action-link').length;
                 const MAX_HISTORY_LENGTH = 20;

@@ -2,7 +2,7 @@ let shell_game_edit_shell;
 
 jQuery(function ($) {
 
-
+    const EMPTY_ELEMENT_NAME_VALUE = '---';
 
     let modal;
     let editing_div = $("div.shell-game-shell-editor");
@@ -22,6 +22,8 @@ jQuery(function ($) {
         },
         containerCssClass: 'form-control'
     });
+    
+    let running_rows = 0;
 
 
     /**
@@ -34,9 +36,9 @@ jQuery(function ($) {
             <tr>
                 <td colspan="3">
                      <div class="input-group input-group-sm">
-                        <select class="form-control shell-game-shell-edit-component-list" name="shell_game_edit_shell_component_name[]" data-element-name="${da_el.element_name}"></select>
-                        <select class="form-control shell-game-shell-edit-init-list" name="shell_game_edit_shell_component_name[]" data-element-init="${da_el.element_init}"></select>
-                        <select class="form-control shell-game-shell-edit-end-list" name="shell_game_edit_shell_component_name[]" data-element-end="${da_el.element_end}"></select>
+                        <select class="form-control shell-game-shell-edit-component" name="shell_game_edit_shell_component_name_${running_rows}" data-element_name="${da_el.element_name}"></select>
+                        <select class="form-control shell-game-shell-edit-init" name="shell_game_shell_edit_init_${running_rows}" data-element_init="${da_el.element_init}"></select>
+                        <select class="form-control shell-game-shell-edit-end" name="shell_game_shell_edit_end__${running_rows}" data-element_end="${da_el.element_end}"></select>
                         <div class="input-group-append">
                             <button class="btn btn-sm  shell-game-edit-shell-delete-component " >
                                 <i class="fas fa-trash text-muted"></i>
@@ -51,6 +53,72 @@ jQuery(function ($) {
     }
 
 
+    /**
+     *
+     * @param {jQuery} parent
+     */
+    function kill_select_twos(parent) {
+        parent.find('select').each(function(){
+            let sel = $(this);
+            if (sel.hasClass("select2-hidden-accessible")) {
+                sel.select2('destroy');
+            } else {
+                console.warn('not a select2',sel);
+            }
+        });
+    }
+
+
+    /**
+     *
+     * @param {jQuery} parent
+     */
+    function make_select_twos_inside_dom(parent) {
+
+        function make_select_two_with_data(sel,data) {
+
+            let fake_data = [];
+
+            let da_thing_i_made = sel.select2({
+                dataAdapter: customAdapter,
+                data: fake_data,
+                containerCssClass: 'form-control'
+            });
+
+
+            for(let i = 0; i < data.length; i++) {
+                let name = data[i];
+                fake_data.push({id:name,text:name});
+            }
+            da_thing_i_made.data('select2').dataAdapter.updateOptions(fake_data);
+            return da_thing_i_made;
+        }
+
+
+        //initialize the select boxes
+        parent.find('select.shell-game-shell-edit-component').each(function() {
+            let sel = $(this);
+            let element_name = sel.data('element_name');
+            make_select_two_with_data(sel,element_name_list);
+            sel.val(element_name);
+        });
+
+        parent.find('select.shell-game-shell-edit-init').each(function() {
+            let sel = $(this);
+            let element_init = sel.data('element_init');
+            make_select_two_with_data(sel,SHELL_GAME_COMPONENT_INIT_STATE);
+            sel.val(element_init);
+        });
+
+        parent.find('select.shell-game-shell-edit-end').each(function() {
+            let sel = $(this);
+            let element_end = sel.data('element_end');
+            make_select_two_with_data(sel,SHELL_GAME_COMPONENT_END_STATE);
+            sel.val(element_end);
+        });
+
+
+    }
 
     /**
      *
@@ -65,14 +133,15 @@ jQuery(function ($) {
          */
         let shell_to_edit;
 
-        table_body_components.find('select').select2('destroy');
+
+        kill_select_twos(table_body_components);
 
         if (shell_guid === 'new') {
             shell_to_edit = null;
             editing_div.find('input.shell-game-edit-shell-name').val('');
             editing_div.find('input.shell-game-edit-shell-this').val('');
             editing_div.find('.shell-game-edit-shell-guid').text('').hide();
-            editing_div.find('input.shell-game-edit-shell-color').val('');
+            editing_div.find('input.shell-game-edit-shell-color').val(DEFAULT_SHELL_COLOR);
             select_parent.val('');
             table_body_components.html('');
 
@@ -97,7 +166,7 @@ jQuery(function ($) {
                 }
             }
             if (!color) {
-                editing_div.find('input.shell-game-edit-shell-color').val('')
+                editing_div.find('input.shell-game-edit-shell-color').val(DEFAULT_SHELL_COLOR)
             }
 
             table_body_components.html('');
@@ -107,43 +176,8 @@ jQuery(function ($) {
                 table_body_components.append(row_html);
             }
 
-            function make_select_two_with_data(sel,data) {
-                let da_thing_i_made = sel.select2({
-                    dataAdapter: customAdapter,
-                    data: [],
-                    containerCssClass: 'form-control'
-                });
 
-                let fake_data = [];
-                for(let i = 0; i < data.length; i++) {
-                    let name = data[i];
-                    fake_data.push({id:name.guid,text:name});
-                }
-                da_thing_i_made.data('select2').dataAdapter.updateOptions(fake_data);
-                return da_thing_i_made;
-            }
-
-            //initialize the select boxes
-            table_body_components.find('select.shell-game-shell-edit-component-list').each(function() {
-                let sel = $(this);
-                let element_name = sel.data('element_name');
-                make_select_two_with_data(sel,element_name_list);
-                sel.val(element_name);
-            });
-
-            table_body_components.find('select.shell-game-shell-edit-init-list').each(function() {
-                let sel = $(this);
-                let element_init = sel.data('element_init');
-                make_select_two_with_data(sel,element_name_list);
-                sel.val(element_init);
-            });
-
-            table_body_components.find('select.shell-game-shell-edit-init-list').each(function() {
-                let sel = $(this);
-                let element_end = sel.data('element_end');
-                make_select_two_with_data(sel,element_name_list);
-                sel.val(element_end);
-            });
+           make_select_twos_inside_dom(table_body_components);
 
 
         }
@@ -164,16 +198,18 @@ jQuery(function ($) {
         onOpen: function() {
 
             let found_shell_guid = editing_div.find('input.shell-game-edit-shell-this').val();
+
+            //set history
+            let history = $('div.shell-game-shell-history');
+            let last_item = history.find('div.shell-game-current-shell').detach();
+            last_item.removeClass('shell-game-current-shell');
+            last_item.addClass('shell-game-shell-link');
+
+
             if (found_shell_guid) { //it can be a new element
                 let shell_to_edit = shell_game_thing.get_shell_by_guid(found_shell_guid);
-
-
-                //set history
-                let history = $('div.shell-game-shell-history');
-                let last_item = history.find('div.shell-game-current-shell').detach();
-                last_item.removeClass('shell-game-current-shell');
-                last_item.addClass('shell-game-shell-link');
-
+                //any with same guid as that being added will be removed also
+                history.find(`div[data-shell_guid="${shell_to_edit.guid}"]`).remove();
 
                 let count_history = history.find('div.shell-game-action-link').length;
                 const MAX_HISTORY_LENGTH = 20;
@@ -182,24 +218,26 @@ jQuery(function ($) {
                     history.find(`div.shell-game-action-link:nth-last-child(-n+${number_to_trim})`).remove();
                 }
 
-                //any with same guid as that being added will be removed also
-                history.find(`div[data-shell_guid="${shell_to_edit.guid}"]`).remove();
-
-                history.prepend(last_item);
-
-
                 let new_menu_item = $(
                     `<div class="dropdown-item shell-game-current-shell shell-game-action-link " data-shell_guid="${shell_to_edit.guid}"> ${shell_to_edit.shell_name}</div>`
                 );
+
                 if ('colors' in shell_game_thing.last_raw) {
-                    if (shell_game_thing.last_raw.colors.hasOwnProperty(found_shell_guid)) {
-                        let color = shell_game_thing.last_raw.colors[found_shell_guid];
+                    if (shell_game_thing.last_raw.colors.hasOwnProperty(shell_to_edit.guid)) {
+                        let color = shell_game_thing.last_raw.colors[shell_to_edit.guid];
                         new_menu_item.css('background-color', color)
                     }
                 }
 
+
                 history.append(new_menu_item);
+            } else {
+                let last_item_guid = last_item.data('shell_guid');
+                if (last_item_guid) {
+                    history.find(`div[data-shell_guid="${last_item_guid}"]`).remove();
+                }
             }
+            history.prepend(last_item);
 
 
         },
@@ -229,27 +267,37 @@ jQuery(function ($) {
         }
 
         shell_to_update.shell_name = editing_div.find('input.shell-game-edit-shell-name').val();
-        shell_to_update.shell_parent_name = ShellGameSerializedShell.val();
 
+        let parent_guid = select_parent.val();
+        if (!parent_guid) {return;}
+
+        let parent_shell =  shell_game_thing.get_shell_by_guid(parent_guid);
+        shell_to_update.shell_parent_name = parent_shell.shell_name;
 
 
 
         shell_to_update.elements = [];
+        let element_memory = {};
         table_body_components.find('tr').each(function(){
 
             let tr = $(this);
-            let element_name = tr.find("select.shell-game-shell-edit-component-list").val().trim();
+            let element_name = tr.find("select.shell-game-shell-edit-component").val().trim();
             if (!element_name) {return;}
-            let init_policy = tr.find("select.shell-game-shell-edit-init-list").val();
-            if (!SHELL_GAME_COMPONENT_INIT_STATE.includes(init_policy)) {return;}
+            if (element_name === EMPTY_ELEMENT_NAME_VALUE) {return;}
+            if (element_memory.hasOwnProperty(element_name)) {
+                throw new Error("Cannot have two identically named elements");
+            }
+            let init_policy = tr.find("select.shell-game-shell-edit-init").val();
+            if (!SHELL_GAME_COMPONENT_INIT_STATE.includes(init_policy)) {init_policy = SHELL_GAME_COMPONENT_INIT_STATE[0];}
 
-            let end_policy = tr.find("select.shell-game-shell-edit-init-list").val();
-            if (!SHELL_GAME_COMPONENT_END_STATE.includes(end_policy)) {return;}
+            let end_policy = tr.find("select.shell-game-shell-edit-end").val();
+            if (!SHELL_GAME_COMPONENT_END_STATE.includes(end_policy)) { end_policy = SHELL_GAME_COMPONENT_END_STATE[0];}
             let node = new ShellGameSerializedShellElement();
             node.element_name = element_name;
             node.element_init = init_policy;
             node.element_end = end_policy;
             shell_to_update.elements.push(node);
+            element_memory[element_name] = node;
 
         });
 
@@ -287,11 +335,11 @@ jQuery(function ($) {
     // add another button
     modal.addFooterBtn('Delete Shell', 'tingle-btn tingle-btn--danger tingle-btn--pull-right', function() {
         let shell_to_update
-        let updating_element_guid = editing_div.find('input.shell-game-edit-shell-this').val();
-        if (updating_element_guid) {
-            shell_to_update = shell_game_thing.get_shell_by_guid(updating_element_guid);
+        let updating_shell_guid = editing_div.find('input.shell-game-edit-shell-this').val();
+        if (updating_shell_guid) {
+            shell_to_update = shell_game_thing.get_shell_by_guid(updating_shell_guid);
         } else {
-            shell_to_update = new ShellGameSerializedElement();
+            shell_game_edit_shell('new');//blank out form
         }
 
         if (shell_to_update.guid) {
@@ -318,7 +366,7 @@ jQuery(function ($) {
             }
             select_2_parent.data('select2').dataAdapter.updateOptions(data_array);
 
-            element_name_list = ['---'];
+            element_name_list = [EMPTY_ELEMENT_NAME_VALUE];
             for(let element_name in game.element_lib) {
                 if (!game.element_lib.hasOwnProperty(element_name)) {continue;}
                 element_name_list.push(element_name);
@@ -333,19 +381,22 @@ jQuery(function ($) {
     $('#shell-game-edit-new-shell-component').click(function(){
         let da_var = new ShellGameSerializedShellElement();
         let row_html = make_component_tr(da_var);
-        table_body_components.append(row_html);
+        let live_shit = $(row_html);
+        make_select_twos_inside_dom(live_shit);
+        table_body_components.append(live_shit);
     });
 
     $('body').on('click','.shell-game-edit-shell-delete-component',function() {
        let row = $(this).closest('tr');
+       kill_select_twos(row);
        row.remove();
     });
 
 
 
     $('body').on('click','.shell-game-shell-link',function() {
-        let element_guid = $(this).data('element_guid');
-        shell_game_edit_shell(element_guid);
+        let shell_guid = $(this).data('shell_guid');
+        shell_game_edit_shell(shell_guid);
     });
 
 

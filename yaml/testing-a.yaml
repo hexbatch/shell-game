@@ -1,0 +1,194 @@
+author: Will
+date: 2021-03-14T00:00:00.000Z
+notes: first test
+tags:
+  - rabbit
+  - steak
+  - pies
+  - hello-there
+game:
+  element_lib:
+    first:
+      guid: element-master-37b51e83-ca21-4819-adf1-f46ab49fbb67
+      element_name: first
+      element_variables:
+        apple:
+          variable_name: apple
+          variable_initial_value: 1
+        baker:
+          variable_name: baker
+          variable_initial_value: a string will go here
+        my_const_y:
+          variable_name: my_const_y
+          variable_initial_value: 0.55
+      element_gloms:
+        x:
+          glom_target_name: xer
+          glom_reference_name: x
+        'y':
+          glom_target_name: yer
+          glom_reference_name: 'y'
+      element_script: |
+        this.apple = this.x * this.y + (this.apple* this.my_const);
+        this.baker = this.y + ' is y value';
+        //triggered, alot
+    second:
+      guid: element-master-099619a9-1556-4d88-8134-cfc81a0c6fe8
+      element_name: second
+      element_variables:
+        xer:
+          variable_name: xer
+          variable_initial_value: 1
+        yer:
+          variable_name: yer
+          variable_initial_value: 1
+        whyyyy:
+          variable_name: whyyyy
+          variable_initial_value: 3.154
+      element_gloms:
+        witch:
+          glom_target_name: apple
+          glom_reference_name: witch
+      element_script: |
+        this.xer ++;
+        this.yer --;
+        this.whyyy = this.witch + 4;
+        if(this.whyyy) {
+            this.whyyy = 0;
+        }
+    Apple_Butt:
+      guid: element-master-f88bea9d-d138-46f1-91fc-5c3b3f023d3c
+      element_name: Apple_Butt
+      element_variables:
+        dog:
+          variable_name: dog
+          variable_initial_value: dingus
+      element_gloms:
+        witch:
+          glom_target_name: witch
+          glom_reference_name: witch
+      element_script: this.dog = "Dingus ran";
+    red_and_redder:
+      guid: element-master-a1c15d4f-4eb9-4ee8-a050-ebc707dc094c
+      element_name: red_and_redder
+      element_variables:
+        red:
+          variable_name: red
+          variable_initial_value: 1
+        b:
+          variable_name: b
+          variable_initial_value: 2
+      element_gloms: {}
+      element_script: let i = 8;
+  shell_lib:
+    main:
+      guid: shell-master-fedf1f65-4e38-4997-a52d-171a57e24aa3
+      shell_name: main
+      shell_parent_name: null
+      elements:
+        - element_name: first
+          element_init: new
+          element_end: void
+        - element_name: second
+          element_init: new
+          element_end: void
+    other:
+      guid: shell-master-044da3c6-01b5-422e-baa2-af1b230d6cfa
+      shell_name: other
+      shell_parent_name: main
+      elements:
+        - element_name: first
+          element_init: find
+          element_end: void
+  running_shells:
+    main:
+      - guid: shell-d0706263-7c3c-4773-9728-b573b87d6dbe
+        shell_elements:
+          first:
+            guid: element-19381b84-3466-4517-8fc8-c255513b4af9
+            variables:
+              apple: -1.641592446947707e+32
+              baker: '-120 is y value'
+              my_const_y: 0
+            gloms:
+              x: 120
+              'y': -120
+          second:
+            guid: element-1fc8d735-e87b-4f01-a8b0-421fe89e45db
+            variables:
+              xer: 121
+              yer: -121
+              whyyyy: 3.154
+            gloms:
+              witch: -7.461783849762304e+30
+        shell_children:
+          other:
+            - guid: shell-db5d5a8e-64f7-4210-b8b3-b71c0d0ccddc
+              shell_elements:
+                first:
+                  guid: element-d1e2d97b-2067-4844-a731-ae2cb5f10330
+                  variables:
+                    apple: -7.009304413403061e+30
+                    baker: '-120 is y value'
+                    my_const_y: 0
+                  gloms:
+                    x: 120
+                    'y': -120
+              shell_children: {}
+            - guid: shell-25d0d196-adc6-4c36-8a94-ea788679af77
+              shell_elements:
+                first:
+                  guid: element-1e6d3263-6602-4c7c-bb0c-44fd6c5583c4
+                  variables:
+                    apple: -7.319693392825078e+30
+                    baker: '-120 is y value'
+                    my_const_y: 0
+                  gloms:
+                    x: 120
+                    'y': -120
+              shell_children: {}
+            - guid: shell-15240e47-6fe7-4b3b-b989-bd333198e83e
+              shell_elements:
+                first:
+                  guid: element-19381b84-3466-4517-8fc8-c255513b4af9
+                  variables:
+                    apple: -1.641592446947707e+32
+                    baker: '-120 is y value'
+                    my_const_y: 0
+                  gloms:
+                    x: 120
+                    'y': -120
+              shell_children: {}
+            - guid: shell-e13cab02-769a-43b5-a705-3904a6aea179
+              shell_elements:
+                first:
+                  guid: element-19381b84-3466-4517-8fc8-c255513b4af9
+                  variables:
+                    apple: -1.641592446947707e+32
+                    baker: '-120 is y value'
+                    my_const_y: 0
+                  gloms:
+                    x: 120
+                    'y': -120
+              shell_children: {}
+            - guid: shell-7b59cc71-ae2a-4e82-bc27-c27a781d4313
+              shell_elements:
+                first:
+                  guid: element-19381b84-3466-4517-8fc8-c255513b4af9
+                  variables:
+                    apple: -1.641592446947707e+32
+                    baker: '-120 is y value'
+                    my_const_y: 0
+                  gloms:
+                    x: 120
+                    'y': -120
+              shell_children: {}
+start_up: Copywrite Will Woodlief
+touch:
+  when: 1616635028663
+  rand: 0.24220202925361112
+colors:
+  element-master-099619a9-1556-4d88-8134-cfc81a0c6fe8: '#f5c542'
+  element-master-37b51e83-ca21-4819-adf1-f46ab49fbb67: '#8767f9'
+  element-master-a1c15d4f-4eb9-4ee8-a050-ebc707dc094c: '#fa0000'
+  element-master-f88bea9d-d138-46f1-91fc-5c3b3f023d3c: '#cd1313'

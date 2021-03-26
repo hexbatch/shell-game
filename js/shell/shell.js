@@ -75,6 +75,7 @@ function ShellGameShell(raw_input,run_object,
                     break;
                 }
             }
+            par = par.shell_parent;
         }
         return found_element;
     }
@@ -145,11 +146,13 @@ function ShellGameShell(raw_input,run_object,
                 throw new ShellGameShellError("Cannot init an element in shell: " + this.shell_name + " --> " + template.element_name );
             }
 
-            this.shell_elements.push(element_new);
-            element_new.owning_shell_guid = this.guid;
+            if (element_new) { //may not be element to add if find does not work
+                this.shell_elements.push(element_new);
+                element_new.owning_shell_guid = this.guid;
 
-            if (!this.run_object.element_lib.element_guid_lookup.hasOwnProperty(element_new.guid)) {
-                this.run_object.element_lib.element_guid_lookup[element_new.guid] = element_new;
+                if (!this.run_object.element_lib.element_guid_lookup.hasOwnProperty(element_new.guid)) {
+                    this.run_object.element_lib.element_guid_lookup[element_new.guid] = element_new;
+                }
             }
         }//end template loop when spawning
 
@@ -183,6 +186,10 @@ function ShellGameShell(raw_input,run_object,
             }
             this.guid = raw_input.guid;
         } else {
+            this.guid = 'shell-master-'+uuid.v4();
+        }
+
+        if (!this.guid) {
             this.guid = 'shell-master-'+uuid.v4();
         }
 

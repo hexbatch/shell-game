@@ -77,7 +77,6 @@ function ShellGameKeeper() {
      * @param {ShellGameSerializedShell} edited_shell
      */
     this.edit_shell = function(edited_shell) {
-        //todo implement this
         /*
             find older shell via its guid,
 
@@ -98,17 +97,24 @@ function ShellGameKeeper() {
 
 
         if (!edited_shell.shell_name) {throw new ShellGameKeeperError("Edited Shell needs a name");}
-        let shell ;
+        let real_shell ;
         if (this.run.shell_lib.shells.hasOwnProperty(edited_shell.shell_name) ) {
-            shell = this.run.shell_lib.shells[edited_shell.shell_name];
+            real_shell = this.run.shell_lib.shells[edited_shell.shell_name];
         } else if (this.run.shell_lib.master_shell_guid_lookup.hasOwnProperty(edited_shell.guid)) { //because can change its name
-            shell = this.run.shell_lib.master_shell_guid_lookup[edited_shell.guid];
+            real_shell = this.run.shell_lib.master_shell_guid_lookup[edited_shell.guid];
         }else {
             throw new ShellGameKeeperError("Cannot find Shell by name of " + edited_shell.shell_name + " or by guid of "  + edited_shell.guid);
         }
 
+        let old_shell = new ShellGameSerializedShell(real_shell);
 
-        let old_shell_name = shell.shell_name;
+        if (!old_shell.shell_parent_name && edited_shell.shell_parent_name) {
+            throw new ShellGameKeeperError("Cannot change the top shell to a non top shell this way >>> Must be edited in the yaml");
+        }
+
+
+
+        let old_shell_name = old_shell.shell_name;
         let new_shell_name = edited_shell.shell_name;
 
         if (old_shell_name !== new_shell_name) {
@@ -139,8 +145,9 @@ function ShellGameKeeper() {
          */
         let old_components = {};
 
-        for(let i = 0; i < shell.elements.length ; i++) {
-            old_components[shell.elements[i].element_name] = shell.elements[i];
+
+        for(let i = 0; i < old_shell.elements.length ; i++) {
+            old_components[old_shell.elements[i].element_name] = old_shell.elements[i];
         }
 
         /**
@@ -174,7 +181,7 @@ function ShellGameKeeper() {
         }
 
         let b_parent_changed = false;
-        if (shell.shell_parent_name !== edited_shell.shell_parent_name) {b_parent_changed = true;}
+        if (old_shell.shell_parent_name !== edited_shell.shell_parent_name) {b_parent_changed = true;}
 
         /**
          *
@@ -199,89 +206,111 @@ function ShellGameKeeper() {
             if (!that.run.shell_lib.shell_guid_lookup.hasOwnProperty(running_shell.guid)) {throw new ShellGameKeeperError("Uh, houston, we have a problem... cannot find guid when we damn well shoudl have");}
             let real_shells_for_real_men = that.run.shell_lib.shell_guid_lookup[running_shell.guid] ;
             let closet_element = real_shells_for_real_men.find_first_element_in_ancestor_chain(element_name);
-            let ret = new ShellGameSerializedRunningShellElement(closet_element);
-            return ret;
+            if (closet_element) {
+                let ret = new ShellGameSerializedRunningShellElement(closet_element);
+                return ret;
+            } else {
+                return null;
+            }
+
 
         }
 
 
         /**
-         * //this-task fix up
          *
-         *
-         * @param  {?ShellGameSerializedRunningShell} parent
-         * @param {string} running_shell_name
          * @param {ShellGameSerializedRunningShell} running_shell
+         * @param {string} running_shell_name
          */
-        function edit_shell_from_running_shells(parent,running_shell_name, running_shell) {
+        function edit_shell_from_running_shell(running_shell,running_shell_name) {
+            //if this is the same kind of shell that was edited, then fix up its elements here
+
             if (running_shell_name === old_shell_name) {
-                if (b_parent_changed) {
-                    delete parent.shell_children[old_shell_name];//todo parent can be null, so this will not work
-                } else {
-                    if (old_shell_name !== new_shell_name) {
-                        let temp = running_shell.shell_children[old_shell_name]; //todo not compatible with above null or logic
-                        delete running_shell.shell_children[old_shell_name];
-                        running_shell.shell_children[new_shell_name] = temp;
+                for(let component_name in  running_shell.shell_elements) {
+                    if (!running_shell.shell_elements.hasOwnProperty(component_name)) {continue;}
+                    if (components_removed.hasOwnProperty(component_name)) {
+                        delete running_shell.shell_elements[component_name];
                     }
-                    for(let i = 0; i < running_shell.shell_children[new_shell_name]; i++) {
-                        let spawn  = running_shell.shell_children[new_shell_name][i];
-                        for(let component_name in  spawn.shell_elements) {
-                            if (!spawn.shell_elements.hasOwnProperty(component_name)) {continue;}
-                            if (components_removed.hasOwnProperty(component_name)) {
-                                delete spawn.shell_elements[component_name];
+                }
+
+                for(let component_name in components_added) {
+                    if (!components_added.hasOwnProperty(component_name)) {continue;}
+                    let component_dets = components_added[component_name];
+                    /**
+                     * @type {ShellGameSerializedRunningShellElement}
+                     */
+                    let node ;
+                    if (component_dets.element_init === 'find') {
+                        node  = find_closest_element(running_shell,component_name);
+                        if (node) { //may not find it if not in ancestor chain
+                            for (let glom_ref_name in node.gloms) {
+                                if (!node.gloms.hasOwnProperty(glom_ref_name)) {
+                                    continue;
+                                }
+                                node.gloms[glom_ref_name] = null;
                             }
                         }
+                    } else {
+                        node = new ShellGameSerializedRunningShellElement();
+                        let el_my_hell = copy.element_lib[component_name];
+                        for(let glommy_phonome in el_my_hell.element_gloms) {
+                            if (!el_my_hell.element_gloms.hasOwnProperty(glommy_phonome)) {continue; /*..this code is too complicated, but it works*/}
+                            node.gloms[glommy_phonome] = null;
+                        }
 
-                        for(let component_name in components_added) {
-                            if (!components_added.hasOwnProperty(component_name)) {continue;}
-                            let component_dets = components_added[component_name];
-                            /**
-                             * @type {ShellGameSerializedRunningShellElement}
-                             */
-                            let node ;
-                            if (component_dets.element_init === 'find') {
-                                let node  = find_closest_element(running_shell,component_name);
-                                for(let glom_ref_name in node.gloms) {
-                                    if (! node.gloms.hasOwnProperty(glom_ref_name)) {continue; }
-                                    node.gloms[glom_ref_name] = null;
-                                }
-                            } else {
-                                node = new ShellGameSerializedRunningShellElement();
-                                let el_my_hell = copy.element_lib[component_name];
-                                for(let glommy_phonome in el_my_hell.element_gloms) {
-                                    if (!el_my_hell.element_gloms.hasOwnProperty(glommy_phonome)) {continue; /*..bitch I hate this code*/}
-                                    node.gloms[glommy_phonome] = null;
-                                }
+                        for(let varmy_patruski in el_my_hell.element_variables) {
+                            if (!el_my_hell.element_variables.hasOwnProperty(varmy_patruski)) {continue;}
+                            let victory_is_mine = el_my_hell.element_variables[varmy_patruski];
+                            node.variables[varmy_patruski] = victory_is_mine.variable_initial_value;
+                        }
+                    }
 
-                                for(let varmy_patruski in el_my_hell.element_variables) {
-                                    if (!el_my_hell.element_variables.hasOwnProperty(varmy_patruski)) {continue; /*..bitch I hate this code*/}
-                                    let victory_is_mine = el_my_hell.element_variables[varmy_patruski];
-                                    node.variables[varmy_patruski] = victory_is_mine.variable_initial_value;
-                                }
-                            }
+                    if (node) {
+                        running_shell.shell_elements[component_name] = node;
+                    }
 
-
-                            spawn[component_name] = node;
-                        } //end each component added
-                    } //end each shell child being looked at
-                } //end parent name not changed for this child stack
+                } //end each component added
             }
-            for(let child_shell_name in shell.shell_children) {
-                if (!shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
-                let child_array_of_shells = shell.shell_children[child_shell_name];
-                for(let child_shell_index = 0; child_shell_index < child_array_of_shells.length; child_shell_index++) {
-                    let child_shell = child_array_of_shells[child_shell_index];
-                    edit_shell_from_running_shells(shell,child_shell_name,child_shell);
+
+
+            //loop for each of its children shells,
+            // if a child matches, and the parent was changed, then delete that child (and all its children) without pause
+            // if a child matches, and the parent is the same, but the name was changed, then re-index this to be under the new name
+            // for all children, recurse , using the old child name, if there was a name change
+
+
+            for(let child_shell_name in running_shell.shell_children) {
+                if (!running_shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
+                if (child_shell_name === old_shell_name && b_parent_changed) {
+                    delete running_shell.shell_children[child_shell_name];
+
+                } else if (child_shell_name !== old_shell_name) {
+                    //move the stack of children from old name to new name
+                    let temp = running_shell.shell_children[child_shell_name];
+                    delete running_shell.shell_children[child_shell_name];
+                    running_shell.shell_children[new_shell_name] = temp;
                 }
             }
-        }
+
+            //now we have the child housekeeping out of the way, call each child
+
+            for(let child_shell_name in running_shell.shell_children) {
+                if (!running_shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
+                let child_array_of_shells = running_shell.shell_children[child_shell_name];
+                for(let child_shell_index = 0; child_shell_index < child_array_of_shells.length; child_shell_index++) {
+                    let child_shell = child_array_of_shells[child_shell_index];
+                    edit_shell_from_running_shell(child_shell,child_shell_name);
+                }
+            }
+
+        }//end edit shell from running shell
 
         for(let top_shell_name in copy.running_shells) {
             if (!copy.running_shells.hasOwnProperty(top_shell_name)) {continue;}
             let top_shell_array = copy.running_shells[top_shell_name];
             for(let i = 0; i < top_shell_array.length; i++) {
                 let running_shell = top_shell_array[i];
-                edit_shell_from_running_shells(null,top_shell_name,running_shell);
+                edit_shell_from_running_shell(running_shell,top_shell_name);
             }
         }
 
@@ -293,7 +322,9 @@ function ShellGameKeeper() {
 
         this.load(this.last_raw);
 
-    }
+
+
+    } //end edit shell function
 
 
     /**
@@ -301,11 +332,106 @@ function ShellGameKeeper() {
      * @param {string} name_or_guid
      */
     this.delete_shell = function(name_or_guid) {
-        //todo implement delete shell
         /**
          * to delete the shell, find all the things using it as the master, and remove them from a cloned serialized,
          * then reload
          */
+
+        /**
+         * @type {ShellGameShell}
+         */
+        let found_real_shell ;
+        if (this.run.shell_lib.shells.hasOwnProperty(name_or_guid) ) {
+            found_real_shell = this.run.shell_lib.shells[name_or_guid];
+        } else if (this.run.shell_lib.master_shell_guid_lookup.hasOwnProperty(name_or_guid)) {
+            found_real_shell = this.run.shell_lib.master_shell_guid_lookup[name_or_guid];
+        }else {
+            throw new ShellGameKeeperError("Failed to delete: Cannot find Master Shell by name or guid of " + name_or_guid);
+        }
+
+        let shell_name_to_remove = found_real_shell.shell_name;
+        let shell_guid_to_remove = found_real_shell.guid;
+
+        //make sure we not deleting top shell
+        let top_shell_name = this.run.main_shell.shell_name;
+        if (top_shell_name === shell_name_to_remove) {
+            throw new ShellGameKeeperError("Cannot delete top shell " + top_shell_name);
+        }
+
+        /**
+         * @type {ShellGameSerialized}
+         */
+        let copy = _.cloneDeep(this.serialized_game);
+        delete copy.shell_lib[shell_name_to_remove];
+
+        let shell_names_to_remove_from_running = [shell_name_to_remove];
+
+
+        for(let master_shell_name in copy.shell_lib) {
+            if (!copy.shell_lib.hasOwnProperty(master_shell_name)) {continue;}
+            let mouse = copy.shell_lib[master_shell_name];
+            if (mouse.shell_parent_name === shell_name_to_remove) {
+                shell_names_to_remove_from_running.push(master_shell_name);
+                delete copy.shell_lib[master_shell_name];
+            }
+        }
+
+        let top_shell_keys = Object.keys(copy.running_shells);
+        if (top_shell_keys.length !== 1) {
+            throw new ShellGameKeeperError("Cannot delete if there is more not one top shell");
+        }
+
+        let top_shell_array= copy.running_shells[top_shell_keys[0]];
+
+        if (top_shell_array.length !==1 ) {
+            throw new ShellGameKeeperError("Cannot delete if there is more not one top shell");
+        }
+
+        let top_shell = top_shell_array[0];
+
+        /**
+         *
+         * @param {ShellGameSerializedRunningShell} running_shell
+         */
+        function remove_shell_from_running_shells(running_shell) {
+            for(let child_shell_name in running_shell.shell_children) {
+                if (!running_shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
+                if (shell_names_to_remove_from_running.includes(child_shell_name)) {
+                    delete running_shell.shell_children[child_shell_name];
+
+                } else  {
+                    let child_array_of_shells = running_shell.shell_children[child_shell_name];
+                    for(let child_shell_index = 0; child_shell_index < child_array_of_shells.length; child_shell_index++) {
+                        let child_shell = child_array_of_shells[child_shell_index];
+                        remove_shell_from_running_shells(child_shell);
+                    }
+                }
+            }
+        }
+
+        remove_shell_from_running_shells(top_shell);
+
+        //reload the game
+
+        let colors ;
+        if (!('colors' in this.last_raw)) {
+            colors = {};
+        } else {
+            colors = this.last_raw.colors;
+        }
+        if (colors.hasOwnProperty(shell_guid_to_remove)) {
+            delete colors[shell_guid_to_remove];
+            this.last_raw.colors = colors;
+        }
+
+
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = copy;
+
+
+        this.load(this.last_raw);
     }
 
     /**
@@ -324,6 +450,10 @@ function ShellGameKeeper() {
 
         if (this.serialized_game.shell_lib.hasOwnProperty(shell.shell_name)) {
             throw new ShellGameKeeperError("The shell name of " + shell.shell_name + " is already being used");
+        }
+
+        if (!shell.shell_parent_name) {
+            throw new ShellGameKeeperError("Cannot add the top shell this way >>> Must be placed into the yaml");
         }
 
         this.serialized_game.shell_lib[shell.shell_name] = shell;
@@ -671,6 +801,7 @@ function ShellGameKeeper() {
 
 
 
+    // noinspection JSUnusedGlobalSymbols  //will use in display layer
     this.pop_shell = function(guid) {
         this.run.pop_active_shell(guid);
         this.serialized_game = this.run.export_as_object();
