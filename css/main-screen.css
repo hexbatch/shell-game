@@ -4,7 +4,7 @@
 div.shell-game-yaml-holder {
     position: relative;
     width: 100%;
-    height: 80vh;
+    height: 50vh;
 }
 
 #shell-game-editor {
@@ -13,5 +13,39 @@ div.shell-game-yaml-holder {
     right: 0;
     bottom: 0;
     left: 0;
+}
+
+/*div.tokenfield.tokenfield-mode-tokens {*/
+
+/*}*/
+
+@media (max-width: 991px) {
+
+    div.shell-game-inspect-menu-area{
+        margin-bottom: 0.5em;
+        padding: 0;
+    }
+}
+
+
+@media (min-width: 992px) {
+    div.shell-game-tag-holder {
+        width: 18rem;
+    }
+
+    div.shell-game-inspect-menu-area{
+        width: 32em;
+        padding: 0.5em;
+    }
+
+    div.shell-game-yaml-holder {
+
+        height: 65vh;
+    }
+
+}
+
+div.shell-game-actions-container button {
+    width: 6em;
 }
 

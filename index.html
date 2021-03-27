@@ -17,6 +17,9 @@
     <!-- Select2 -->
     <link href="node_modules/select2/dist/css/select2.min.css" rel="stylesheet" />
 
+    <!-- Select2 bootstrap theme -->
+    <link href="node_modules/@ttskch/select2-bootstrap4-theme/dist/select2-bootstrap4.min.css" rel="stylesheet" />
+
     <!-- Tingle -->
     <link href="node_modules/tingle.js/dist/tingle.min.css" rel="stylesheet" />
 
@@ -42,110 +45,121 @@
 </head>
 <body>
 
+<!-- navbar -->
 
-<div class="container-fluid mx-lg-3 mt-lg-3 shell-game-main-page">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+        Shell Emulator
+    </a>
 
-    <div class="row">
-        <div class="col-12 col-sm-12 col-md-3 d-flex flex-column justify-content-center order-2 order-md-1">
-            <div class="pb-1 pb-md-0">
-                <input class="form-control shell-game-text-tagger" placeholder="" title="Enter Tags">
+    <button class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <button id="shell-game-yaml-editor" type="button" class="btn btn-outline-success border border-light">YAML</button>
+            </li>
+            <li class="nav-item">
+                <button id="shell-game-load" type="button" class="btn btn-outline-primary border border-light">Load</button>
+            </li>
+
+
+
+            <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                >
+                    Inspect
+                </a>
+                <div class="dropdown-menu shell-game-inspect-menu-area" aria-labelledby="navbarDropdown">
+                    <div class="input-group input-group-sm">
+                        <input class="form-control" id="shell-game-inspect-box" title="Enter GUID here"
+                               placeholder="element|shell-master-37b51e83-ca21-4819-adf1-f46ab49fbb67">
+                        <div class="input-group-append">
+                            <button class="btn btn-sm btn-outline-info" id="shell-game-inspect-with">
+                                Inspect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+        </ul>
+
+
+
+
+
+        <div class="form-inline mr-lg-3 pb-2 pb-lg-0 shell-game-tag-holder ">
+
+            <input class="form-control shell-game-text-tagger" placeholder="" title="Enter Tags">
+        </div>
+
+
+
+        <div class="form-inline ">
+            <div class="input-group pb-2 pb-lg-0">
+
+                <select id="shell-game-element-list" title="Elements" class="form-control"></select>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-info" id="shell-game-edit-selected-any">
+                        Edit
+                    </button>
+                </div>
             </div>
         </div>
-        <div class="col-sm-12 col-md-6 order-1 order-md-1">
-            <h1>Shell Emulator</h1>
-        </div>
-        <div class="col order-3">
-            <!-- space for future -->
-        </div>
+
+
+
+
+
+
     </div>
+</nav>
+
+<!-- end navbar -->
+
+
+<div class="container-fluid  shell-game-main-page">
+
+
 
     <div class="row">
 
-        <div class="col-12 col-sm-12 col-md-12 col-lg order-1 order-lg-3 mr-lg-2">
-            <div class="card shell-game-control-card" >
+        <div class="col-12 col-sm-12 col-md-12 col-lg-2 order-1 order-lg-3 shell-game-actions-container ">
 
-                <div class="card-body">
-                    <h5 class="card-title">Check Yaml</h5>
-                    <p class="card-text  ">
-                        This will load and then write back out to the yaml editor. Nothing will be run
-                        <span style="display: inline-block;width: 100%; border-bottom: 1px solid whitesmoke; margin-top: 0.5em; margin-bottom: 0.5em"></span>
-                        <button id="shell-game-load" type="button" class="btn btn-warning border border-light">Check and Load</button>
-                    </p>
+            <div class="row">
+                <div class="col-4 col-lg-12 pb-lg-3 pt-lg-3">
+                    <button id="shell-game-step-action" type="button" class="btn btn-outline-success float-lg-right  mr-lg-1">
+                        Step
+                    </button>
                 </div>
 
-                <div class="card-body">
-                    <h5 class="card-title">Execute</h5>
-                    <p class="card-text ">
-                        Step through code one turn at a time, each time, the new results will be written out the YAML
-                        <span style="display: inline-block;width: 100%; border-bottom: 1px solid whitesmoke; margin-top: 0.5em; margin-bottom: 0.5em"></span>
-                        <button id="shell-game-step" type="button" class="btn btn-success border border-dark">Step</button>
-                    </p>
+                <div class="col-4 col-lg-12 pb-lg-3 pt-lg-3 ">
+                    <button id="shell-game-place-action" type="button" class="btn btn-outline-secondary  float-lg-right mr-lg-1">
+                        Place
+                    </button>
                 </div>
 
+                <div class="col-4 col-lg-12 pb-lg-3 pt-lg-3">
+                    <button id="shell-game-pop-action" type="button" class="btn btn-outline-secondary float-lg-right mr-lg-1">
+                        Pop
+                    </button>
+                </div>
+
+            </div>
 
 
-            </div> <!-- /.card.shell-game-control-card -->
         </div>
 
-        <div class=" col-sm-12 col-md-12 col-lg-4 order-2 order-lg-2">
-            <div class="card " >
-
-                <div class="card-body shell-game-edit-element-card">
-                    <h5 class="card-title">Elements</h5>
-                    <div class="card-text shell-game-element-holder">
-                        <select id="shell-game-element-list" title="Elements" class="form-control"></select>
-                    </div> <!-- /.shell-game-holder -->
-                    <p>
-                        <button class="mt-1 btn btn-sm btn-outline-info" id="shell-game-edit-selected-element">
-                            Edit
-                        </button>
-                    </p>
-                </div> <!-- /.card-body.shell-game-edit-element-card -->
 
 
-                <div class="card-body shell-game-edit-shell-card">
-                    <h5 class="card-title">Shells</h5>
-                    <div class="card-text shell-game-shell-holder">
-                        <select id="shell-game-edit-shell-master-list" title="Shells" class="form-control"></select>
-                    </div> <!-- /.shell-game-holder -->
-                    <p>
-                        <button class="mt-1 btn btn-sm btn-outline-info" id="shell-game-edit-selected-shell">
-                            Edit
-                        </button>
-                    </p>
-                </div> <!-- /.card-body.shell-game-edit-shell-card -->
+        <div class="col-12 col-sm-12 col-md-12 col-lg-10 order-3 order-lg-1 shell-game-display-area">
 
-
-
-                <div class="card-body shell-game-inspection-card">
-                    <h5 class="card-title">Enter a Guid to Inspect</h5>
-                    <div class="card-text">
-                        <div class="input-group input-group-sm">
-                            <input class="form-control" id="shell-game-inspect-box" title="Enter GUID here" placeholder="element|shell-master-37b51e83-ca21-4819-adf1-f46ab49fbb67">
-                            <div class="input-group-append">
-                                <button class="btn btn-sm btn-outline-info" id="shell-game-inspect-with">
-                                    Inspect
-                                </button>
-                            </div>
-                        </div>
-                    </div> <!-- /.shell-game-holder -->
-
-                </div> <!-- /.card-body.shell-game-inspection-card -->
-
-
-            </div> <!-- /.card -->
-        </div>
-
-        <div class="col-12 col-sm-12 col-md-12 col-lg-6 order-3 order-lg-1 shell-game-yaml-outer-holder">
-            <div class="card " >
-                <div class="card-body">
-                    <h5 class="card-title">Yaml Display</h5>
-                    <div class="card-text shell-game-yaml-holder">
-                        <div id="shell-game-editor"></div>
-                    </div> <!-- /.shell-game-holder -->
-                </div> <!-- /.card-body -->
-            </div> <!-- /.card -->
-        </div> <!-- /.shell-game-yaml-outer-holder -->
+        </div> <!-- /.shell-game-display-area -->
 
     </div>
 
@@ -162,6 +176,24 @@
 
 
 <div style="display: none">
+
+
+
+<!-- ------------------------------------------YAML HOLDER ------------------------------------------------------------>
+
+    <div class="shell-game-yaml-outer-holder">
+        <div class="card " >
+            <div class="card-body">
+                <h5 class="card-title">Yaml Data</h5>
+                <div class="card-text shell-game-yaml-holder">
+                    <div id="shell-game-editor"></div>
+                </div> <!-- /.shell-game-holder -->
+            </div> <!-- /.card-body -->
+        </div> <!-- /.card -->
+    </div> <!-- /.shell-game-yaml-outer-holder -->
+
+<!-- ------------------------------------------End YAML HOLDER ------------------------------------------------------------>
+
 
 <!--    ------------------------------------- Element Editor -------------------------------------------------       -->
 
@@ -428,9 +460,8 @@
 <script src="js/gui/game-main.js"></script>
 <script src="js/gui/text_editor_gui.js"></script>
 
-<script src="js/gui/gui-select-master-shell.js"></script>
 <script src="js/gui/edit-element.js"></script>
-<script src="js/gui/gui-select-element.js"></script>
+<script src="js/gui/gui-select-element-shell.js"></script>
 
 <script src="js/gui/edit-shell.js"></script>
 

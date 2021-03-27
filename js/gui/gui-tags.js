@@ -51,26 +51,45 @@ jQuery(function (){
         addItemOnBlur: true
     });
 
-    function on_tag_editor_change(a) {
+    function on_tag_editor_change(a,token_word) {
+
+        if (!shell_game_thing.is_loaded()) {
+            if (token_word) {
+                shell_game_tokenfield.removeItem(token_word);
+            }
+
+            return;
+        }
+
         let items = a.getItems();
         let tag_name_array = [];
         for(let i = 0; i < items.length; i++) {
             tag_name_array.push(items[i].name);
         }
 
-        shell_game_thing.add_top_key('tags',tag_name_array,true);
+        try {
+            shell_game_thing.add_top_key('tags',tag_name_array,true);
+
+        } catch (e) {
+            console.error(e);
+            do_toast({title:'Error',subtitle:e.name,content: e.message,delay:10000,type:'error'});
+        }
+
+
 
     }
 
+    shell_game_thing.is_loaded();
 
-    shell_game_tokenfield.on('addedToken' ,(a/*,token_info*/) => {
-       on_tag_editor_change(a);
+    shell_game_tokenfield.on('addedToken' ,(a,token_info) => {
+       on_tag_editor_change(a,token_info.name);
     });
 
 
 
 
+
     shell_game_tokenfield.on("removedToken", (a/*,token_info*/) => {
-       on_tag_editor_change(a);
+       on_tag_editor_change(a,null);
     });
 });

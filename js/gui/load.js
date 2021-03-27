@@ -2,15 +2,7 @@ jQuery(function($){
 
     $("#shell-game-load").click(function() {
 
-        try {
-
-            let raw = shell_game_get_object_from_editor_value();
-            shell_game_thing.load(raw);
-
-        } catch (e) {
-            console.error(e);
-            do_toast({title:'Error',subtitle:e.name,content: e.message,delay:0,type:'error'});
-        }
+       load_from_yaml();
     });
 
     //synchronize yaml editor after load
@@ -25,3 +17,15 @@ jQuery(function($){
     ));
 
 });
+
+function load_from_yaml() {
+    try {
+
+        let raw = shell_game_get_object_from_editor_value();
+        shell_game_thing.load(raw);
+
+    } catch (e) {
+        console.error(e);
+        do_toast({title:'Error',subtitle:e.name,content: e.message,delay:0,type:'error'});
+    }
+}

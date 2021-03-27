@@ -7,10 +7,60 @@ const SHELL_GAME_STORAGE_BACKUP_KEY = 'hexbatch-shell-game-backup-version-1';
 
 jQuery(function ($){
 
+    let modal;
+    let editing_div = $("div.shell-game-yaml-outer-holder");
+
     shell_game_editor = ace.edit("shell-game-editor");
     shell_game_editor.setTheme("ace/theme/monokai");
     shell_game_editor.session.setMode("ace/mode/yaml");
     shell_game_editor_setup_save($);
+
+
+    //set up popup box
+    // noinspection JSPotentiallyInvalidConstructorUsage,JSUnusedGlobalSymbols
+    modal = new tingle.modal({
+        footer: true,
+        stickyFooter: false,
+        closeMethods: ['overlay', 'button', 'escape'],
+        closeLabel: "Close",
+        cssClass: ['shell-game-element-popup'],
+        onOpen: function() {
+
+        },
+        onClose: function() {
+            //do not destroy this
+        },
+        beforeClose: function() {
+            return true; // close the modal
+            // return false; // nothing happens
+        }
+    });
+
+    // add a button
+    modal.addFooterBtn('Load', 'tingle-btn tingle-btn--default', function() {
+
+        load_from_yaml();
+        modal.close();
+
+
+    });
+
+
+    modal.addFooterBtn('Close Without Loading', 'tingle-btn tingle-btn--pull-right', function() {
+
+        modal.close();
+
+
+    });
+
+
+
+    modal.setContent(editing_div[0]);
+
+    $('button#shell-game-yaml-editor').click(function() {
+        // open modal
+        modal.open();
+    }) ;
 
 });
 

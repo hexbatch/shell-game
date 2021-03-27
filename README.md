@@ -173,9 +173,12 @@ The select box will list all the non topmost shells, the new shell instance will
 * [Lodash](https://lodash.com/)
 * [TokenField](https://github.com/KaneCohen/tokenfield)
 * [Select2](https://select2.org/)
+* [Select2 Bootstrap 4 Theme](https://github.com/ttskch/select2-bootstrap4-theme)
 * [Uuid](https://github.com/uuidjs/uuid)
 * [Tingle](https://tingle.robinparisi.com/)
 * [Font Awesome](https://fontawesome.com/)
+* [d3-graphviz (Dots)](https://github.com/magjac/d3-graphviz)
+* [Dot Guide](https://www.graphviz.org/pdf/dotguide.pdf)
 
 ### Reference
 

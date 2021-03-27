@@ -15,12 +15,13 @@ jQuery(function ($) {
 
     let select_2_parent = select_parent.select2({
         dataAdapter: customAdapter,
-        data: select_for_master_shells_data,
+        data: [],
         placeholder: {
             id: '0', // the value of the option
             text: 'Select Parent'
         },
-        containerCssClass: 'form-control'
+        containerCssClass: 'form-control',
+        theme: 'bootstrap4',
     });
     
     let running_rows = 0;
@@ -82,7 +83,8 @@ jQuery(function ($) {
             let da_thing_i_made = sel.select2({
                 dataAdapter: customAdapter,
                 data: fake_data,
-                containerCssClass: 'form-control'
+                containerCssClass: 'form-control',
+                theme: 'bootstrap4',
             });
 
 

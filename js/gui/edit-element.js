@@ -196,7 +196,7 @@ jQuery(function ($) {
 
         // open modal
         modal.open();
-    }
+    }//end main function for editing shells
 
 
     // noinspection JSPotentiallyInvalidConstructorUsage,JSUnusedGlobalSymbols

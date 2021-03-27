@@ -883,8 +883,10 @@ function ShellGameKeeper() {
         that.is_pre = false;
     }
 
-    this.refresh = function() {
+    this.is_loaded = function() {return !!this.run;}
 
+    this.refresh = function() {
+        if (!this.run) {return;}
         if (this.is_refreshing || this.is_loading || this.is_pre) {return;} //do not allow nested refreshes
         pre_refresh();
 

@@ -1,5 +1,5 @@
 jQuery(function ($){
-    $("#shell-game-step").click(function() {
+    $("#shell-game-step-action").click(function() {
 
         try {
             shell_game_thing.step();
