@@ -159,6 +159,181 @@
 
         <div class="col-12 col-sm-12 col-md-12 col-lg-10 order-3 order-lg-1 shell-game-display-area">
 
+
+            <script src="node_modules/d3/dist/d3.js"></script>
+            <script src="node_modules/@hpcc-js/wasm/dist/index.min.js" type="javascript/worker"></script>
+            <script src="node_modules/d3-graphviz/build/d3-graphviz.js"></script>
+            <div id="graph" style="text-align: center;width: 600px;height: 600px;background-color: white"></div>
+            <script>
+                d3.select("#graph").graphviz()
+                    .renderDot(
+                `digraph G {
+
+    graph [fontsize=10 fontname="Verdana" compound=true];
+    node [shape=record fontsize=10 fontname="Verdana"];
+
+    subgraph cluster_0 {
+        node [style=filled];
+        "Item 1 " "Item 2",
+        u [ shape=invtriangle]
+        a [
+                 label=<
+            <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="1" CELLPADDING="10">
+              <TR><TD ROWSPAN="3" BGCOLOR="yellow">class</TD></TR>
+              <TR><TD PORT="here" BGCOLOR="lightblue">qualifier</TD></TR>
+            </TABLE>>
+              ]
+
+        ;
+        label = "Container A";
+        color=blue;
+
+    }
+
+    subgraph cluster_1 {
+        node [style=filled];
+        "Item 3" "Item 4"
+
+        subgraph cluster_4 {
+            label="replacement";
+            N2 [label="problem"];
+            N3 [label="problem"];
+
+            subgraph cluster_5 {
+                label="inner";
+
+                N5 [  label=<
+            <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="1" CELLPADDING="40">
+              <TR><TD ROWSPAN="3" BGCOLOR="purple">C</TD></TR>
+              <TR><TD PORT="howdy" BGCOLOR="lightblue">bears</TD></TR>
+            </TABLE>>];
+                N6 [label="Pinapples"];
+                color=orange;
+                style=filled;
+            }
+            ;
+            color=lime;
+        }
+        ;
+        label = "Container B";
+        color=blue;
+         shape=invtriangle;
+    }
+
+    subgraph cluster_2 {
+        node [style=filled];
+        "Item 5" "Item 6"
+
+        b [shape=ellipse style=filled
+                                 label=<
+                            <TABLE BGCOLOR="bisque" CELLPADDING="10">
+                              <TR>
+                                  <TD COLSPAN="3">elephant</TD>
+                                  <TD ROWSPAN="2" BGCOLOR="chartreuse"
+                                      VALIGN="bottom" ALIGN="right">two</TD>
+                              </TR>
+                              <TR>
+                                <TD COLSPAN="2" ROWSPAN="2">
+                                  <TABLE BGCOLOR="grey">
+                                    <TR><TD>corn</TD></TR>
+                                    <TR><TD BGCOLOR="yellow">c</TD></TR>
+                                    <TR><TD>f</TD></TR>
+                                  </TABLE>
+                                </TD>
+                                <TD BGCOLOR="white">penguin</TD>
+                              </TR>
+                              <TR>
+                                <TD COLSPAN="2" BORDER="4" ALIGN="right" PORT="there">4</TD>
+                              </TR>
+                            </TABLE>>
+                              ]
+                              ;
+        label = "Container C";
+        color=blue;
+    }
+
+    // Edges between nodes render fine
+    "Item 1" -> "Item 2";
+    "Item 1" -> "Item 4";
+    "Item 2" -> "Item 3";
+    "Item 3" -> N5:howdy [dir=both arrowtail=diamond]
+
+
+    N2 -> b [label=<
+                            <TABLE>
+                              <TR>
+                                <TD BGCOLOR="red" WIDTH="10"> </TD>
+                                <TD>Edge labels<BR/>also</TD>
+                                <TD BGCOLOR="blue" WIDTH="10"> </TD>
+                              </TR>
+                            </TABLE>>
+                              ];
+
+    N2 ->      b:there;
+
+    // Edges that directly connect one cluster to another
+    "Item 1" -> "Item 3" [ltail=cluster_0 lhead=cluster_1];
+    "Item 1" -> "Item 5" [ltail=cluster_0 lhead=cluster_2];
+}`
+                    );
+
+                // d3.select("#graph").graphviz()
+                //     .renderDot(
+                        `digraph G {
+                              rankdir=LR
+                              node [shape=plaintext]
+                              a [
+                                 label=<
+                            <TABLE BORDER="0" CELLBORDER="1" CELLSPACING="0">
+                              <TR><TD ROWSPAN="3" BGCOLOR="yellow">class</TD></TR>
+                              <TR><TD PORT="here" BGCOLOR="lightblue">qualifier</TD></TR>
+                            </TABLE>>
+                              ]
+                              b [shape=ellipse style=filled
+                                 label=<
+                            <TABLE BGCOLOR="bisque">
+                              <TR>
+                                  <TD COLSPAN="3">elephant</TD>
+                                  <TD ROWSPAN="2" BGCOLOR="chartreuse"
+                                      VALIGN="bottom" ALIGN="right">two</TD>
+                              </TR>
+                              <TR>
+                                <TD COLSPAN="2" ROWSPAN="2">
+                                  <TABLE BGCOLOR="grey">
+                                    <TR><TD>corn</TD></TR>
+                                    <TR><TD BGCOLOR="yellow">c</TD></TR>
+                                    <TR><TD>f</TD></TR>
+                                  </TABLE>
+                                </TD>
+                                <TD BGCOLOR="white">penguin</TD>
+                              </TR>
+                              <TR>
+                                <TD COLSPAN="2" BORDER="4" ALIGN="right" PORT="there">4</TD>
+                              </TR>
+                            </TABLE>>
+                              ]
+                              c [
+                              label=<long line 1<BR/>line 2<BR ALIGN="LEFT"/>line 3<BR ALIGN="RIGHT"/>>
+                              ]
+
+                              subgraph { rank=same b c }
+                              a:here -> b:there [dir=both arrowtail=diamond]
+                              c -> b
+                              d [shape=triangle]
+                              d -> c [label=<
+                            <TABLE>
+                              <TR>
+                                <TD BGCOLOR="red" WIDTH="10"> </TD>
+                                <TD>Edge labels<BR/>also</TD>
+                                <TD BGCOLOR="blue" WIDTH="10"> </TD>
+                              </TR>
+                            </TABLE>>
+                              ]
+                            }`
+                //     );
+
+            </script>
+
         </div> <!-- /.shell-game-display-area -->
 
     </div>

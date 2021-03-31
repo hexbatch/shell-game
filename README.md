@@ -178,7 +178,12 @@ The select box will list all the non topmost shells, the new shell instance will
 * [Tingle](https://tingle.robinparisi.com/)
 * [Font Awesome](https://fontawesome.com/)
 * [d3-graphviz (Dots)](https://github.com/magjac/d3-graphviz)
+  * [d3 - needed for the above](https://github.com/d3/d3)
+  
+Dot guides
+
 * [Dot Guide](https://www.graphviz.org/pdf/dotguide.pdf)
+* [Dot Shapes](https://graphviz.org/doc/info/shapes.html)
 
 ### Reference
 
