@@ -54,6 +54,24 @@ function ShellGameKeeper() {
 
 
 
+
+    /**
+     *
+     * @param {string} guid
+     * @return {ShellGameSerializedShell}
+     */
+    this.get_shell_or_null_by_guid = function(guid) {
+        if (!this.run.shell_lib.shell_guid_lookup.hasOwnProperty(guid)) {
+            return null;
+        }
+        let shell_name = this.run.shell_lib.shell_guid_lookup[guid].shell_name;
+
+        if (!this.serialized_game.shell_lib.hasOwnProperty(shell_name)) {
+            throw new ShellGameKeeperError("Cannot find shell of name "+ shell_name);
+        }
+        return this.serialized_game.shell_lib[shell_name];
+    }
+
     /**
      *
      * @param {string} guid
@@ -475,6 +493,23 @@ function ShellGameKeeper() {
 
         this.refresh();
         return shell.guid;
+    }
+
+    /**
+     *
+     * @param {string} guid
+     * @return {ShellGameSerializedElement}
+     */
+    this.get_element_or_null_by_guid = function(guid) {
+        if (!this.run.element_lib.element_guid_lookup.hasOwnProperty(guid)) {
+            return null;
+        }
+        let element_name = this.run.element_lib.element_guid_lookup[guid].element_name;
+
+        if (!this.serialized_game.element_lib.hasOwnProperty(element_name)) {
+            throw new ShellGameKeeperError("Cannot find element of name "+ element_name);
+        }
+        return this.serialized_game.element_lib[element_name];
     }
 
     /**

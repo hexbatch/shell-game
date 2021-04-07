@@ -62,6 +62,44 @@ function ShellGameSerializedRunningShell(real_shell) {
             this.shell_children[da_shell].push(node);
         }
     }
+
+    /**
+     *
+     * @param {string} shell_name
+     * @param {number} depth
+     * @return {string}
+     */
+    this.to_dot = function(shell_name,depth) {
+
+        let extra_tabs = '';
+        for(let k = 0; k < depth; k++) {
+            extra_tabs += `\t`;
+        }
+
+        let ret = `${extra_tabs}subgraph "cluster-${this.guid}" {\n`;
+        ret += `${extra_tabs}\tlabel="${shell_name}";\n`;
+        ret += `${extra_tabs}\tid="${this.guid}";\n`;
+        ret += `${extra_tabs}\tcolor="[[${shell_name}::shell-color]]"\n`;
+        //ret += `${extra_tabs}\tcolor=lime\n`;
+        for(let element_name in this.shell_elements) {
+            if (!this.shell_elements.hasOwnProperty(element_name)) {continue;}
+            let element_as_dot = this.shell_elements[element_name].to_dot(element_name,extra_tabs);
+            ret += `\t${extra_tabs}${element_as_dot}\n`;
+        }
+        ret += `\n`;
+        for(let shell_child_name in this.shell_children) {
+            if (!this.shell_children.hasOwnProperty(shell_child_name)) {continue;}
+            let shell_stack = this.shell_children[shell_child_name];
+            for(let shell_stack_index = 0; shell_stack_index < shell_stack.length; shell_stack_index++) {
+                let child_shell = shell_stack[shell_stack_index];
+                let child_as_dot = child_shell.to_dot(shell_child_name,depth+1);
+                ret += `\t${child_as_dot}\n`;
+            }
+
+        }
+        ret += `${extra_tabs}\t}`;
+        return ret;
+    }
 }
 
 
@@ -98,6 +136,59 @@ function ShellGameSerializedRunningShellElement(real_element) {
             let da_glom = real_element.element_gloms[i];
             this.gloms[da_glom.glom_reference_name] = da_glom.glom_current_value;
         }
+    }
+
+    /**
+     *
+     * @param {string} element_name
+     * @param {string} extra_tabs
+     * @return {string}
+     */
+    this.to_dot = function(element_name,extra_tabs) {
+
+        let ret = `"${this.guid}"  [ shape=ellipse color="[[${element_name}::element-color]]" fixedsize="false" label=<\n`;
+
+        ret += `${extra_tabs}\t<TABLE  BGCOLOR="[[${element_name}::element-color]]" BORDER="2" COLOR="[[${element_name}::element-color]]" CELLBORDER="0" CELLSPACING="0" CELLPADDING="2">\n`;
+
+        ret += `${extra_tabs}\t\t<TR><TD COLSPAN="2" BORDER="2" COLOR="[[${element_name}::element-color]]">${element_name}</TD></TR>\n`;
+
+        const MAGIC_PADDING_CONST = 8;
+        for(let var_name in this.variables) {
+            if (!this.variables.hasOwnProperty(var_name)) {continue;}
+
+            let name_width = var_name.length * MAGIC_PADDING_CONST;
+            let value = this.variables[var_name];
+            let value_width = '';
+            if (value) {
+                value_width =  value.toString().length * MAGIC_PADDING_CONST;
+            }
+
+            ret += `${extra_tabs}\t\t<TR>`+
+                `<TD WIDTH="${name_width}" PORT="${var_name}" BORDER="2" COLOR="whitesmoke" ALIGN="CENTER">${var_name}</TD>`+
+                `<TD WIDTH="${value_width}" BORDER="2" COLOR="whitesmoke" ALIGN="CENTER">${value}</TD>`+
+                `</TR>\n`;
+        }
+
+        for(let glom_name in this.gloms) {
+            if (!this.gloms.hasOwnProperty(glom_name)) {continue;}
+
+            let name_width = glom_name.length * MAGIC_PADDING_CONST;
+            let value = this.gloms[glom_name];
+            let value_width = '';
+            if (value) {
+                value_width =  value.toString().length * MAGIC_PADDING_CONST;
+            }
+
+            ret += `${extra_tabs}\t\t<TR>`+
+                `<TD WIDTH="${name_width}" PORT="${glom_name}" BORDER="2" COLOR="lightskyblue" ALIGN="CENTER" >${glom_name}</TD>`+
+                `<TD WIDTH="${value_width}" BORDER="2" COLOR="lightskyblue" ALIGN="CENTER">${value}</TD>`+
+                `</TR>\n`;
+        }
+
+        ret += `${extra_tabs}\t</TABLE>>];`;
+
+        return ret;
+
     }
 }
 

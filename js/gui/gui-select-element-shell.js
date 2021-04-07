@@ -110,7 +110,7 @@ jQuery(function ($) {
                 children: []
             }
 
-            group.children.push({id:"new",text:" *** New Shell *** ",notes:"For New", data: { type: 'shell', info: {make_new: true}}});
+            group.children.push({id:"new_shell",text:" *** New Shell *** ",notes:"For New", data: { type: 'shell', info: {make_new: true}}});
 
             for(let shell_name in game.shell_lib) {
                 if (!game.shell_lib.hasOwnProperty(shell_name)) {continue;}

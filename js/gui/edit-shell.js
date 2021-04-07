@@ -244,7 +244,6 @@ jQuery(function ($) {
 
         },
         onClose: function() {
-            console.log('modal closed');
             //modal.destroy();
         },
         beforeClose: function() {
@@ -309,6 +308,7 @@ jQuery(function ($) {
         if (!shell_color || shell_color === '#000000' ||  shell_color === '#000') {
             shell_color = '#dddddd'
         }
+        let b_close = true;
         if (updating_element_guid) {
             let colors;
             if (!('colors' in shell_game_thing.last_raw)) {
@@ -320,14 +320,30 @@ jQuery(function ($) {
             editing_div.find(`div[data-shell_guid="${shell_to_update.guid}"]`).css('background-color', shell_color);
             colors[updating_element_guid] = shell_color;
 
-            shell_game_thing.add_top_key('colors', colors, false);//it gets refreshed when the element is saved right after this
+            try {
+                shell_game_thing.add_top_key('colors', colors, false);//it gets refreshed when the element is saved right after this
 
-            shell_game_thing.edit_shell(shell_to_update);
+                shell_game_thing.edit_shell(shell_to_update);
+            }  catch (e) {
+                console.error(e);
+                do_toast({title:'Error For Updating Shell',subtitle:e.name,content: e.message,delay:0,type:'error'});
+                b_close = false;
+            }
+
         } else {
-            shell_game_thing.add_shell(shell_to_update,shell_color);
+            try {
+                shell_game_thing.add_shell(shell_to_update, shell_color);
+            } catch (e) {
+                console.error(e);
+                do_toast({title:'Error For Inserting Shell',subtitle:e.name,content: e.message,delay:0,type:'error'});
+                b_close = false;
+            }
         }
 
-        modal.close();
+        if (b_close) {
+            modal.close();
+        }
+
 
 
 
@@ -360,7 +376,7 @@ jQuery(function ($) {
         function (hook) {
             let game = hook.keeper.serialized_game;
             let data_array = [];
-
+            data_array.push({id:0,text:"Select Parent",data: null});
             for(let shell_name in game.shell_lib) {
                 if (!game.shell_lib.hasOwnProperty(shell_name)) {continue;}
                 let shell = game.shell_lib[shell_name];

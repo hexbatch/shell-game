@@ -20,8 +20,8 @@ jQuery(function(){
            console.debug('Variable Target Name',hm.variable_target_name);
            console.debug('Starting Shell',hm.starting_running_shell);
            console.debug('Starting Element',hm.starting_running_element);
-           console.debug('Running Shell',hm.target_running_shell);
-           console.debug('Running Element',hm.target_running_element);
+           console.debug('Target Shell',hm.target_running_shell);
+           console.debug('Target Element',hm.target_running_element);
 
        }
 
