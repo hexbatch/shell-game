@@ -127,7 +127,7 @@ function ShellGameElement(raw_input,element_master) {
         }
     }
 
-    if ('guid' in raw_input) {
+    if ('guid' in raw_input &&  !(raw_input instanceof  ShellGameElement) ) {
         if (!(typeof raw_input.guid === 'string' || raw_input.guid instanceof String || (raw_input.guid === null)) ) {
             throw new ShellGameElementError("element guid is not a string or null");
         }

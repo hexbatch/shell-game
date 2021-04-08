@@ -2,11 +2,34 @@ jQuery(function (){
 
     /**
      *
+     * @type {ShellGameSerializedRunningShell}
+     */
+    let selected_shell = null;
+
+    shell_game_thing.add_event(new ShellGameEventHook(
+        'on_selected_running_shell',
+        null,
+        function (hook) {
+             selected_shell = hook.keeper.selected_running_shell;
+        })
+    );
+
+
+    /**
+     *
      * @type {object} dot_viewer
      */
     let dot_viewer = null;
 
-    //synchronize yaml editor after step
+    /**
+     * @type {Object}
+     */
+    let dot_nodes = null;
+
+
+
+
+    //draw dots after each refresh
     shell_game_thing.add_event(new ShellGameEventHook(
         'on_refresh',
         null,
@@ -23,7 +46,7 @@ jQuery(function (){
                  * @type {ShellGameSerializedRunningShell}
                  */
                 let main_shell = game.running_shells[main_shell_name][0];
-                let da_dot_words = main_shell.to_dot(main_shell_name,1);
+                let da_dot_words = main_shell.to_dot(main_shell_name,1,selected_shell);
 
 
 
@@ -60,10 +83,9 @@ jQuery(function (){
                  * @type {string[]}
                  */
                 let da_connects_array = [];
-                //"b-good-37b51e83-ca21-4819-adf1-f46ab49fbb67":"element-master-37b51e83-ca21-4819-adf1-f46ab49fbb67" -> Christmas:howdy [label=specialz];
+                //"b-good-37b51e83-ca21-4819-adf1-f46ab49fbb67":"element-master-37b51e83-ca21-4819-adf1-f46ab49fbb67" -> Christmas:howdy [label=special];
                 //"start-element-guid":"glom_name" -> "end-element-guid":"glom_target"
 
-                //todo go through each of the running elements, and get the glom targets
                 for(let el_index =0 ; el_index < elements.length; el_index++) {
                     let el = elements[el_index];
                     let what = shell_game_thing.get_glom_targets(el.guid,null);
@@ -125,14 +147,75 @@ jQuery(function (){
                      `\t${da_dot_words}\n` +
                      `\t${da_connects}\n` +
                      `}`
-                console.debug(all_dots);
+               // console.debug(all_dots);
 
                 if (dot_viewer) {
                  //   dot_viewer.destroy();
+                    if (! _.isEmpty(dot_nodes)) {
+                        dot_nodes.on("click", null);
+                        dot_nodes.on("dblclick", null);
+                    }
+
+
                 }
                 dot_viewer = d3.select("#graph").graphviz({
                     fit: true
-                }).renderDot( all_dots);
+                }).renderDot( all_dots,() => {
+                    dot_nodes = d3.selectAll(".node");
+
+                    dot_nodes.on("click", my_node_click_handler);
+
+                });
+
+
+                function my_node_click_handler() {
+                    let event = d3.event;
+                    event.preventDefault();
+
+                    let running_element_guid = jQuery(this).find('title').text().replace(/\u00A0/g, ' ');
+
+
+                    /**
+                     *
+                     * @param {ShellGameSerializedRunningShell} running_shell
+                     * @return {ShellGameSerializedRunningShell}
+                     */
+                    function find_parent_shell(running_shell) {
+                        for(let element_name in running_shell.shell_elements) {
+                            if (!running_shell.shell_elements.hasOwnProperty(element_name)) {continue;}
+                            let el = running_shell.shell_elements[element_name];
+                            if (el.guid === running_element_guid) {
+                                return running_shell;
+                            }
+                        }
+
+                        for(let child_shell_name in running_shell.shell_children) {
+                            if (!running_shell.shell_children.hasOwnProperty(child_shell_name)) {continue;}
+                            let child_array_of_shells = running_shell.shell_children[child_shell_name];
+                            for(let child_shell_index = 0; child_shell_index < child_array_of_shells.length; child_shell_index++) {
+                                let child_shell = child_array_of_shells[child_shell_index];
+                                let what =  find_parent_shell(child_shell);
+                                if (what) {return what;}
+                            }
+                        }
+                        return null;
+                    }
+
+                    if (running_element_guid) {
+                        let parent_shell = find_parent_shell(main_shell);
+                        if (parent_shell && hook.keeper.selected_running_shell && parent_shell.guid === hook.keeper.selected_running_shell.guid) {
+                            hook.keeper.refresh(null);
+                        } else {
+                            hook.keeper.refresh(parent_shell);
+                        }
+
+                    }
+
+
+                }
+
+
+
 
 
             } catch (e) {

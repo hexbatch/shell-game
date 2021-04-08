@@ -2,11 +2,12 @@
 
 
 /*to change the color a little with respect to the background element*/
+
+
 .lighten{
     position: relative;
     z-index: 0;
 }
-
 .lighten:before {
     content: '';
     position: absolute;

@@ -67,9 +67,10 @@ function ShellGameSerializedRunningShell(real_shell) {
      *
      * @param {string} shell_name
      * @param {number} depth
+     * @param {ShellGameSerializedRunningShell} selected_shell
      * @return {string}
      */
-    this.to_dot = function(shell_name,depth) {
+    this.to_dot = function(shell_name,depth,selected_shell) {
 
         let extra_tabs = '';
         for(let k = 0; k < depth; k++) {
@@ -80,7 +81,12 @@ function ShellGameSerializedRunningShell(real_shell) {
         ret += `${extra_tabs}\tlabel="${shell_name}";\n`;
         ret += `${extra_tabs}\tid="${this.guid}";\n`;
         ret += `${extra_tabs}\tcolor="[[${shell_name}::shell-color]]"\n`;
-        //ret += `${extra_tabs}\tcolor=lime\n`;
+
+        if (selected_shell && selected_shell.guid === this.guid) {
+            ret += `${extra_tabs}\tstyle=filled;\n`;
+        } else {
+            ret += `${extra_tabs}\tstyle=solid;\n`;
+        }
         for(let element_name in this.shell_elements) {
             if (!this.shell_elements.hasOwnProperty(element_name)) {continue;}
             let element_as_dot = this.shell_elements[element_name].to_dot(element_name,extra_tabs);
@@ -92,7 +98,7 @@ function ShellGameSerializedRunningShell(real_shell) {
             let shell_stack = this.shell_children[shell_child_name];
             for(let shell_stack_index = 0; shell_stack_index < shell_stack.length; shell_stack_index++) {
                 let child_shell = shell_stack[shell_stack_index];
-                let child_as_dot = child_shell.to_dot(shell_child_name,depth+1);
+                let child_as_dot = child_shell.to_dot(shell_child_name,depth+1,selected_shell);
                 ret += `\t${child_as_dot}\n`;
             }
 

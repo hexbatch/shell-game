@@ -23,6 +23,12 @@ function ShellGameKeeper() {
 
     /**
      *
+     * @type {ShellGameSerializedRunningShell}
+     */
+    this.selected_running_shell = null;
+
+    /**
+     *
      * @type {boolean}
      */
     this.is_loading = false;
@@ -32,6 +38,12 @@ function ShellGameKeeper() {
      * @type {boolean}
      */
     this.is_stepping = false;
+
+    /**
+     *
+     * @type {boolean}
+     */
+    this.is_selecting_running_shell = false;
 
 
     /**
@@ -53,7 +65,40 @@ function ShellGameKeeper() {
     this.event_hooks = [];
 
 
+    /**
+     *
+     * @param {string} guid
+     * @return {ShellGameSerializedShell[]}
+     */
+    this.get_master_child_shells_of_running_shell = function(guid) {
+        if (!this.run.shell_lib.shell_guid_lookup.hasOwnProperty(guid)) {
+            throw new ShellGameKeeperError(`The guid passed [${guid}] does not match a shell record`);
+        }
+        let regular_shell = this.run.shell_lib.shell_guid_lookup[guid];
+        let master_shell;
+        if (!regular_shell.shell_master) {
+            master_shell = regular_shell;
+        } else {
+            master_shell = regular_shell.shell_master;
+        }
 
+        let found_raw_master_children = [];
+
+        for(let that_master_guid in this.run.shell_lib.master_shell_guid_lookup) {
+            if (!this.run.shell_lib.master_shell_guid_lookup.hasOwnProperty(that_master_guid)) {continue;}
+            let master_candy = this.run.shell_lib.master_shell_guid_lookup[that_master_guid];
+            if (master_candy.shell_parent_name === master_shell.shell_name) {
+                found_raw_master_children.push(master_candy);
+            }
+        }
+
+        let ret = [];
+        for ( let i = 0; i < found_raw_master_children.length; i++ ) {
+            let node = new ShellGameSerializedShell(found_raw_master_children[i]);
+            ret.push(node);
+        }
+        return ret;
+    }
 
     /**
      *
@@ -88,6 +133,8 @@ function ShellGameKeeper() {
         }
         return this.serialized_game.shell_lib[shell_name];
     }
+
+
 
 
     /**
@@ -831,9 +878,39 @@ function ShellGameKeeper() {
 
     }
 
+    /**
+     *
+     * @param {string} running_shell_guid
+     * @return {ShellGameSerializedShell}
+     */
+    this.get_master_shell_by_childs_guid = function(running_shell_guid) {
+        if (!this.run) {
+            throw new ShellGameKeeperError("Not loaded, cannot find shell");
+        }
+        if (this.run.shell_lib.shell_guid_lookup.hasOwnProperty(running_shell_guid)) {
+            return new ShellGameSerializedShell( this.run.shell_lib.shell_guid_lookup[running_shell_guid]);
+        }
+        throw new ShellGameKeeperError(`Cannot find raw shell by guid of ${running_shell_guid}`);
+    }
 
+    /**
+     *
+     * @param {string} master_shell_guid_to_add
+     * @param {string} running_parent_shell_guid
+     */
+    this.insert_running_shell = function(master_shell_guid_to_add,running_parent_shell_guid) {
+        if (!this.run) {
+            throw new ShellGameKeeperError("Not loaded, cannot insert running shell");
+        }
+        this.run.add_active_shell(master_shell_guid_to_add,running_parent_shell_guid);
+        this.serialized_game = this.run.export_as_object();
 
-
+        if (!_.isObject(this.last_raw)) {
+            this.last_raw = {};
+        }
+        this.last_raw.game = this.serialized_game;
+        this.refresh();
+    }
 
 
     // noinspection JSUnusedGlobalSymbols  //will use in display layer
@@ -920,10 +997,37 @@ function ShellGameKeeper() {
 
     this.is_loaded = function() {return !!this.run;}
 
-    this.refresh = function() {
+    /**
+     * @param {?ShellGameSerializedRunningShell} [selected_shell]
+     */
+    this.refresh = function(selected_shell) {
         if (!this.run) {return;}
         if (this.is_refreshing || this.is_loading || this.is_pre) {return;} //do not allow nested refreshes
         pre_refresh();
+
+        let old_selected_shell = this.selected_running_shell;
+
+        if (selected_shell !== undefined) {
+            if (selected_shell) {
+                this.selected_running_shell = selected_shell;
+            } else {
+                this.selected_running_shell = null;
+            }
+
+            if (old_selected_shell !== this.selected_running_shell) {
+
+                this.is_selecting_running_shell = true;
+                for (let event_hook_index = 0; event_hook_index < this.event_hooks.length; event_hook_index++) {
+                    let my_hook = this.event_hooks[event_hook_index];
+                    if (!(my_hook.event_type === 'on_selected_running_shell')) {
+                        continue;
+                    }
+                    my_hook.do_event_hook(this);
+                }
+                this.is_selecting_running_shell = false;
+            }
+        }
+
 
         this.is_refreshing = true;
 
@@ -934,7 +1038,11 @@ function ShellGameKeeper() {
         }
 
         this.is_refreshing = false;
+
+
     }
+
+
 
     /**
      *

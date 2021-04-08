@@ -20,7 +20,7 @@ game:
           variable_initial_value: a string will go here
         my_const:
           variable_name: my_const
-          variable_initial_value: 22
+          variable_initial_value: 5
       element_gloms:
         x:
           glom_target_name: xer
@@ -29,8 +29,8 @@ game:
           glom_target_name: yer
           glom_reference_name: 'y'
       element_script: |
-        this.apple = this.x * this.y + (this.apple* this.my_const);
-        this.baker = this.y + ' is y value';
+        this.baker = this.my_const + ' : ' + this.apple;
+        this.apple = this.x + this.y + this.my_const;
     second:
       guid: element-master-301a59c6-ec40-4d8f-a235-3ca545de5464
       element_name: second
@@ -72,17 +72,17 @@ game:
           first:
             guid: element-ea84d462-69ba-4b18-a50b-c5f8e7394ce9
             variables:
-              apple: -232222
-              baker: '-100 is y value'
+              apple: 1
+              baker: 'AAA'
               my_const: 22
             gloms:
-              x: 100
-              'y': -100
+              x: 102
+              'y': -102
           second:
             guid: element-c8f5e09a-a3a5-4cdc-bc48-a76166054586
             variables:
-              xer: 101
-              yer: -101
+              xer: 103
+              yer: -103
             gloms: {}
         shell_children:
           other:
@@ -91,28 +91,28 @@ game:
                 first:
                   guid: element-06c3927d-8dc6-4f71-b40f-ed2cd9e6576e
                   variables:
-                    apple: -9450
-                    baker: '-100 is y value'
-                    my_const: 22
+                    apple: 2
+                    baker: 'BBB'
+                    my_const: 28
                   gloms:
-                    x: 100
-                    'y': -100
+                    x: 102
+                    'y': -102
               shell_children: {}
             - guid: shell-4c9ed307-acc5-4841-884d-8517419e4cae
               shell_elements:
                 first:
                   guid: element-b15b22e2-d9b4-4c71-bc90-2e6edc3ae819
                   variables:
-                    apple: -9890
-                    baker: '-100 is y value'
-                    my_const: 22
+                    apple: 3
+                    baker: 'CCC'
+                    my_const: 20
                   gloms:
-                    x: 100
-                    'y': -100
+                    x: 102
+                    'y': -102
               shell_children: {}
 touch:
-  when: 1617831753718
-  rand: 0.6649985123640874
+  when: 1617897960770
+  rand: 0.36267620923872235
 start_up: Copywrite Will Woodlief
 colors:
   element-master-301a59c6-ec40-4d8f-a235-3ca545de5464: '#ffae00'

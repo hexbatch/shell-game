@@ -160,7 +160,9 @@ The select box will list all the non topmost shells, the new shell instance will
 * *on_step*
   * Fired after each step
 * *on_load*
-  * Fired after the shells load from the source  
+  * Fired after the shells load from the source
+* *on_selected_running_shell*
+  * Fired when selected is chosen or reset
 
 
 ## Development Reference

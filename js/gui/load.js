@@ -12,7 +12,7 @@ jQuery(function($){
         function (hook) {
             let game = hook.keeper.serialized_game;
             console.log('game',game);
-            do_toast({title:'Loaded',subtitle:'(its done already)',content: "Loaded YAML", delay:2000,type:'warning'});
+            do_toast({title:'Loaded',subtitle:'(its done already)',content: "Loaded YAML", delay:2000,type:'success'});
         }
     ));
 

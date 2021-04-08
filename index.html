@@ -426,6 +426,90 @@
 
 <!--    ------------------------------------- END Shell Editor ---------------------------------------------       -->
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--    ------------------------------------- Add Running Shell-----------------------------------------------       -->
+
+    <div class="shell-game-add-running-shell">
+
+        <input type="hidden" class="shell-game-add-shell-this">
+        <div class="container-fluid">
+
+
+            <div class="card " >
+                <div class="card-body ">
+                    <h5 class="card-title">Add Sub-Shell</h5>
+                    <div class="card-text">
+
+
+                        <div class="row " style="position: relative">
+
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-6 order-1">
+
+                                Into <span class="shell-game-parent-name"></span>
+                                <br>
+
+                                <small class="">
+                                    <code class=" shell-game-target-parent-shell-guid border text-monospace text-break align-top border-0"></code>
+                                </small>
+
+
+                            </div><!-- /.col  -->
+
+                            <div class="col-sm-12 col-md-12 col-lg-6 order-2">
+
+                                <div class="input-group ">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text"  >
+                                            Possible Child Shells
+                                        </span>
+                                    </div>
+                                    <select id="shell-game-add-running-shell-to-parent-list"
+                                            class="shell-game-add-running-shell-to-parent-list form-control bg-info"
+                                            title="Add Shell" autocomplete="off"
+                                    >
+                                        <option value="">(Uninitialized)</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                        </div> <!-- /.row -->
+                    </div> <!-- /.shell-game-holder -->
+                </div> <!-- /.card-body -->
+            </div> <!-- /.card -->
+
+
+
+        </div>
+
+    </div> <!-- /.shell-game-add-running-shell-->
+
+<!--    ------------------------------------- END Insert Running Shell ---------------------------------------       -->
+
+
+
+
 </div>
 
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
@@ -476,7 +560,8 @@
 
 <script src="js/gui/gui-tags.js"></script>
 <script src="js/gui/load.js"></script>
-<script src="js/gui/step.js"></script>
+<script src="js/gui/action-buttons.js"></script>
+<script src="js/gui/add-running-shell.js"></script>
 <script src="js/gui/toast.js"></script>
 <script src="js/gui/extras.js"></script>
 </body>

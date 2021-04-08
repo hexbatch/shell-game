@@ -41,6 +41,7 @@ function ShellGameEventHook(event_type,target,callback) {
         case 'on_change_running_shell':
         case 'on_change_master_element':
         case 'on_change_running_element':
+        case 'on_selected_running_shell':
         case 'on_refresh':
         case 'on_pre':
         case 'on_step':
@@ -170,6 +171,14 @@ function ShellGameEventHook(event_type,target,callback) {
                 b_do_callback_with_change_only = true;
                 break;
 
+            }
+
+            case 'on_selected_running_shell': {
+                if (this.keeper.is_selecting_running_shell) {
+                    this.current_value = this.keeper.selected_running_shell;
+                    this.callback(this);
+                }
+                break;
             }
 
             case 'on_step': {
