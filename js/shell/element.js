@@ -157,7 +157,7 @@ function ShellGameElement(raw_input,element_master) {
         if (checker.hasOwnProperty(n.glom_reference_name)) {
             throw new ShellGameElementError('Element ' + this.element_name + ": Gloms cannot have same names as each other or variables: found " + n.glom_reference_name);
         }
-        checker[n.variable_name] = 0;
+        checker[n.glom_reference_name] = 0;
     }
 
     if ('element_script' in raw_input) {

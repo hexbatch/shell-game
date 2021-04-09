@@ -14,6 +14,7 @@
  * @property {ShellGameSerialized} [game]
  * @property {string[]} [tags]
  * @property {Object.<string, {}>} [meta]
+ * @property {Object.<string, string>} [colors]
  */
 
 

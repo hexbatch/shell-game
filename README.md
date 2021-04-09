@@ -292,3 +292,12 @@ game:
                   gloms: { }
 
 ```
+
+#Roadmap to Version 3 release
+
+
+* Edit running values
+  * [//]: # (TODO: make listener and dialog to edit selected running element running element values {no script or change defs or glomsm add keeper selected element and event})
+
+* Test for nestedness (should be okay or minor bug if not)
+  * [//]: # (TODO: Test nested shells)

@@ -69,7 +69,7 @@ jQuery(function ($) {
                         
                         <small><span 
                             class="rounded var-name-blurb"
-                            data-variable_name="${a_ref.variable_target_name.guid}"
+                            data-variable_name="${a_ref.variable_target_name}"
                         >
                             <span data-shell_guid="${a_ref.target_shell.guid}"
                                   class ="shell-game-action-link shell-game-shell-link" 

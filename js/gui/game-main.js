@@ -35,7 +35,9 @@ jQuery(function(){
 
             Utils.Extend(CustomDataAdapter, ArrayAdapter);
             CustomDataAdapter.prototype.updateOptions = function (data) {
+                // noinspection JSUnresolvedVariable
                 this.$element.find('option').remove();
+                // noinspection JSUnresolvedFunction
                 this.addOptions(this.convertToOptions(data));
             }
             return CustomDataAdapter;
