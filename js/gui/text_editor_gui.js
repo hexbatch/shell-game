@@ -59,6 +59,7 @@ jQuery(function ($){
 
     $('button#shell-game-yaml-editor').click(function() {
         // open modal
+        shell_game_editor.renderer.updateFull();
         modal.open();
     }) ;
 
@@ -94,15 +95,20 @@ function shell_game_set_editor_value_from_object(thing_which_is_object,key_to_re
 }
 
 /**
- *
+ * @param {string} [alternate_yaml]
  * @return {ShellGameRawInput}
  */
-function shell_game_get_object_from_editor_value() {
+function shell_game_get_object_from_editor_value(alternate_yaml) {
     /**
      * @type {object} yaml_parsed
      */
     let yaml_parsed ;
     let yaml_string = shell_game_get_editor_value();
+    if (!yaml_string.trim() && alternate_yaml) {
+        shell_game_editor.setValue(alternate_yaml,1);
+        shell_game_editor.renderer.updateFull();
+        return shell_game_get_object_from_editor_value();
+    }
     try {
         yaml_parsed = jsyaml.load(yaml_string, 'utf8');
         console.debug('yaml read is',yaml_parsed);

@@ -26,6 +26,14 @@ Load in index.html in a web browser. You do not need a local server here, just t
 * Edit elements after you click on them  
 * Alternately Do changes by editing the YAML text
 
+### Operation Notes To Live By
+ * This is version 0.3 , its econo lodge not the hilton
+ * You must select a shell by clicking on an element, on the table with the text
+ * When you select a shell, the dot might suggenly draw it in a different place
+ * The new element dialog sometimes cannot be be selected from the dropdown until you select something else  
+ * The gui is a little rough. But it will work if you jiggle things about*
+ * To make a new doc, simply empty out the yaml, and a new one will be made
+
 ### Yaml Structure
 Please refer to the yaml example below at the bottom of the page , or see yaml/testing.yaml 
 

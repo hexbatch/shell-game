@@ -261,84 +261,118 @@ jQuery(function ($) {
          * @type {ShellGameSerializedShell}
          */
         let shell_to_update;
-        let updating_element_guid = editing_div.find('input.shell-game-edit-shell-this').val();
-        if (updating_element_guid) {
-            shell_to_update = shell_game_thing.get_shell_by_guid(updating_element_guid);
-        } else {
-            shell_to_update = new ShellGameSerializedShell();
-        }
-
-        shell_to_update.shell_name = editing_div.find('input.shell-game-edit-shell-name').val();
-
-        let parent_guid = select_parent.val();
-        if (!parent_guid) {return;}
-
-        let parent_shell =  shell_game_thing.get_shell_by_guid(parent_guid);
-        shell_to_update.shell_parent_name = parent_shell.shell_name;
-
-
-
-        shell_to_update.elements = [];
-        let element_memory = {};
-        table_body_components.find('tr').each(function(){
-
-            let tr = $(this);
-            let element_name = tr.find("select.shell-game-shell-edit-component").val().trim();
-            if (!element_name) {return;}
-            if (element_name === EMPTY_ELEMENT_NAME_VALUE) {return;}
-            if (element_memory.hasOwnProperty(element_name)) {
-                throw new Error("Cannot have two identically named elements");
-            }
-            let init_policy = tr.find("select.shell-game-shell-edit-init").val();
-            if (!SHELL_GAME_COMPONENT_INIT_STATE.includes(init_policy)) {init_policy = SHELL_GAME_COMPONENT_INIT_STATE[0];}
-
-            let end_policy = tr.find("select.shell-game-shell-edit-end").val();
-            if (!SHELL_GAME_COMPONENT_END_STATE.includes(end_policy)) { end_policy = SHELL_GAME_COMPONENT_END_STATE[0];}
-            let node = new ShellGameSerializedShellElement();
-            node.element_name = element_name;
-            node.element_init = init_policy;
-            node.element_end = end_policy;
-            shell_to_update.elements.push(node);
-            element_memory[element_name] = node;
-
-        });
-
-
-        //colors
-        let shell_color = editing_div.find('input.shell-game-edit-shell-color').val();
-        if (!shell_color || shell_color === '#000000' ||  shell_color === '#000') {
-            shell_color = '#dddddd'
-        }
         let b_close = true;
-        if (updating_element_guid) {
-            let colors;
-            if (!('colors' in shell_game_thing.last_raw)) {
-                colors = {};
+        let updating_element_guid = editing_div.find('input.shell-game-edit-shell-this').val();
+        try {
+            if (updating_element_guid) {
+                shell_to_update = shell_game_thing.get_shell_by_guid(updating_element_guid);
             } else {
-                colors = shell_game_thing.last_raw.colors;
+                shell_to_update = new ShellGameSerializedShell();
             }
 
-            editing_div.find(`div[data-shell_guid="${shell_to_update.guid}"]`).css('background-color', shell_color);
-            colors[updating_element_guid] = shell_color;
+            shell_to_update.shell_name = editing_div.find('input.shell-game-edit-shell-name').val();
 
-            try {
-                shell_game_thing.add_top_key('colors', colors, false);//it gets refreshed when the element is saved right after this
-
-                shell_game_thing.edit_shell(shell_to_update);
-            }  catch (e) {
-                console.error(e);
-                do_toast({title:'Error For Updating Shell',subtitle:e.name,content: e.message,delay:0,type:'error'});
-                b_close = false;
+            let parent_guid = select_parent.val();
+            if (!parent_guid) {
+                return;
             }
 
-        } else {
-            try {
-                shell_game_thing.add_shell(shell_to_update, shell_color);
-            } catch (e) {
-                console.error(e);
-                do_toast({title:'Error For Inserting Shell',subtitle:e.name,content: e.message,delay:0,type:'error'});
-                b_close = false;
+            let parent_shell = shell_game_thing.get_shell_by_guid(parent_guid);
+            shell_to_update.shell_parent_name = parent_shell.shell_name;
+
+
+            shell_to_update.elements = [];
+            let element_memory = {};
+            table_body_components.find('tr').each(function () {
+
+                let tr = $(this);
+                let element_name = tr.find("select.shell-game-shell-edit-component").val().trim();
+                if (!element_name) {
+                    return;
+                }
+                if (element_name === EMPTY_ELEMENT_NAME_VALUE) {
+                    return;
+                }
+                if (element_memory.hasOwnProperty(element_name)) {
+                    throw new Error("Cannot have two identically named elements");
+                }
+                let init_policy = tr.find("select.shell-game-shell-edit-init").val();
+                if (!SHELL_GAME_COMPONENT_INIT_STATE.includes(init_policy)) {
+                    init_policy = SHELL_GAME_COMPONENT_INIT_STATE[0];
+                }
+
+                let end_policy = tr.find("select.shell-game-shell-edit-end").val();
+                if (!SHELL_GAME_COMPONENT_END_STATE.includes(end_policy)) {
+                    end_policy = SHELL_GAME_COMPONENT_END_STATE[0];
+                }
+                let node = new ShellGameSerializedShellElement();
+                node.element_name = element_name;
+                node.element_init = init_policy;
+                node.element_end = end_policy;
+                shell_to_update.elements.push(node);
+                element_memory[element_name] = node;
+
+            });
+
+
+            //colors
+            let shell_color = editing_div.find('input.shell-game-edit-shell-color').val();
+            if (!shell_color || shell_color === '#000000' || shell_color === '#000') {
+                shell_color = '#dddddd'
             }
+
+            if (updating_element_guid) {
+                let colors;
+                if (!('colors' in shell_game_thing.last_raw)) {
+                    colors = {};
+                } else {
+                    colors = shell_game_thing.last_raw.colors;
+                }
+
+                editing_div.find(`div[data-shell_guid="${shell_to_update.guid}"]`).css('background-color', shell_color);
+                colors[updating_element_guid] = shell_color;
+
+                try {
+                    shell_game_thing.add_top_key('colors', colors, false);//it gets refreshed when the element is saved right after this
+
+                    shell_game_thing.edit_shell(shell_to_update);
+                } catch (e) {
+                    console.error(e);
+                    do_toast({
+                        title: 'Error For Updating Shell',
+                        subtitle: e.name,
+                        content: e.message,
+                        delay: 0,
+                        type: 'error'
+                    });
+                    b_close = false;
+                }
+
+            } else {
+                try {
+                    shell_game_thing.add_shell(shell_to_update, shell_color);
+                } catch (e) {
+                    console.error(e);
+                    do_toast({
+                        title: 'Error For Inserting Shell',
+                        subtitle: e.name,
+                        content: e.message,
+                        delay: 0,
+                        type: 'error'
+                    });
+                    b_close = false;
+                }
+            }
+        } catch (e) {
+            console.error(e);
+            do_toast({
+                title: 'Error For Inserting Shell',
+                subtitle: e.name,
+                content: e.message,
+                delay: 0,
+                type: 'error'
+            });
+            b_close = false;
         }
 
         if (b_close) {
