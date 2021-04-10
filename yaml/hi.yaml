@@ -4,8 +4,8 @@ notes: first test
 tags:
   - rabbit
   - steak
-  - pie
   - help
+  - tab
 game:
   element_lib:
     first:
@@ -45,6 +45,30 @@ game:
       element_script: |
         this.xer ++;
         this.yer --;
+    hero:
+      guid: element-master-56e6a403-7cf5-4d5a-8c43-3c67c26d909b
+      element_name: hero
+      element_variables:
+        time:
+          variable_name: time
+          variable_initial_value: 0
+        what:
+          variable_name: what
+          variable_initial_value: 3.445
+        show:
+          variable_name: show
+          variable_initial_value: null
+      element_gloms:
+        x:
+          glom_target_name: xer
+          glom_reference_name: x
+        apple_me:
+          glom_target_name: apple
+          glom_reference_name: apple_me
+      element_script: |
+        this.time++;
+        this.what = x +2;
+        this.show = "I found " + this.apple_me;
   shell_lib:
     main:
       guid: shell-master-f1143e0f-43f3-4931-8df4-f5e91181b715
@@ -65,6 +89,17 @@ game:
         - element_name: first
           element_init: find
           element_end: void
+    Expirement:
+      guid: shell-master-d8dbac18-3815-4f6c-b994-38d7aed97689
+      shell_name: Expirement
+      shell_parent_name: other
+      elements:
+        - element_name: hero
+          element_init: new
+          element_end: return
+        - element_name: second
+          element_init: new
+          element_end: void
   running_shells:
     main:
       - guid: shell-9500539e-8ba2-4689-a414-67348eb6dd30
@@ -72,17 +107,17 @@ game:
           first:
             guid: element-ea84d462-69ba-4b18-a50b-c5f8e7394ce9
             variables:
-              apple: 1
-              baker: 'AAA'
+              apple: 22
+              baker: '22 : 22'
               my_const: 22
             gloms:
-              x: 102
-              'y': -102
+              x: 123
+              'y': -123
           second:
             guid: element-c8f5e09a-a3a5-4cdc-bc48-a76166054586
             variables:
-              xer: 103
-              yer: -103
+              xer: 124
+              yer: -124
             gloms: {}
         shell_children:
           other:
@@ -91,30 +126,51 @@ game:
                 first:
                   guid: element-06c3927d-8dc6-4f71-b40f-ed2cd9e6576e
                   variables:
-                    apple: 2
-                    baker: 'BBB'
+                    apple: 28
+                    baker: '28 : 28'
                     my_const: 28
                   gloms:
-                    x: 102
-                    'y': -102
+                    x: 123
+                    'y': -123
               shell_children: {}
-            - guid: shell-4c9ed307-acc5-4841-884d-8517419e4cae
+            - guid: shell-9604f6fb-2c67-478c-b4b4-0faf59efdb6f
               shell_elements:
                 first:
-                  guid: element-b15b22e2-d9b4-4c71-bc90-2e6edc3ae819
+                  guid: element-7d804050-68bf-493e-ac96-271f4c61cadf
                   variables:
-                    apple: 3
-                    baker: 'CCC'
-                    my_const: 20
+                    apple: 22
+                    baker: '22 : 22'
+                    my_const: 22
                   gloms:
-                    x: 102
-                    'y': -102
-              shell_children: {}
+                    x: 123
+                    'y': -123
+              shell_children:
+                Expirement:
+                  - guid: shell-18e87c22-6084-49df-9e23-0053e1f9dcac
+                    shell_elements:
+                      hero:
+                        guid: element-445062f1-aa0a-47a2-b2d0-2d8db4394cd2
+                        variables:
+                          time: 0
+                          what: 3.445
+                          show: null
+                        gloms:
+                          x: 4
+                          apple_me: hello there
+                      second:
+                        guid: element-fdfd9681-1ac3-4807-9c44-01a6faa1c8ed
+                        variables:
+                          xer: 5
+                          yer: -3
+                        gloms: {}
+                    shell_children: {}
 touch:
-  when: 1617897960770
-  rand: 0.36267620923872235
+  when: 1618005450686
+  rand: 0.8776739628271026
 start_up: Copywrite Will Woodlief
 colors:
   element-master-301a59c6-ec40-4d8f-a235-3ca545de5464: '#ffae00'
   element-master-d4a37fa3-6c0b-4484-92b5-6f3f9a2587e2: '#8af024'
   shell-master-ed86544f-c639-451a-a6fd-d6d42796cf62: '#00d9ff'
+  element-master-56e6a403-7cf5-4d5a-8c43-3c67c26d909b: '#e811e1'
+  shell-master-d8dbac18-3815-4f6c-b994-38d7aed97689: '#538df9'

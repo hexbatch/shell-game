@@ -5,12 +5,65 @@ let shell_game_editor;
 const SHELL_GAME_STORAGE_KEY = 'hexbatch-shell-game-version-1';
 const SHELL_GAME_STORAGE_BACKUP_KEY = 'hexbatch-shell-game-backup-version-1';
 
-function shell_game_editor_init($) {
+jQuery(function ($){
+
+    let modal;
+    let editing_div = $("div.shell-game-yaml-outer-holder");
+
     shell_game_editor = ace.edit("shell-game-editor");
     shell_game_editor.setTheme("ace/theme/monokai");
     shell_game_editor.session.setMode("ace/mode/yaml");
     shell_game_editor_setup_save($);
-}
+
+
+    //set up popup box
+    // noinspection JSPotentiallyInvalidConstructorUsage,JSUnusedGlobalSymbols
+    modal = new tingle.modal({
+        footer: true,
+        stickyFooter: false,
+        closeMethods: ['overlay', 'button', 'escape'],
+        closeLabel: "Close",
+        cssClass: ['shell-game-element-popup'],
+        onOpen: function() {
+
+        },
+        onClose: function() {
+            //do not destroy this
+        },
+        beforeClose: function() {
+            return true; // close the modal
+            // return false; // nothing happens
+        }
+    });
+
+    // add a button
+    modal.addFooterBtn('Load', 'tingle-btn tingle-btn--default', function() {
+
+        load_from_yaml();
+        modal.close();
+
+
+    });
+
+
+    modal.addFooterBtn('Close Without Loading', 'tingle-btn tingle-btn--pull-right', function() {
+
+        modal.close();
+
+
+    });
+
+
+
+    modal.setContent(editing_div[0]);
+
+    $('button#shell-game-yaml-editor').click(function() {
+        // open modal
+        modal.open();
+    }) ;
+
+});
+
 
 /**
  * @return {string}
@@ -42,7 +95,7 @@ function shell_game_set_editor_value_from_object(thing_which_is_object,key_to_re
 
 /**
  *
- * @return {Object}
+ * @return {ShellGameRawInput}
  */
 function shell_game_get_object_from_editor_value() {
     /**
@@ -95,3 +148,15 @@ function shell_game_editor_setup_save($) {
 
     });
 }
+
+jQuery(function(){
+    //synchronize yaml editor after refresh
+    shell_game_thing.add_event(new ShellGameEventHook(
+        'on_refresh',
+        null,
+        function (hook) {
+            let out = hook.current_value;
+            shell_game_set_editor_value_from_object(out);
+        }
+    ));
+});

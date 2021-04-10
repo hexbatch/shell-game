@@ -1,4 +1,7 @@
 
+$(function (){
+    $.toastDefaults.position = 'bottom-right'
+});
 /**
  *
  * @param {object} options
@@ -19,7 +22,7 @@ function do_toast(options) {
         title : 'something happened',
         type : 'info',
         subtitle : '',
-        message : ''
+        message : '',
     };
 
 
@@ -27,7 +30,6 @@ function do_toast(options) {
     if ('type' in options) { thing.type = options.type;}
     if ('subtitle' in options) { thing.subtitle = options.subtitle;}
     if ('content' in options) { thing.content = options.content;}
-    if ('position' in options) { thing.position = options.position;}
     if ('image' in options) { thing.img = options.image;}
     if ('delay' in options) {
         if ($.isNumeric(options.delay)) {

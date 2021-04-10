@@ -20,9 +20,17 @@ function ShellGameGlom(raw_input) {
         this.glom_current_value = raw_input.glom_current_value;
     }
 
+    let name_regex = /^[a-zA-Z_]+$/;
     if ('glom_reference_name' in raw_input) {
         this.glom_reference_name = raw_input.glom_reference_name;
+        if (!name_regex.test(this.glom_reference_name)) {
+            throw new ShellGameKeeperError("Only variable names with letters and underscore is allowed for glom reference names");
+        }
+
     } else {
         this.glom_reference_name = this.glom_target_name;
+        if (!name_regex.test(this.glom_reference_name)) {
+            throw new ShellGameKeeperError("Only variable names with letters and underscore is allowed for glom reference names");
+        }
     }
 }

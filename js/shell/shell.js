@@ -1,46 +1,4 @@
 
-/**
- * @param {object} [raw_input]
- * @constructor
- */
-function ShellGameElementTemplate(raw_input) {
-    this.element_name = '';
-    this.element_init = '';
-
-    if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameElementTemplate)) {
-        throw new ShellGameShellError("raw_input is not a plain object or a ShellGame Ele Template");
-    }
-
-    if ('element_name' in raw_input) {
-        if (!(typeof raw_input.element_name === 'string' || raw_input.element_name instanceof String)) {
-            throw new ShellGameElementTemplateError("element_name is not a string");
-        }
-        this.element_name = raw_input.element_name;
-    }
-
-    if (!this.element_name) {
-        throw new ShellGameElementTemplateError("no name set for template in element_name");
-    }
-
-    if ('element_init' in raw_input) {
-        if (!(typeof raw_input.element_init === 'string' || raw_input.element_init instanceof String)) {
-            throw new ShellGameElementTemplateError("element_init is not a string");
-        }
-        switch (raw_input.element_init) {
-            case 'new':
-            case 'find': {
-                this.element_init = raw_input.element_init;
-                break
-            }
-            default: {
-                throw new ShellGameElementTemplateError("wrong init plan set for template in element_init. Needed new|find but got: " + raw_input.shell_name);
-            }
-        }
-
-    } else {
-        throw new ShellGameElementTemplateError("no init plan set for template in element_init");
-    }
-}
 
 /**
  * @param {object} [raw_input]
@@ -59,6 +17,12 @@ function ShellGameShell(raw_input,run_object,
     this.run_object = null;
 
     /**
+     *
+     * @type {?string}
+     */
+    this.guid = null;
+
+    /**
      * @type {string}
      */
     this.shell_name = '';
@@ -72,6 +36,12 @@ function ShellGameShell(raw_input,run_object,
      * @type {ShellGameShell}
      */
     this.shell_parent = null;
+
+
+    /**
+     * @type {ShellGameShell}
+     */
+    this.shell_master = null;
 
     /**
      * @type {ShellGameShell[]}
@@ -89,10 +59,38 @@ function ShellGameShell(raw_input,run_object,
     this.shell_elements = [];
 
 
+    /**
+     *
+     * @param {string} search_for_element_name
+     * @return {ShellGameElement}
+     */
+    this.find_first_element_in_ancestor_chain = function(search_for_element_name){
+        let par = this.shell_parent;
+        let found_element = null;
+        while (par && (found_element === null)) {
+            for (let u = 0; u < par.shell_elements.length; u++) {
+                let test_element = par.shell_elements[u];
+                if (test_element.element_name === search_for_element_name) {
+                    found_element = test_element;
+                    break;
+                }
+            }
+            par = par.shell_parent;
+        }
+        return found_element;
+    }
+
+
     if (master instanceof ShellGameShell && (live_parent instanceof  ShellGameShell || !live_parent  )) {
 
+        this.shell_master = master;
         this.run_object = master.run_object;
         this.shell_name = master.shell_name;
+
+        this.guid = 'shell-'+uuid.v4();
+        if (!run_object.shell_lib.shell_guid_lookup.hasOwnProperty(this.guid)) {
+            run_object.shell_lib.shell_guid_lookup[this.guid] = this;
+        }
 
 
         if (live_parent) {
@@ -107,6 +105,7 @@ function ShellGameShell(raw_input,run_object,
             this.shell_parent_name = master.shell_parent_name;
             this.shell_parent = live_parent;
             this.shell_parent.shell_children.push(this);
+
         } else {
             this.shell_parent_name = null;
             this.shell_parent = null;
@@ -124,37 +123,36 @@ function ShellGameShell(raw_input,run_object,
 
         for (let i = 0; i < master.templates.length; i++) {
             let template = master.templates[i];
+            let element_new;
             if (template.element_init === 'new') {
-                let element_new = this.run_object.element_lib.original_and_init(template.element_name);
+                element_new = this.run_object.element_lib.original_and_init(template.element_name);
                 if (lookup_element_states.hasOwnProperty(element_new.element_name)) {
                     let ele_state = lookup_element_states[element_new.element_name];
                     element_new.restore_element_from_state(ele_state);
                 }
-                this.shell_elements.push(element_new);
+
             } else if (template.element_init === 'find') {
                 //go up through the chain of parents to try to find it
-                let par = this.shell_parent;
-                let found_element = null;
-                while(par && (found_element === null)) {
-                    for (let u = 0; u < par.shell_elements.length; u++) {
-                        let test_element = par.shell_elements[u];
-                        if (test_element.element_name === template.element_name) {
-                            found_element = test_element;
-                            break;
-                        }
-                    }
-                }
+                let found_element = this.find_first_element_in_ancestor_chain(template.element_name);
 
                 if (found_element) {
-                    let element_new = new ShellGameElement(found_element);
+                    element_new = new ShellGameElement(found_element,found_element.element_master);
                     if (lookup_element_states.hasOwnProperty(element_new.element_name)) {
                         let ele_state = lookup_element_states[element_new.element_name];
                         element_new.restore_element_from_state(ele_state);
                     }
-                    this.shell_elements.push(element_new);
                 }
             } else {
                 throw new ShellGameShellError("Cannot init an element in shell: " + this.shell_name + " --> " + template.element_name );
+            }
+
+            if (element_new) { //may not be element to add if find does not work
+                this.shell_elements.push(element_new);
+                element_new.owning_shell_guid = this.guid;
+
+                if (!this.run_object.element_lib.element_guid_lookup.hasOwnProperty(element_new.guid)) {
+                    this.run_object.element_lib.element_guid_lookup[element_new.guid] = element_new;
+                }
             }
         }//end template loop when spawning
 
@@ -167,7 +165,7 @@ function ShellGameShell(raw_input,run_object,
         this.run_object = run_object;
 
 
-        if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameShell)) {
+        if (!$.isPlainObject(raw_input) && (!raw_input instanceof ShellGameShell) && (!raw_input instanceof ShellGameSerializedShell)) {
             throw new ShellGameShellError("raw_input is not a plain object or a Shell");
         }
 
@@ -180,6 +178,19 @@ function ShellGameShell(raw_input,run_object,
 
         if (!this.shell_name) {
             throw new ShellGameShellError("no name set for shell in shell_name");
+        }
+
+        if ('guid' in raw_input) {
+            if (!(typeof raw_input.guid === 'string' || raw_input.guid instanceof String)) {
+                throw new ShellGameShellError("guid is not a string");
+            }
+            this.guid = raw_input.guid;
+        } else {
+            this.guid = 'shell-master-'+uuid.v4();
+        }
+
+        if (!this.guid) {
+            this.guid = 'shell-master-'+uuid.v4();
         }
 
 
@@ -197,7 +208,7 @@ function ShellGameShell(raw_input,run_object,
 
             for (let i = 0; i < raw_input.elements.length; i++) {
                 let pre_node = raw_input.elements[i];
-                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof  ShellGameElementTemplate)) {
+                if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof  ShellGameElementTemplate) && (!pre_node instanceof  ShellGameSerializedShellElement)) {
                     throw new ShellGameShellError("raw templates node is not a plain object or a Element Template");
                 }
                 let template = new ShellGameElementTemplate(pre_node);
@@ -218,17 +229,20 @@ function ShellGameShell(raw_input,run_object,
     }
 
 
+
+
     /**
+     * @param {ShellGameRun} run_object
      * @param {?ShellGameShell} live_parent
      * @param {ShellGameElementState[]} element_states
      * @return {ShellGameShell}
      */
-    this.spawn = function(live_parent,element_states) {
+    this.spawn = function(run_object, live_parent,element_states) {
         // make a clone and then either copy the variables from the lib, if new, or find in shell_elements of ancestor chain.
         // If in ancestor chain,  then copy from closet ancestor, or skip
         //put anything found in the clone shell's shell_elements
         //return cloned shell with elements
-        return new ShellGameShell(null,null,this,live_parent,element_states);
+        return new ShellGameShell(null,run_object,this,live_parent,element_states);
     }
 
 
@@ -256,6 +270,83 @@ function ShellGameShell(raw_input,run_object,
         for(let i = 0; i < this.shell_elements.length ; i++) {
             this.shell_elements[i].init_element();
         }
+    }
+
+
+
+
+    /**
+     *
+     * @param {string} search_for_element_name
+     * @return {ShellGameElement}
+     */
+    this.find_this_element = function(search_for_element_name){
+        let ret = null;
+        for(let i = 0; i < this.shell_elements.length ; i++) {
+            if (this.shell_elements[i].element_name === search_for_element_name) {
+                ret = this.shell_elements[i];
+                break;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * For any elements that have element_end of return, then find the element in the ancestor chain, starting with the parent,
+     * and overwrite the first found element's value to be what this value is
+     *
+     * Remove it from the parent's shell_children, set the shell_parent to null
+     *
+     * @param {ShellGameRun} run_object
+     */
+    this.pop_shell = function(run_object) {
+        if (!this.shell_parent) {return;}
+
+        //pop any shell children first
+        for(let child_index = 0; child_index < this.shell_children.length; child_index++) {
+            let child = this.shell_children[child_index];
+            child.pop_shell(run_object);
+        }
+
+        for (let i = 0; i < this.shell_master.templates.length; i++) {
+            let template = this.shell_master.templates[i];
+            if (template.element_end === 'return') {
+                let found_element = this.find_first_element_in_ancestor_chain(template.element_name);
+
+
+                if (found_element) {
+                    let our_element = this.find_this_element(template.element_name);
+                    if (!our_element) {throw new ShellGameShellError("Cannot find element of '"+template.element_name+"' even though its in the template");}
+                    for(let variable_index = 0; variable_index <  our_element.element_variables.length; variable_index++) {
+                        let da_var = our_element.element_variables[variable_index];
+                        let dat_var = found_element.get_variable(da_var.variable_name);
+                        dat_var.variable_current_value = da_var.variable_current_value;
+                    }
+                    delete run_object.element_lib.element_guid_lookup[our_element.guid];
+                }
+            }
+        }//end template loop when ending
+
+        //remove self from parent's child list
+        let found_index = -1;
+        for(let shell_child_index = 0; shell_child_index < this.shell_parent.shell_children.length; shell_child_index++) {
+            let is_it_me = this.shell_parent.shell_children[shell_child_index];
+            if (is_it_me.guid === this.guid) {
+                found_index = shell_child_index;
+                break;
+            }
+        }
+
+        if (found_index >= 0) {
+            this.shell_parent.shell_children.splice(found_index, 1);
+        }
+
+        //remove from game
+
+        this.shell_parent = null;
+
+        delete run_object.shell_lib.shell_guid_lookup[this.guid] ;
+
     }
 
 
@@ -347,7 +438,8 @@ function ShellGameShell(raw_input,run_object,
     }//end glom
 
     /**
-     * @param {?object} [ret]
+     * @param {? Object.<string, ShellGameSerializedRunningShell[]>} [ret]
+     *
      * return object with shell name as the only key,
      * under that the shell elements keyed by element name and them having keys of variables and gloms
      *  those keys having the name and value
@@ -368,23 +460,25 @@ function ShellGameShell(raw_input,run_object,
              gloms: []
         shell_children: []
      */
-    this.export_shell = function(ret) {
+    this.export_running_shell = function(ret) {
 
         if (!ret) {ret = {};}
         if (!ret.hasOwnProperty(this.shell_name)) {
             ret[this.shell_name] = [];
         }
 
-        let master_node = {shell_elements: {},shell_children: {}};
+        let master_node = new ShellGameSerializedRunningShell();
+        master_node.guid = this.guid;
+
         for(let b =0; b < this.shell_elements.length; b++) {
             let node = this.shell_elements[b];
-            let top_export = node.export_element();
+            let top_export = node.export_running_shell_element();
             _.merge(master_node.shell_elements, top_export);
         }
 
         for(let s =0; s < this.shell_children.length; s++) {
             let child_shell = this.shell_children[s];
-            child_shell.export_shell(master_node.shell_children);
+            child_shell.export_running_shell(master_node.shell_children);
         }
 
         ret[this.shell_name].push(master_node);
@@ -393,49 +487,96 @@ function ShellGameShell(raw_input,run_object,
     }
 
     /**
-     *
-     * @param {string} [shell_name] optional name to search for
+     * returns up to limit results from search, a blank search means include everything, starts from top and works from walks the tree from left to right to fill up the slots
+     * @param {string} [shell_search] optional name or guid to search for
+     * @param {number} [limit] default 1
+     * @param {ShellGameShell[]} [found_list]
      * @return {ShellGameShell[]} returns 0 or more in an array
      */
-    this.list_shells = function(shell_name) {
+    this.list_shells = function(shell_search,limit,found_list) {
 
-        if (shell_name) {
-            if (shell_name === this.shell_name) {
-                return [this];
+        if (_.isEmpty(found_list)) {
+            found_list = [];
+        }
+
+        if (shell_search) {
+            if (shell_search === this.shell_name || shell_search === this.guid) {
+                !_.includes(found_list,this) && found_list.push(this);
+                if (found_list.length >= limit) {return found_list;}
             }
             for (let i = 0; i < this.shell_children.length; i++) {
                 let child = this.shell_children[i];
-                if (shell_name === child.shell_name) {
-                    return [child];
+                if (shell_search === child.shell_name || shell_search === child.guid) {
+                    !_.includes(found_list,child) && found_list.push(child);
+                    if (found_list.length >= limit) {return found_list;}
                 }
             }
 
             for (let i = 0; i < this.shell_children.length; i++) {
-                let maybe_ret = this.shell_children[i].list_shells(shell_name);
-                if (maybe_ret.length) {
-                    return maybe_ret;
-                }
+                let sub_search = this.shell_children[i].list_shells(shell_search,limit - found_list.length,found_list);
+                found_list = _.union(found_list,sub_search);
+                if (found_list.length >= limit) {return found_list;}
             }
         } else {
-            let ret = [];
-            ret.push(this);
+
+            found_list.push(this);
+            if (found_list.length >= limit) {return found_list;}
             for (let i = 0; i < this.shell_children.length; i++) {
-                ret.push(this.shell_children[i])
+                let das_child = this.shell_children[i]
+                !_.includes(found_list,das_child) &&  found_list.push(das_child);
+                if (found_list.length >= limit) {return found_list;}
             }
 
             for (let i = 0; i < this.shell_children.length; i++) {
-                let child_ret = this.shell_children[i].list_shells(shell_name);
+                let child_ret = this.shell_children[i].list_shells(shell_search,limit - found_list.length,found_list);
                 for(let u = 0; u < child_ret.length; u ++) {
                     let mini_me = child_ret[u];
-                    ret.push(mini_me);
+                    !_.includes(found_list,mini_me) &&  found_list.push(mini_me);
+                    if (found_list.length >= limit) {return found_list;}
                 }
             }
-
-            return ret;
-
 
         }
 
+        return found_list;
+
+
+    }
+
+
+
+
+    /**
+     * Gets a list of elements in this shell, and children shells, searching either by the element name or the element guid
+     * returns up to limit results from search, a blank search means include everything, starts from top and works from walks the tree from left to right to fill up the slots
+     * @param {string} [element_search] optional name or guid to search for
+     * @param {number} [limit] default 1
+     * @param {ShellGameElement[]} [found_list]
+     * @return {ShellGameElement[]} returns 0 or more in an array
+     */
+    this.list_running_elements = function(element_search, limit, found_list) {
+
+        if (_.isEmpty(found_list)) {
+            found_list = [];
+        }
+
+        for(let element_index = 0; element_index < this.shell_elements.length; element_index++) {
+            let el = this.shell_elements[element_index];
+            if (element_search) {
+                if ((element_search !== el.element_name) && (element_search !== el.guid) ) {continue;}
+            }
+
+            !_.includes(found_list,el) && found_list.push(el);
+            if (found_list.length >= limit) {return found_list;}
+        }
+
+        for (let i = 0; i < this.shell_children.length; i++) {
+            let sub_search = this.shell_children[i].list_running_elements(element_search,limit - found_list.length,found_list);
+            found_list = _.union(found_list,sub_search);
+            if (found_list.length >= limit) {return found_list;}
+        }
+
+        return found_list;
 
     }
 

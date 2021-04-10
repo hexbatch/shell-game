@@ -16,7 +16,14 @@ function ShellGameVariable(raw_input ) {
             throw new ShellGameVariableError("variable_name is not a string");
         }
         this.variable_name = raw_input.variable_name;
+
+        let name_regex = /^[a-zA-Z_]+$/;
+        if (!name_regex.test(this.variable_name)) {
+            throw new ShellGameKeeperError("Only variable names with letters and underscore is allowed");
+        }
     }
+
+
 
     if ('variable_initial_value' in raw_input) {
         this.variable_initial_value = raw_input.variable_initial_value;

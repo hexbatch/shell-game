@@ -1,0 +1,34 @@
+
+
+
+/*to change the color a little with respect to the background element*/
+
+
+.lighten{
+    position: relative;
+    z-index: 0;
+}
+.lighten:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: -1;
+    background-color: #fff;
+    opacity: 0.3;
+}
+
+/*All dynamic links should have this*/
+.shell-game-action-link {
+    cursor: pointer;
+}
+
+
+
+.select2-container {
+    width: auto !important;
+    min-width: 15em;
+}
+

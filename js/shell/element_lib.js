@@ -7,11 +7,47 @@
 function ShellGameElementLib(raw_input) {
 
 
-    if (!$.isPlainObject(raw_input) ) { throw new ShellGameElementLibError("raw_input is not a plain object");}
+    if (!_.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameSerialized)) { throw new ShellGameRunError("raw_input is not a ShellGameSerialized or plain object");}
     /**
+     * contains only master elements by name
      * @type {Object.<string, ShellGameElement>}
      */
     this.elements = {};
+
+
+    /**
+     * Holds all Elements, running and master
+     * @type {Object.<string, ShellGameElement>}
+     */
+    this.element_guid_lookup = {};
+
+
+    /**
+     * Holds master Elements
+     * @type {Object.<string, ShellGameElement>}
+     */
+    this.master_element_guid_lookup = {};
+
+    /**
+     *
+     * @param {ShellGameElement} element
+     */
+    this.add_master_element = function(element) {
+
+        if (this.elements.hasOwnProperty(element.element_name)) {
+            throw new ShellGameElementLibError("Already have an existing master element of the name of " + element.element_name);
+        }
+
+        if (!this.element_guid_lookup.hasOwnProperty(element.guid)) {
+            this.element_guid_lookup[element.guid] = element;
+        }
+
+        if (!this.master_element_guid_lookup.hasOwnProperty(element.guid)) {
+            this.master_element_guid_lookup[element.guid] = element;
+        }
+        this.elements[element.element_name] = element;
+    }
+
 
     if ('element_lib' in raw_input) {
         if (!$.isPlainObject(raw_input.element_lib) && (!raw_input.element_lib instanceof  ShellGameElementLib)) {
@@ -24,13 +60,16 @@ function ShellGameElementLib(raw_input) {
             if (!jQuery.isPlainObject(pre_node) && (!pre_node instanceof ShellGameElement)) {
                 throw new ShellGameElementLibError( "raw element_lib node is not a plain object Or a ShellGame Element");
             }
-            let element  = new ShellGameElement(pre_node);
+            let element  = new ShellGameElement(pre_node,null);
             if (i !== element.element_name) {
                 throw new ShellGameElementLibError( "raw element_lib node has a key of "+ i + " and a name of " + element.element_name +" but they need to be the same");
             }
-            this.elements[i] = element;
+
+            this.add_master_element(element);
         }
     }
+
+
 
     /**
      *
@@ -47,11 +86,28 @@ function ShellGameElementLib(raw_input) {
     /**
      *
      * @param {string} element_name
+     * @return {ShellGameElement}
+     */
+    this.get_master_element_by_name = function(element_name) {
+        for(let i in this.master_element_guid_lookup) {
+            if (!this.master_element_guid_lookup.hasOwnProperty(i)) {continue;}
+
+            if (this.master_element_guid_lookup[i].element_name === element_name) {
+                return this.master_element_guid_lookup[i];
+            }
+        }
+        throw new ShellGameElementLibError("Master Element not found for name of " + element_name)
+    }
+
+    /**
+     *
+     * @param {string} element_name
      * @return {boolean}
      */
     this.check_if_element_exists = function(element_name) {
         return this.elements.hasOwnProperty(element_name);
     }
+
 
     /**
      *
@@ -61,15 +117,19 @@ function ShellGameElementLib(raw_input) {
     this.original_and_init = function(element_name) {
         if (this.elements.hasOwnProperty(element_name)) {
             let found = this.elements[element_name];
-            let copy = new ShellGameElement(found);
+            let master_element = this.get_master_element_by_name(element_name);
+            let copy = new ShellGameElement(found,master_element);
             copy.init_element();
+            if (!this.element_guid_lookup.hasOwnProperty(copy.guid)) {
+                this.element_guid_lookup[copy.guid] = copy;
+            }
             return copy;
         }
         throw new ShellGameElementLibError('Cannot find element of ' + element_name + " in the library");
     }
 
     /**
-     * @return {Object.<string, ShellGameElement>}
+     * @return {Object.<string, ShellGameSerializedElement>}
      * returns an object with keys of all the element names with values of the raw element objects
      */
     this.export_lib = function() {
@@ -81,6 +141,8 @@ function ShellGameElementLib(raw_input) {
         }
         return ret;
     };
+
+
 
 }
 

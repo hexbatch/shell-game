@@ -1,10 +1,20 @@
+let script_error_callback;
+
 /**
- * @param {?object} [raw_input]
+ * @param {?object} raw_input
+ * @param {?ShellGameElement} element_master
  * @constructor
  */
-function ShellGameElement(raw_input) {
+function ShellGameElement(raw_input,element_master) {
 
     this.element_name = '';
+
+    /**
+     * @type {?string}
+     */
+    this.guid = null;
+
+
     /**
      * @type {ShellGameVariable[]}
      */
@@ -20,9 +30,23 @@ function ShellGameElement(raw_input) {
      */
     this.element_script = '';
 
+    /**
+     * @type {?string}
+     */
+    this.owning_shell_guid = null;
+
+
+    /**
+     * @type {?ShellGameElement}
+     */
+    this.element_master = null;
+
     if (raw_input === null) {return;}
 
-    if (!$.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameElement)) { throw new ShellGameElementError("raw_input is not a plain object or an Element");}
+    this.element_master = element_master;
+
+    if (!$.isPlainObject(raw_input) && (!raw_input instanceof  ShellGameElement) && (!raw_input instanceof  ShellGameSerializedElement)) {
+        throw new ShellGameElementError("raw_input is not a plain object or an Element");}
 
     if ('element_name' in raw_input) {
         if (!(typeof raw_input.element_name === 'string' || raw_input.element_name instanceof String)) {
@@ -105,6 +129,29 @@ function ShellGameElement(raw_input) {
         }
     }
 
+    if ('guid' in raw_input &&  !(raw_input instanceof  ShellGameElement) ) {
+        if (!(typeof raw_input.guid === 'string' || raw_input.guid instanceof String || (raw_input.guid === null)) ) {
+            throw new ShellGameElementError("element guid is not a string or null");
+        }
+        if (raw_input.guid) {
+            this.guid = raw_input.guid;
+        } else {
+            if (this.element_master) {
+                this.guid = 'element-'+uuid.v4();
+            } else {
+                this.guid = 'element-master-'+uuid.v4();
+            }
+
+        }
+
+    } else {
+        if (this.element_master) {
+            this.guid = 'element-'+uuid.v4();
+        } else {
+            this.guid = 'element-master-'+uuid.v4();
+        }
+    }
+
     //check to make sure all gloms have a unique name AND do not have a variable name
 
     for(let i = 0;i < this.element_gloms.length ; i++) {
@@ -112,7 +159,7 @@ function ShellGameElement(raw_input) {
         if (checker.hasOwnProperty(n.glom_reference_name)) {
             throw new ShellGameElementError('Element ' + this.element_name + ": Gloms cannot have same names as each other or variables: found " + n.glom_reference_name);
         }
-        checker[n.variable_name] = 0;
+        checker[n.glom_reference_name] = 0;
     }
 
     if ('element_script' in raw_input) {
@@ -176,14 +223,15 @@ function ShellGameElement(raw_input) {
             vars_to_run[node.glom_reference_name] = node.glom_current_value;
         }
 
-        console.log('Element ' + this.element_name + ": running vars from script " + this.element_name,vars_to_run,this.element_script);
         try {
             run_script(vars_to_run, this.element_script);
         } catch (err) {
             console.warn('Element ' + this.element_name + ": that script don't run! ",err);
+            if (script_error_callback) {
+                script_error_callback(`Element ${this.element_name} script crashed: ${err.message}`);
+            }
             return;
         }
-        console.log('Element ' + this.element_name + ": changed stuff is",vars_to_run);
 
         for(let m in vars_to_run) {
             if (!vars_to_run.hasOwnProperty(m)) {continue;}
@@ -191,13 +239,12 @@ function ShellGameElement(raw_input) {
             let found_var = variable_lookup[m];
             found_var.variable_current_value = vars_to_run[m];
         }
-        console.log('Element ' + this.element_name + ": new variables are",this.element_variables);
 
     }
 
 
     /**
-     * @return {object}
+     * @return {Object.<string,ShellGameSerializedRunningShellElement>}
      * key by element name and them having keys of variables and gloms
      *  those keys having the name and value
      *
@@ -212,45 +259,52 @@ function ShellGameElement(raw_input) {
              y: 2
 
      */
-    this.export_element = function() {
-        let ret = {};
-        ret[this.element_name] = {gloms: {}, variables: {}};
-        for(let y =0; y < this.element_variables.length; y++) {
-            let node = this.element_variables[y];
-            ret[this.element_name].variables[node.variable_name] = node.variable_current_value;
-        }
-
-        for(let y =0; y < this.element_gloms.length; y++) {
-            let node = this.element_gloms[y];
-            ret[this.element_name].gloms[node.glom_reference_name] = node.glom_current_value;
-        }
-
-        return ret;
-    }
-
-    this.export_element_definition = function() {
-        let ret = {
-            element_name: this.element_name,
-            element_variables: {},
-            element_gloms: {},
-            element_script: this.element_script
-        };
-
+    this.export_running_shell_element = function() {
+        let node = new ShellGameSerializedRunningShellElement();
+        node.guid = this.guid;
 
         for(let y =0; y < this.element_variables.length; y++) {
             let da_var = this.element_variables[y];
-            ret.element_variables[ da_var.variable_name] = {
-                variable_name: da_var.variable_name,
-                variable_initial_value: da_var.variable_initial_value
-            };
+            node.variables[da_var.variable_name] = da_var.variable_current_value;
         }
 
         for(let y =0; y < this.element_gloms.length; y++) {
             let da_glom = this.element_gloms[y];
-            ret.element_gloms[da_glom.glom_reference_name] = {
-                glom_target_name: da_glom.glom_target_name,
-                glom_reference_name: da_glom.glom_reference_name
-            };
+            node.gloms[da_glom.glom_reference_name] = da_glom.glom_current_value;
+        }
+
+        let ret = {};
+        ret[this.element_name] = node;
+
+        return ret;
+    }
+
+    /**
+     *
+     * @return {ShellGameSerializedElement}
+     */
+    this.export_element_definition = function() {
+
+        let ret = new ShellGameSerializedElement();
+        ret.guid = this.guid;
+        ret.element_name = this.element_name;
+        ret.element_script = this.element_script;
+
+        for(let y =0; y < this.element_variables.length; y++) {
+            let da_var = this.element_variables[y];
+            let node = new ShellGameSerializedVariable();
+            node.variable_initial_value = da_var.variable_initial_value;
+            node.variable_name = da_var.variable_name;
+            ret.element_variables[da_var.variable_name] = node;
+
+        }
+
+        for(let y =0; y < this.element_gloms.length; y++) {
+            let da_glom = this.element_gloms[y];
+            let node = new ShellGameSerializedGlom();
+            node.glom_reference_name = da_glom.glom_reference_name;
+            node.glom_target_name = da_glom.glom_target_name;
+            ret.element_gloms[da_glom.glom_reference_name] = node;
         }
 
         return ret;
@@ -271,6 +325,20 @@ function ShellGameElement(raw_input) {
 
     /**
      *
+     * @param {string} variable_name
+     * @return {ShellGameVariable}
+     */
+    this.get_variable = function(variable_name) {
+
+        for(let i = 0; i < this.element_variables.length; i++) {
+            let thing = this.element_variables[i];
+            if (thing.variable_name === variable_name) {return thing;}
+        }
+        throw new ShellGameElementError("Variable name of '"+ variable_name+"' does not exist in this element of guid " + this.guid);
+    }
+
+    /**
+     *
      * @param {string} glom_name
      * @return {boolean}
      */
@@ -287,6 +355,13 @@ function ShellGameElement(raw_input) {
      * @param {ShellGameElementState} state
      */
     this.restore_element_from_state = function (state) {
+
+
+        if (state.guid) {
+            this.guid = state.guid;
+        } else {
+            this.guid = 'element-'+uuid.v4();
+        }
 
         for(let var_name in state.state_variables) {
             if (!state.state_variables.hasOwnProperty(var_name)) {continue;}
