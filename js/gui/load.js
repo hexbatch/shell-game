@@ -9,9 +9,9 @@ jQuery(function($){
     shell_game_thing.add_event(new ShellGameEventHook(
         'on_load',
         null,
-        function (hook) {
-            let game = hook.keeper.serialized_game;
-            console.log('game',game);
+        function (/*hook*/) {
+        //    let game = hook.keeper.serialized_game;
+        //    console.log('game',game);
             do_toast({title:'Loaded',subtitle:'(its done already)',content: "Loaded YAML", delay:2000,type:'success'});
         }
     ));

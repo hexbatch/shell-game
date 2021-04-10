@@ -90,7 +90,27 @@ jQuery(function ($) {
         null,
         function (hook) {
             let game = hook.keeper.serialized_game;
-            select_for_master_all_data = [];
+
+            if (select_for_master_all) {
+                //destroy
+                $('select#shell-game-element-list').select2('destroy');
+                $('select#shell-game-element-list').html('');
+                select_for_master_all = null;
+                select_for_master_all_data= [];
+            }
+
+            select_for_master_all = regular_select_element.select2({
+                dataAdapter: customAdapter,
+                data: select_for_master_all_data,
+                placeholder: {
+                    id: '0', // the value of the option
+                    text: 'Edit Shells and Elements'
+                },
+                containerCssClass: 'form-control',
+                theme: 'bootstrap4',
+            });
+
+
 
             let group = {
                 text: "Elements",

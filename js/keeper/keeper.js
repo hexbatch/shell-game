@@ -27,6 +27,13 @@ function ShellGameKeeper() {
      */
     this.selected_running_shell = null;
 
+
+    /**
+     *
+     * @type {ShellGameSerializedRunningShellElement}
+     */
+    this.selected_running_element = null;
+
     /**
      *
      * @type {boolean}
@@ -562,9 +569,48 @@ function ShellGameKeeper() {
     /**
      *
      * @param {string} guid
+     * @return {ShellGameSerializedRunningShellElement}
+     */
+    this.get_running_element_or_null_by_guid = function(guid) {
+        if (!this.run.element_lib.element_guid_lookup.hasOwnProperty(guid)) {
+            return null;
+        }
+
+        return new ShellGameSerializedRunningShellElement(this.run.element_lib.element_guid_lookup[guid]);
+    }
+
+    /**
+     *
+     * @param {ShellGameSerializedRunningShellElement} running_element
+     */
+    this.update_running_element = function(running_element) {
+        if (!this.run.element_lib.element_guid_lookup.hasOwnProperty(running_element.guid)) {
+            throw new ShellGameKeeperError(`Cannot find running element in the game by guid: ${running_element.guid}`)
+        }
+
+        let da_el = this.run.element_lib.element_guid_lookup[running_element.guid];
+        for (let i = 0; i < da_el.element_variables.length; i++) {
+            let v = da_el.element_variables[i];
+            if (running_element.variables.hasOwnProperty(v.variable_name)) {
+                v.variable_current_value = running_element.variables[v.variable_name];
+            }
+        }
+
+        this.serialized_game = this.run.export_as_object();
+
+        this.last_raw.game = this.serialized_game;
+        this.load(this.last_raw);
+
+        this.refresh();
+
+    }
+
+    /**
+     *
+     * @param {string} guid
      * @return {ShellGameSerializedElement}
      */
-    this.get_element_by_guid = function(guid) {
+    this.get_master_element_by_guid = function(guid) {
         if (!this.run.element_lib.element_guid_lookup.hasOwnProperty(guid)) {
             throw new ShellGameKeeperError("Cannot find element of guid "+ guid);
         }
@@ -999,13 +1045,21 @@ function ShellGameKeeper() {
 
     /**
      * @param {?ShellGameSerializedRunningShell} [selected_shell]
+     * @param {?ShellGameSerializedRunningShellElement} [selected_element]
      */
-    this.refresh = function(selected_shell) {
+    this.refresh = function(selected_shell,selected_element) {
         if (!this.run) {return;}
         if (this.is_refreshing || this.is_loading || this.is_pre) {return;} //do not allow nested refreshes
         pre_refresh();
 
         let old_selected_shell = this.selected_running_shell;
+        let old_selected_element = this.selected_running_element;
+
+        if (selected_element === undefined) {
+            this.selected_running_element = null;
+        } else {
+            this.selected_running_element = selected_element;
+        }
 
         if (selected_shell !== undefined) {
             if (selected_shell) {
@@ -1014,7 +1068,7 @@ function ShellGameKeeper() {
                 this.selected_running_shell = null;
             }
 
-            if (old_selected_shell !== this.selected_running_shell) {
+            if (old_selected_shell !== this.selected_running_shell || old_selected_element  !== this.selected_running_element ) {
 
                 this.is_selecting_running_shell = true;
                 for (let event_hook_index = 0; event_hook_index < this.event_hooks.length; event_hook_index++) {

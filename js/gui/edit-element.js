@@ -137,7 +137,7 @@ jQuery(function ($) {
             }
 
         } else {
-            element_to_edit = shell_game_thing.get_element_by_guid(element_guid);
+            element_to_edit = shell_game_thing.get_master_element_by_guid(element_guid);
             editing_div.find('input.shell-game-edit-element-name').val(element_to_edit.element_name);
 
             editing_div.find('input.shell-game-edit-element-this').val(element_to_edit.guid);
@@ -225,7 +225,7 @@ jQuery(function ($) {
             last_item.addClass('shell-game-element-link');
 
             if (element_guid) { //it can be a new element
-                let element_to_edit = shell_game_thing.get_element_by_guid(element_guid);
+                let element_to_edit = shell_game_thing.get_master_element_by_guid(element_guid);
                 js_editor.setValue(element_to_edit.element_script, 1);
 
 
@@ -279,7 +279,7 @@ jQuery(function ($) {
         let element_to_update
         let updating_element_guid = editing_div.find('input.shell-game-edit-element-this').val();
         if (updating_element_guid) {
-            element_to_update = shell_game_thing.get_element_by_guid(updating_element_guid);
+            element_to_update = shell_game_thing.get_master_element_by_guid(updating_element_guid);
         } else {
             element_to_update = new ShellGameSerializedElement();
         }
@@ -370,7 +370,7 @@ jQuery(function ($) {
         let element_to_update
         let updating_element_guid = editing_div.find('input.shell-game-edit-element-this').val();
         if (updating_element_guid) {
-            element_to_update = shell_game_thing.get_element_by_guid(updating_element_guid);
+            element_to_update = shell_game_thing.get_master_element_by_guid(updating_element_guid);
         } else {
             element_to_update = new ShellGameSerializedElement();
         }

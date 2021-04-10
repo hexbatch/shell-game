@@ -93,7 +93,7 @@ jQuery(function (){
                     let glom_target = hm.variable_target_name;
                     let starting_element = hm.starting_running_element;
                     let target_element = hm.target_running_element;
-                    let serialized_starting_element = hook.keeper.get_element_by_guid(starting_element.guid);
+                    let serialized_starting_element = hook.keeper.get_master_element_by_guid(starting_element.guid);
                     let connect = `"${starting_element.guid}":"${glom_name}" -> "${target_element.guid}":"${glom_target}" `+
                         `[color="[[${serialized_starting_element.element_name}::element-color]]"]`;
                     da_connects_array.push(connect);
@@ -205,12 +205,8 @@ jQuery(function (){
 
                 if (running_element_guid) {
                     let parent_shell = find_parent_shell(main_shell);
-                    if (parent_shell && hook.keeper.selected_running_shell && parent_shell.guid === hook.keeper.selected_running_shell.guid) {
-                        hook.keeper.refresh(null);
-                    } else {
-                        hook.keeper.refresh(parent_shell);
-                    }
-
+                    let running_element = hook.keeper.get_running_element_or_null_by_guid(running_element_guid);
+                    hook.keeper.refresh(parent_shell,running_element);
                 }
 
 

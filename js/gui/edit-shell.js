@@ -157,6 +157,7 @@ jQuery(function ($) {
             if (shell_to_edit.shell_parent_name && shell_game_thing.serialized_game.shell_lib.hasOwnProperty(shell_to_edit.shell_parent_name)) {
                 parent_shell = shell_game_thing.serialized_game.shell_lib[shell_to_edit.shell_parent_name];
                 select_parent.val(parent_shell.guid);
+                select_parent.trigger('change');
             }
             
 

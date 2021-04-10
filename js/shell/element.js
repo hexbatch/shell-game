@@ -1,3 +1,5 @@
+let script_error_callback;
+
 /**
  * @param {?object} raw_input
  * @param {?ShellGameElement} element_master
@@ -225,6 +227,9 @@ function ShellGameElement(raw_input,element_master) {
             run_script(vars_to_run, this.element_script);
         } catch (err) {
             console.warn('Element ' + this.element_name + ": that script don't run! ",err);
+            if (script_error_callback) {
+                script_error_callback(`Element ${this.element_name} script crashed: ${err.message}`);
+            }
             return;
         }
 

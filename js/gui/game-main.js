@@ -44,6 +44,10 @@ jQuery(function(){
         }
     );
 
+    script_error_callback = function(what) {
+        do_toast({title:'Element Script Error',subtitle:'',content: what,delay:10000,type:'warning'});
+    }
+
 });
 
 

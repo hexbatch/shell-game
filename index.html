@@ -131,22 +131,28 @@
 
         <div class="col-12 col-sm-12 col-md-12 col-lg-1 order-1 order-lg-3 shell-game-actions-container ">
 
-            <div class="row">
-                <div class="col-4 col-lg-12 pb-lg-3 pt-lg-3">
+            <div class="row mr-0">
+                <div class="col-3 col-lg-12 pb-lg-3 pt-lg-3">
                     <button id="shell-game-step-action" type="button" class="btn btn-outline-success float-lg-right  mr-lg-1">
                         Step
                     </button>
                 </div>
 
-                <div class="col-4 col-lg-12 pb-lg-3 pt-lg-3 ">
+                <div class="col-3 col-lg-12 pb-lg-3 pt-lg-3 ">
                     <button id="shell-game-place-action" type="button" class="btn btn-outline-secondary  float-lg-right mr-lg-1">
                         Place
                     </button>
                 </div>
 
-                <div class="col-4 col-lg-12 pb-lg-3 pt-lg-3">
+                <div class="col-3 col-lg-12 pb-lg-3 pt-lg-3">
                     <button id="shell-game-pop-action" type="button" class="btn btn-outline-secondary float-lg-right mr-lg-1">
                         Pop
+                    </button>
+                </div>
+
+                <div class="col-3 col-lg-12 pb-lg-3 pt-lg-3">
+                    <button id="shell-game-edit-running-element-action" type="button" class="btn btn-outline-secondary float-lg-right mr-lg-1">
+                        Edit
                     </button>
                 </div>
 
@@ -316,6 +322,82 @@
     </div> <!-- /.shell-game-element-editor-->
 
 <!--    ------------------------------------- END Element Editor ---------------------------------------------       -->
+
+
+
+
+
+
+
+
+
+
+
+<!--    ------------------------------------- Running Element Values Editor ----------------------------------       -->
+
+    <div class="shell-game-running-element-editor">
+
+        <input type="hidden" class="shell-game-edit-running-element-this">
+        <div class="container-fluid">
+
+
+            <div class="row ">
+
+                <div class="col-12 col-sm-12 col-md-12 ">
+
+                    <div class="card " >
+                        <div class="card-body">
+
+                            <div class="input-group col-12 col-md-12 col-lg-6">
+
+                                <input type="text" value="" title="Element Name" placeholder="Element Name" class="shell-game-edit-element-name form-control ">
+
+                            </div>
+
+                            <div class="col-12 col-md-12 col-lg-6 mt-1 pt-2 mt-lg-0">
+                                <small class="">
+                                    <code class=" shell-game-edit-element-guid border text-monospace text-break align-top border-0"></code>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+                <div class="col-sm-12 col-md-12 col-lg-6">
+                    <div class="card " >
+                        <div class="card-body">
+                            <h5 class="card-title">Variables</h5>
+                            <div class="card-text">
+                                <table class="table table-striped table-light shell-game-running-element-values">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Value</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody></tbody>
+                                </table>
+                            </div> <!-- /.shell-game-holder -->
+                        </div> <!-- /.card-body -->
+                    </div> <!-- /.card -->
+                </div> <!-- /.col -->
+
+
+            </div><!-- /.row -->
+        </div>
+
+    </div> <!-- /.shell-game-running-element-editor-->
+
+<!--    ------------------------------------- END Running Element Values Editor ------------------------------       -->
+
+
+
+
+
+
+
 
 
 
@@ -554,6 +636,7 @@
 <script src="js/gui/gui-select-element-shell.js"></script>
 
 <script src="js/gui/edit-shell.js"></script>
+<script src="js/gui/edit-running-element.js"></script>
 
 <script src="js/gui/my-dots.js"></script>
 

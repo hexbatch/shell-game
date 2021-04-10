@@ -4,21 +4,10 @@ The hexbatch project has code executing as elements inside shells. This program 
 
 ### Version 0.3
 
-This version has the basic storage and operations. Its basically a YAML editor with three buttons
+This version has dots to show the graphs of the elements and shells
 
-![image](https://user-images.githubusercontent.com/725763/111225950-734a8780-85ae-11eb-86a4-d3b9cbf5d12d.png)
+![image](https://user-images.githubusercontent.com/725763/114252684-26b75980-996c-11eb-9d08-a08ce258c70c.png)
 
-[//]: # (TODO: update screenshot)
-
-The next version after this will have more of a gui. The state will still be stored in the yaml though. 
-So, all the below will be used in the next version. 
-
-The future gui will make it easier to design and test out shell and element concepts, and add in higher order behavior implemented by 
-using the yaml and data structures in this version. As of version 0.2, all the code and yaml works
-
-## First version is pretty bare bones. A YAML editor, a Check button, a Step button , and an Add button
-
-Edit the yaml directly to set things up
 
 #### To install:
 
@@ -30,12 +19,14 @@ Load in index.html in a web browser. You do not need a local server here, just t
 
 #### To use:
 
-* Add in a new yaml or copy and paste it from somewhere, and press the check button or step button. 
+* Add in a new yaml or copy and paste it from somewhere, and press the load button.
 * Watch things change in the yaml by pressing the step button
-* Insert New Shell Copies with the Add Button
-* Do changes by editing the YAML text, use the testing.yaml, if you want , as a starting point
+* Add new shells and elements
+* Place and Pop Shells by selecting the shell to do this  
+* Edit elements after you click on them  
+* Alternately Do changes by editing the YAML text
 
-### Most of the screen has the big yaml editor, to the side are two buttons start and step
+### Yaml Structure
 Please refer to the yaml example below at the bottom of the page , or see yaml/testing.yaml 
 
 * The YAML Document is only automatically read from and written to under the `game:` key, so you can add anything else in other keys
@@ -125,13 +116,17 @@ Please refer to the yaml example below at the bottom of the page , or see yaml/t
 * If you want to remove a shell, just delete it from the *running_shells*
 
 
-### Pressing the Add button will add a shell under its parent
+### Pressing the Place button will add a shell under its parent
 
-You only need to start with an empty top shell that is running, and then can add in shells as you want.
- There can be unlimited siblings that are the same shell, but each of these can be set with different values
+Must select a shell first, its color will change
 
-The select box will list all the non topmost shells, the new shell instance will set its element's variables according to its
-*element_init* setting (new or find)
+Dialog to insert will list choices. If no choices then there are no shells that have the parent of what you selected
+
+### Pressing the Pop button will remove the shell
+
+Must select a shell first
+
+Popped shell elements might update same elements in shells above, depending on their setting
 
 ### Tags can be added and removed
 
@@ -292,12 +287,3 @@ game:
                   gloms: { }
 
 ```
-
-#Roadmap to Version 3 release
-
-
-* Edit running values
-  * [//]: # (TODO: make listener and dialog to edit selected running element running element values {no script or change defs or glomsm add keeper selected element and event})
-
-* Test for nestedness (should be okay or minor bug if not)
-  * [//]: # (TODO: Test nested shells)

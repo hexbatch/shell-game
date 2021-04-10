@@ -14,9 +14,9 @@ jQuery(function ($){
     shell_game_thing.add_event(new ShellGameEventHook(
         'on_step',
         null,
-        function (hook) {
-            let game = hook.keeper.serialized_game;
-            console.log('game',game);
+        function (/*hook*/) {
+            //let game = hook.keeper.serialized_game;
+          //  console.log('game',game);
             do_toast({title:'Stepped!',subtitle:'Here we go',delay:1000,type:'success'});
         }
     ));
@@ -34,6 +34,19 @@ jQuery(function ($){
         } catch (e) {
             console.error(e);
             do_toast({title:'Error Popping',subtitle:e.name,content: e.message,delay:10000,type:'error'});
+        }
+    });
+
+    $("#shell-game-edit-running-element-action").click(function() {
+
+        try {
+            if (shell_game_thing.selected_running_element) {
+                shell_game_edit_running_element(shell_game_thing.selected_running_element.guid)
+            }
+
+        } catch (e) {
+            console.error(e);
+            do_toast({title:'Error Editing Running Element',subtitle:e.name,content: e.message,delay:10000,type:'error'});
         }
     });
 
