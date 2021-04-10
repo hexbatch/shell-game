@@ -226,6 +226,7 @@ jQuery(function ($) {
 
             if (element_guid) { //it can be a new element
                 let element_to_edit = shell_game_thing.get_master_element_by_guid(element_guid);
+                if (!element_to_edit.element_script) {element_to_edit.element_script = '';}
                 js_editor.setValue(element_to_edit.element_script, 1);
 
 

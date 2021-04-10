@@ -941,6 +941,20 @@ function ShellGameKeeper() {
 
     /**
      *
+     * @param {string} running_shell_guid
+     * @return {ShellGameSerializedShell}
+     */
+    this.get_top_master_shell = function() {
+        if (!this.run) {
+            throw new ShellGameKeeperError("Not loaded, cannot find shell");
+        }
+        let top_running = this.run.main_shell
+        return new ShellGameSerializedShell( top_running.shell_master );
+
+    }
+
+    /**
+     *
      * @param {string} master_shell_guid_to_add
      * @param {string} running_parent_shell_guid
      */

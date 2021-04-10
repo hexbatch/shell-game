@@ -117,6 +117,7 @@ jQuery(function ($) {
                 children: []
             }
 
+            let top_shell_guid = hook.keeper.get_top_master_shell().guid;
             group.children.push({id:"new",text:" *** New Element *** ",notes:"For New", data: { type: 'element', info: {make_new: true}}});
             for(let element_name in game.element_lib) {
                 if (!game.element_lib.hasOwnProperty(element_name)) {continue;}
@@ -135,6 +136,7 @@ jQuery(function ($) {
             for(let shell_name in game.shell_lib) {
                 if (!game.shell_lib.hasOwnProperty(shell_name)) {continue;}
                 let shell = game.shell_lib[shell_name];
+                if (shell.guid === top_shell_guid) {continue;}
                 group.children.push({id:shell.guid,text:shell.shell_name,data: { type: 'shell', info:shell }});
             }
             select_for_master_all_data.push(group);
